@@ -2,7 +2,6 @@ import * as Koa from 'koa';
 import * as Router from 'koa-router';
 import * as fs from 'fs';
 
-import {isFunction} from "util";
 const bodyParser = require('koa-bodyparser');
 const send = require('koa-send');
 const debug = require('debug')('shopen-core');
@@ -20,7 +19,7 @@ class BootStrap {
 
         app.use(bodyParser());
         app.use(this.globalMiddleWare);
-        
+
         app.context.menus = [];
 
         const router = new Router();

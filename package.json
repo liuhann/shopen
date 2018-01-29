@@ -4,7 +4,7 @@
   "description": "A Webstore with themes appearance and code setting written in nodejs",
   "main": "index.js",
   "scripts": {
-    "server": "node core/boot.js",
+    "server": "node boot/server.js",
     "registry": "npm set registry https://registry.npmjs.org/"
   },
   "repository": {
@@ -24,6 +24,7 @@
     "koa-cors": "0.0.16",
     "koa-router": "^7.3.0",
     "koa-send": "^4.1.2",
+    "koa-static": "^4.0.2",
     "lowdb": "^1.0.0",
     "shortid": "^2.2.8",
     "vue": "^2.5.13",
