@@ -1,0 +1,27 @@
+{
+    "compilerOptions": {
+        "allowJs": true,
+         // this aligns with Vue's browser support
+        // this enables stricter inference for data properties on `this`
+        "strict": true,
+        // if using webpack 2+ or rollup, to leverage tree shaking:
+        "moduleResolution": "node",
+        "module": "commonjs",
+        "lib": [
+            "es2015"
+        ],
+        "noImplicitAny": true,
+        /*"outDir": "./dist",*/
+        "sourceMap": true,
+        "noImplicitReturns": true,
+        "target": "es6",
+        "baseUrl": "."
+    },
+    "include": [
+        "core/**/*",
+        "modules/website/**/*"
+    ],
+    "exclude": [
+        "node_modules"
+    ]
+}
