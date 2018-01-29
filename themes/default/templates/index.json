@@ -1,0 +1,51 @@
+{
+  "template": "index",
+  "name": "Index Page",
+  "path": "index.html",
+  "layout": "default",
+  "components": {
+    "section-list": {
+      "sections": [
+        {
+          "component": "feature-row",
+          "data": {
+            "image": "http://www.sesamestreetchina.com.cn/upload/muppets/201204171019191038144225.jpg",
+            "align": "Left",
+            "heading": "伯爵 Count",
+            "text": "伯爵长相虽与吸血鬼德古拉公爵有几分相似，但喜感幽默的他可绝对不是吸血鬼！伯爵喜欢的是数字，可不是脖子！他看到什么都要数一数，而且他数完数的时候，天还会打雷！\n12",
+            "buttonLabel": "马上试一下！",
+            "buttonLink": ""
+          }
+        },
+        {
+          "component": "rich-text",
+          "data": {
+            "heading": "First ",
+            "text": "The next generation of our best-reviewed Fire tablet, with up to 12 hours of battery life, a vibrant 8\" HD display, a 1.3 GHz quad-core processor, 1.5 GB of RAM, and Dolby Audio. More durable than the latest iPad.\n16 or 32 GB of internal storage and a microSD slot for up to 256 GB of expandable storage\nNow with Alexa, for quick access to the information and entertainment you want. Ask questions, play music, check your calendar, get the news, weather, and more - just press the home button and ask.\nEnjoy millions of movies, TV shows, songs, Kindle eBooks, apps and games - including Netflix, Facebook, HBO, Spotify, and more\nPrime members get unlimited access to over a thousand books and magazines, millions of songs, and thousands of movies and TV episodes - at no additional cost\nWatch downloaded videos anywhere with a Prime membership, Netflix plan, or Showtime subscription\nEnhance your entertainment experience with features you only get from Amazon, including ASAP, X-Ray, On Deck, Blue Shade, and FreeTime Parental Controls"
+          }
+        },
+        {
+          "component": "feature-row",
+          "data": {
+            "image": "https://burst.shopifycdn.com/photos/family-holding-hands-in-winter.jpg",
+            "align": "Left",
+            "heading": "Image with text",
+            "text": "Pair large text with an image to give focus to your chosen product, collection, or blog post. Add details on availability, style, or even provide a review.\n",
+            "buttonLabel": "",
+            "buttonLink": ""
+          }
+        },
+        {
+          "component": "featured-product",
+          "data": {
+            "product": "anne-klein-women's-ak-1363svsv-diamond-dial-silver-tone-bracelet-watch",
+            "imageSize": 2,
+            "quantity": true,
+            "vendor": false,
+            "btnCart": "ADD TO CART"
+          }
+        }
+      ]
+    }
+  }
+}

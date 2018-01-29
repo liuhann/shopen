@@ -1,7 +1,11 @@
-const Koa = require('koa');
-const bodyParser = require('koa-bodyparser');
-const Router = require('koa-router');
-const serve = require('koa-static');
+process.env.DEBUG = 'boot';
+
+const fs        = require('fs');
+const Koa       = require('koa');
+const bodyparser= require('koa-bodyparser');
+const Router    = require('koa-router');
+const serve     = require('koa-static');
+const debug     = require('debug')('boot');
 
 class BootStrap {
 
@@ -11,9 +15,12 @@ class BootStrap {
 
     async start() {
         this.app = new Koa();
+        this.services = {};
         //default middlewares
-        this.app.use(bodyParser());
-        this.app.use(serve('../static'));
+        this.app.use(bodyparser());
+
+        this.app.use(serve('./static'));
+
         this.app.use(this.globalMiddleWare);
 
         await this.initAppContext();
@@ -46,27 +53,55 @@ class BootStrap {
      */
     async loadModules(app, router) {
         const moduleDirs = fs.readdirSync('./server');
-
         //loop for each module
         for(let dir of moduleDirs) {
             //find module define js
             const moduleDef = `./server/${dir}/module.js`;
-
             //return is not defined
             if (!fs.existsSync(moduleDef)) continue;
 
-            const module = await import( `../server/${dir}/module.js`);
-            const moduleConfig = module.default;
-
-            if (!moduleConfig) continue;
-
-            if (module.default.route) {
-                module.default.route.apply(null, [router]);
+            const moduleConfig = require( `../server/${dir}/module.js`);
+            if (!moduleConfig) {
+                debug(`module ${dir} in server has no module.js file`);
+                continue;
             }
 
-            if (module.default.middleware) {
-                app.use(module.default.middleware);
+            debug(`initialize module [${dir}]..`);
+
+            if (moduleConfig.services && moduleConfig.name) {
+                const exposedServices = await moduleConfig.services.call(app);
+                app.context[moduleConfig.name] = exposedServices;
+
+                for(let serviceName  in exposedServices) {
+                    this.services[serviceName] = exposedServices[serviceName];
+                }
             }
+
+            if (moduleConfig.paths) {
+                const paths =  await moduleConfig.paths.call(null);
+                for(let path in paths) {
+                    if (paths[path].get) {
+                        debug(`[GET] ${path} -> ${paths[path].get.name}`);
+                        router.get(path, paths[path].get);
+                    }
+                    if (paths[path].put) {
+                        debug(`[PUT] ${path} -> ${paths[path].put.name}`);
+                        router.put(path, paths[path].put);
+                    }
+                    if (paths[path].post) {
+                        debug(`[POST] ${path} -> ${paths[path].post.name}`);
+                        router.post(path, paths[path].post);
+                    }
+                    if (paths[path].delete) {
+                        debug(`[DELETE] ${path} -> ${paths[path].delete.name}`);
+                        router.put(path, paths[path].delete);
+                    }
+                }
+            }
+/*
+            if (moduleConfig.route) {
+                moduleConfig.route.apply(null, [router]);
+            }*/
 
             if (moduleConfig.onload) {
                 moduleConfig.onload.call(null, app);
@@ -89,3 +124,9 @@ class BootStrap {
         await next();
     }
 }
+
+
+const boot = new BootStrap();
+
+boot.start();
+

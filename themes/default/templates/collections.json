@@ -1,0 +1,16 @@
+{
+  "template": "collections",
+  "name": "Collection Pages",
+  "defaultKey": "frontpage",
+  "path": "collections.html",
+  "style": "collection-products.css",
+  "layout": "default",
+  "components": {
+    "collection-products": {
+      "data": {
+        "layout": "grid",
+        "title": "Excited Product Collection1"
+      }
+    }
+  }
+}

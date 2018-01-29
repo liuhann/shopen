@@ -1,0 +1,11 @@
+{
+  "name": "shopen-site-builder",
+  "version": "0.0.1",
+  "scripts": {
+    "dev": "webpack -w"
+  },
+
+  "dependencies": {
+    
+  }
+}

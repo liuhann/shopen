@@ -1,0 +1,17 @@
+{
+  "path": "default.html",
+  "components": {
+    "page-header": {
+      "data": {
+        "logoText": "SesameStreet112",
+        "logo": ""
+      }
+    },
+    "page-footer": {
+      "data": {
+        "logoText": "SesameStreet",
+        "logo": ""
+      }
+    }
+  }
+}

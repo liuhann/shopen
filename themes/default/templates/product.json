@@ -1,0 +1,26 @@
+{
+  "template": "product",
+  "name": "Product Page",
+  "path": "product.html",
+  "layout": "default",
+  "settings": [
+    {
+      "field": "title",
+      "label": "Title",
+      "type": "text"
+    }
+  ],
+  "components": {
+    "section-list": {
+      "sections": []
+    },
+    "product": {
+      "data": {
+        "imageSize": 1,
+        "quantity": true,
+        "vendor": false,
+        "btnCart": "ADD TO CART"
+      }
+    }
+  }
+}

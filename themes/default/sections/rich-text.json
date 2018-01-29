@@ -1,0 +1,20 @@
+{
+  "component": "rich-text",
+  "name": "Rich Text",
+  "path": "rich-text.html",
+  "style": "rich-text.css",
+  "icon": "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'><path fill='currentColor' d='M1 1h18v18H1V1z'></path><path d='M19 0c.552 0 1 .448 1 1v18c0 .552-.448 1-1 1H1c-.552 0-1-.448-1-1V1c0-.552.448-1 1-1h18zM2 18h16V2H2v16zm3-7h10c.552 0 1-.448 1-1s-.448-1-1-1H5c-.552 0-1 .448-1 1s.448 1 1 1zm0-4h10c.552 0 1-.448 1-1s-.448-1-1-1H5c-.552 0-1 .448-1 1s.448 1 1 1zm5 6H5c-.552 0-1 .448-1 1s.448 1 1 1h4c.552 0 1-.448 1-1s-.448-1-1-1z'></path></svg>",
+  "settings": [ {
+    "field": "heading",
+    "label": "Heading",
+    "type": "text"
+  }, {
+    "field": "text",
+    "label": "Text",
+    "type": "richtext"
+  }],
+  "data" : {
+    "heading": "Talk about your brand",
+    "text": "Use this text to share information about your brand with your customers. Describe a product, share announcements, or welcome customers to your store."
+  }
+}
