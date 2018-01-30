@@ -1,14 +1,12 @@
 
 class JsonDbService {
 
-    constructor(app) {
-        this.app = app;
+    constructor() {
+        this.user = null;
     }
 
-    set user(value) {}
-
     getProperty() {
-        const user = this.app.context.core.user.getCurrentUser()
+        const user = this.user.getCurrentUser();
         return user;
     }
 }

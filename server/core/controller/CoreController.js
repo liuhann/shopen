@@ -1,7 +1,7 @@
 const debug = require('debug')('core');
 
 async function getUserProperty(ctx, next) {
-    const value = await ctx.core.db.getProperty(ctx.query.key);
+    const value = await ctx.services.db.getProperty(ctx.query.key);
     ctx.body = {
         key: ctx.query.key,
         value: value

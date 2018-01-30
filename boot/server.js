@@ -70,9 +70,7 @@ class BootStrap {
 
             if (moduleConfig.services && moduleConfig.name) {
                 const exposedServices = await moduleConfig.services.call(app);
-                app.context[moduleConfig.name] = exposedServices;
-
-                for(let serviceName  in exposedServices) {
+                for(let serviceName in exposedServices) {
                     this.services[serviceName] = exposedServices[serviceName];
                 }
             }
@@ -98,15 +96,24 @@ class BootStrap {
                     }
                 }
             }
-/*
-            if (moduleConfig.route) {
-                moduleConfig.route.apply(null, [router]);
-            }*/
-
             if (moduleConfig.onload) {
                 moduleConfig.onload.call(null, app);
             }
         }
+
+        //do some constructor injection by service name
+        for(const serviceName in this.services) {
+            // service list
+            let constructorDefinedRefs = Object.getOwnPropertyNames(this.services[serviceName]);
+            for(const refName of constructorDefinedRefs) {
+                // if service ===
+                if (this.services[serviceName][refName] == null) {
+                    this.services[serviceName][refName] = this.services[refName];
+                }
+            }
+        }
+        debugger;
+        app.context.services = this.services;
     }
 
     /**

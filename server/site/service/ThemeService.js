@@ -1,15 +1,23 @@
 const fs        = require('fs');
 const jsonfile  = require('jsonfile');
 
-module.exports = class ThemeService {
+class ThemeService {
 
     constructor() {
+        this.db = null;
+    }
 
+    loadTheme(name) {
+        ['assets', 'config', 'layout', 'sections', 'templates'].forEach((folder)=> {
+
+        });
+
+        fs.readdirSync(`./themes/${name}/config`);
     }
 
     async getAllSectionComponents() {
         const sections = await this.getSectionSettings();
-        const components:any = {};
+        const components = {};
 
         for(const section of sections) {
             const vueOptions = await this.getSectionComponent(section);
@@ -32,7 +40,6 @@ module.exports = class ThemeService {
     }
 
     async getSectionSettings() {
-
         const sections = fs.readdirSync(`${this.theme}/sections`);
         const settings = [];
         for(const file of sections) {
@@ -62,7 +69,7 @@ module.exports = class ThemeService {
      * @param {string} template
      * @returns {Promise<any>}
      */
-    async loadLayout(layout:string): Promise<any> {
+    async loadLayout(layout) {
         const file = `${this.theme}/layout/${layout}.html`;
         const loaded = fs.readFileSync(file, 'utf-8');
         return loaded;
@@ -99,3 +106,5 @@ module.exports = class ThemeService {
         return loaded;
     }
 }
+
+module.exports = ThemeService;

@@ -1,7 +1,7 @@
 
 class UserService {
-    constructor(app) {
-        this.app = app;
+    constructor() {
+
     }
 
     getCurrentUser() {
