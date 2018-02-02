@@ -1,6 +1,18 @@
 const Router    = require('koa-router');
+const FileLoadService = require('./service/FileLoadService');
+const ThemeService = require('./service/ThemeService');
+const PageDataService = require('./service/PageDataService');
 
 module.exports = {
+
+    async services() {
+        return {
+            loader: new FileLoadService(),
+            theme: new ThemeService(),
+            pageData: new PageDataService(),
+        }
+    },
+
     route(router) {
         //website static pages
         router.get('/', renderThemePage);

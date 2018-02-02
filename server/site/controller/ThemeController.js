@@ -1,14 +1,5 @@
-import * as Koa from "koa";
-//import * as Vue from 'vue';
-
 const Vue = require('vue');
 const send = require('koa-send');
-
-import ThemeService from '../service/ThemeService';
-import PageDataService from '../service/PageDataService';
-import module from "../../module";
-
-const themesPath = 'modules/theme_default';
 
 const SectionList  = require('../vue/section-list.js');
 
@@ -21,22 +12,25 @@ export const camelize = (str) => {
 };
 
 /**
- * 渲染vue页面入口
+ * To render a static website page
  * @param {Application.Context} ctx
  * @param {Function} next
- * @returns {Promise<void>}
  */
-async function renderThemePage(ctx , next ) {
-    const template = ctx.params.template || 'index';
+async function renderSitePage(ctx , next ) {
+    //Page name
+    const page = ctx.params.page || 'index';
+
+    //Page key
     const key = ctx.params.key || null;
 
+    const themeService = ctx.services.theme;
 
+    const loader = ctx.services.loader;
 
-    const themeService = new ThemeService('', themesPath);
     const pageDataService = new PageDataService(template, key, ctx.query);
 
     //根模板、读取页面模板配置
-    const pageSetting = await themeService.loadPageSetting(template);
+    const pageSetting = await loader.loadPageSetting(page);
 
     if (pageSetting) {
         const componentData = await pageDataService.getPageData();

@@ -1,6 +1,6 @@
 const UserService = require('./service/UserService');
 const DBService = require('./service/DBService');
-
+const ProductService = require('./service/ProductSerivce');
 
 const CoreController  = require('./controller/CoreController');
 
@@ -9,8 +9,9 @@ module.exports = {
 
     async services() {
         return {
-            user: new UserService(this),
-            db: new DBService(this)
+            user: new UserService(),
+            db: new DBService(),
+            product: new ProductService(),
         }
     },
 
