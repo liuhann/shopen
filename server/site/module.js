@@ -3,6 +3,8 @@ const FileLoadService = require('./service/FileLoadService');
 const ThemeService = require('./service/ThemeService');
 const PageDataService = require('./service/PageDataService');
 
+const ThemeController  = require('./controller/ThemeController');
+
 module.exports = {
 
     async services() {
@@ -10,6 +12,23 @@ module.exports = {
             loader: new FileLoadService(),
             theme: new ThemeService(),
             pageData: new PageDataService(),
+        }
+    },
+
+    async paths() {
+        return {
+            '/index': {
+                'get': ThemeController.renderSitePage
+            },
+            '/page/': {
+
+            },
+            '/product/' : {
+
+            },
+            '/collection/':{
+
+            }
         }
     },
 

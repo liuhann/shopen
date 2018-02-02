@@ -11,6 +11,21 @@ export const camelize = (str) => {
     return str.replace(camelizeRE, (_, c) => c ? c.toUpperCase() : '')
 };
 
+
+/**
+ * render the index web page
+ * @param ctx
+ * @param next
+ * @returns {Promise<void>}
+ */
+async function renderIndex(ctx, next) {
+    //根模板、读取页面模板配置
+    const pageSetting = await loader.loadPageSetting('index');
+
+
+
+}
+
 /**
  * To render a static website page
  * @param {Application.Context} ctx
@@ -33,7 +48,7 @@ async function renderSitePage(ctx , next ) {
     const pageSetting = await loader.loadPageSetting(page);
 
     if (pageSetting) {
-        const componentData = await pageDataService.getPageData();
+        const componentData = await ctx.services.pageData.getPageData();
         //加载所有sections 包括单例模板
         const sectionComponents = await themeService.getAllSectionComponents();
         for(let componentName in sectionComponents) {

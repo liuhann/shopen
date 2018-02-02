@@ -33,6 +33,10 @@ class ProductSerivce {
     getProducts(filter) {
 
     }
+
+    getProductByName(name) {
+
+    }
 }
 
 module.exports = ProductSerivce;
