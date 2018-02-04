@@ -13,7 +13,6 @@ class ThemeService {
         if (this._roots == null) {
             this._roots = ['index', 'collection', 'page', 'product'];
         }
-
         return this._roots;
     }
 
@@ -21,63 +20,62 @@ class ThemeService {
         //read page setting
         const pageSetting = await this.loader.loadPageSetting(page);
 
-        const componentData = await ctx.services.pageData.getPageData();
-            //加载所有sections 包括单例模板
-            const sectionComponents = await themeService.getAllSectionComponents();
-            for(let componentName in sectionComponents) {
-                sectionComponents[componentName].data = function() {
-                    //这里设置全局的通用数据 或者来自于配置的计算数据
-                    return componentData;
-                };
-                Vue.component(componentName, sectionComponents[componentName]);
-            }
-            //加载动态列表组件
-            Vue.component('section-list', SectionList);
+        const pageData = await ctx.services.pageData.getPageData(page, paths);
 
-            //加载layout主入口文件
-            const vueOptions = {};
+        //load all sections
+        const sectionComponents = await this.getAllSectionComponents();
+        for(let componentName in sectionComponents) {
+            sectionComponents[componentName].data = function() {
+                //page data is available in each component
+                return pageData;
+            };
+            //register component
+            Vue.component(componentName, sectionComponents[componentName]);
+        }
 
-            //获取对应layout文件
-            const layout = pageSetting.layout || 'default';
-            const layoutConfig = await themeService.loadLayoutConfig(layout);
-            vueOptions.template = await themeService.loadLayout(layout);
-            vueOptions.components = {
-                'main-content': {
-                    //页面模板
-                    template: await themeService.loadTemplate(pageSetting.path),
+        //section renderer
+        Vue.component('section-list', SectionList);
+
+        //root options
+        const vueOptions = {};
+
+        //layout name
+        const layout = pageSetting.layout || 'default';
+
+        const layoutConfig = await this.loader.loadLayoutConfig(layout);
+        vueOptions.template = await this.loader.loadLayout(layout);
+
+        //insert page into layout
+        vueOptions.components = {
+            'main-content': {
+                template: await this.loader.loadTemplate(pageSetting.path),
                 data: function() {
                     return Object.assign({
                         setting: pageSetting
-                    }, componentData);
+                    }, pageData);
                 }
             }
         };
 
-            //设置根模板的数据
-            const singletonSectionsData = {};
-            const settings = await themeService.getSectionSettings();
-            for(const setting of settings) {
-                if (setting.singleton) {
-                    singletonSectionsData[camelize(setting.component)] = setting.data;
-                }
+        //设置根模板的数据
+        const singletonSectionsData = {};
+        const settings = await themeService.getSectionSettings();
+        for(const setting of settings) {
+            if (setting.singleton) {
+                singletonSectionsData[camelize(setting.component)] = setting.data;
             }
-            vueOptions.data = {
-                pageData: componentData,
-                setting: layoutConfig
-            };
+        }
 
-            //渲染
-            const renderer = require('vue-server-renderer').createRenderer();
-            const rendered = await renderer.renderToString(new Vue(vueOptions));
+        vueOptions.data = {
+            pageData: pageData,
+            setting: layoutConfig
+        };
+        //渲染
+        const renderer = require('vue-server-renderer').createRenderer();
+        const rendered = await renderer.renderToString(new Vue(vueOptions));
+        return rendered;
     }
 
-    loadTheme(name) {
-        ['assets', 'config', 'layout', 'sections', 'templates'].forEach((folder)=> {
-
-        });
-
-        fs.readdirSync(`./themes/${name}/config`);
-    }
 
     async getAllSectionComponents() {
         const sections = await this.getSectionSettings();
