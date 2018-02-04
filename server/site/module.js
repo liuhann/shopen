@@ -1,12 +1,11 @@
-const Router    = require('koa-router');
 const FileLoadService = require('./service/FileLoadService');
 const ThemeService = require('./service/ThemeService');
 const PageDataService = require('./service/PageDataService');
 
-const ThemeController  = require('./controller/ThemeController');
+const ThemedController  = require('./controller/ThemedController');
 
 module.exports = {
-
+    name : 'site',
     async services() {
         return {
             loader: new FileLoadService(),
@@ -17,17 +16,14 @@ module.exports = {
 
     async paths() {
         return {
-            '/index': {
-                'get': ThemeController.renderSitePage
+            '/': {
+                'get': ThemedController.renderSitePage
             },
-            '/page/': {
-
+            '/:page': {
+                'get': ThemedController.renderSitePage
             },
-            '/product/' : {
-
-            },
-            '/collection/':{
-
+            '/:page/*': {
+                'get': ThemedController.renderSitePage
             }
         }
     },

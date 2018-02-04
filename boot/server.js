@@ -105,14 +105,16 @@ class BootStrap {
         for(const serviceName in this.services) {
             // service list
             let constructorDefinedRefs = Object.getOwnPropertyNames(this.services[serviceName]);
+
+            //iterate fields of service
             for(const refName of constructorDefinedRefs) {
-                // if service ===
-                if (this.services[serviceName][refName] == null) {
+                // inject service by name
+                if (!refName.startsWith('_')  //field start with underline is considered not to be service
+                    && this.services[serviceName][refName] == null) {
                     this.services[serviceName][refName] = this.services[refName];
                 }
             }
         }
-        debugger;
         app.context.services = this.services;
     }
 
