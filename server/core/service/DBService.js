@@ -6,18 +6,24 @@ class JsonDbService {
 		this.user = null;
     }
 
-    getCollection() {
+    insertOne(coll, record) {
+
+    }
+
+    insertMany(coll, records) {
 
     }
 
 	/**
 	 * creates a cursor for a query that can be used to iterate over results
 	 */
-	list(coll, filter, options) {
+	find(coll, filter, options) {
 
     }
 
+    findOne(coll, filter) {
 
+    }
 
     getProperty() {
 

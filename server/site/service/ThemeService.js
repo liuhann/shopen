@@ -40,16 +40,17 @@ class ThemeService {
         Vue.component('section-list', SectionList);
 
         //root options
-        const vueOptions = {};
+        const rootVueOptions = {};
 
         //layout name
         const layout = pageSetting.layout || 'default';
 
         const layoutConfig = await this.loader.loadLayoutConfig(layout);
-        vueOptions.template = await this.loader.loadLayout(layout);
+
+        rootVueOptions.template = await this.loader.loadLayout(layout);
 
         //insert page into layout
-        vueOptions.components = {
+        rootVueOptions.components = {
             'main-content': {
                 template: await this.loader.loadTemplate(pageSetting.path),
                 data: function() {
@@ -59,28 +60,35 @@ class ThemeService {
                 }
             }
         };
-        //设置根模板的数据
+       /* //设置根模板的数据
         const singletonSectionsData = {};
         const settings = await themeService.getSectionSettings();
         for(const setting of settings) {
             if (setting.singleton) {
                 singletonSectionsData[camelize(setting.component)] = setting.data;
             }
-        }
-        vueOptions.data = {
+        }*/
+        rootVueOptions.data = {
             pageData: pageData,
             setting: layoutConfig
         };
         //渲染
         const renderer = require('vue-server-renderer').createRenderer();
-        const rendered = await renderer.renderToString(new Vue(vueOptions));
+        const rendered = await renderer.renderToString(new Vue(rootVueOptions));
         return rendered;
     }
 
-    async getAllSectionComponents() {
+
+	/**
+	 * get vue components which can render in the page.
+	 * @returns {Promise<{}>}
+	 */
+	async getAllSectionComponents() {
+		//all section config
         const sections = await this.loader.getAllSections();
         const components = {};
         for(const section of sections) {
+        	//load template
             const sectionTemplate = await this.loader.getSectionTemplate(section);
 	        const vueOptions = {
 		        props: {
@@ -88,22 +96,11 @@ class ThemeService {
 				        type: Object,
 			        }
 		        },
-		        template: sectionTemplate
+		        template: sectionTemplate,
 	        };
             components[section.component] = vueOptions;
         }
         return components;
-    }
-
-    async getSectionSettings() {
-        const sections = fs.readdirSync(`${this.theme}/sections`);
-        const settings = [];
-        for(const file of sections) {
-            if (file.endsWith('.json')) {
-                settings.push(jsonfile.readFileSync(`${this.theme}/sections/${file}`));
-            }
-        }
-        return settings;
     }
 
 }

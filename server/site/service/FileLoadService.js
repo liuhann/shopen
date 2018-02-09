@@ -88,7 +88,6 @@ class FileLoadService {
 	async getSectionComponent(section) {
 		const file = `${this.getBaseFolder()}/sections/${section.path}`;
 		const sectionTemplate = fs.readFileSync(file, 'utf-8');
-
 		const vueOptions = {
 			props: {
 				setting: {
