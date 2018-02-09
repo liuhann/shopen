@@ -1,11 +1,14 @@
 const Vue = require('vue');
 const SectionList  = require('../vue/section-list.js');
 
+const debug = require('debug')('site:theme');
+
 class ThemeService {
 
     constructor() {
         this.db = null;
         this.loader = null;
+        this.page = null;
         this._roots = null;
     }
 
@@ -20,7 +23,7 @@ class ThemeService {
         //read page setting
         const pageSetting = await this.loader.loadPageSetting(page);
 
-        const pageData = await ctx.services.pageData.getPageData(page, paths);
+        const pageData = await this.page.getPageData(page, paths);
 
         //load all sections
         const sectionComponents = await this.getAllSectionComponents();
@@ -56,7 +59,6 @@ class ThemeService {
                 }
             }
         };
-
         //设置根模板的数据
         const singletonSectionsData = {};
         const settings = await themeService.getSectionSettings();
@@ -65,7 +67,6 @@ class ThemeService {
                 singletonSectionsData[camelize(setting.component)] = setting.data;
             }
         }
-
         vueOptions.data = {
             pageData: pageData,
             setting: layoutConfig
@@ -76,13 +77,19 @@ class ThemeService {
         return rendered;
     }
 
-
     async getAllSectionComponents() {
-        const sections = await this.getSectionSettings();
+        const sections = await this.loader.getAllSections();
         const components = {};
-
         for(const section of sections) {
-            const vueOptions = await this.getSectionComponent(section);
+            const sectionTemplate = await this.loader.getSectionTemplate(section);
+	        const vueOptions = {
+		        props: {
+			        setting: {
+				        type: Object,
+			        }
+		        },
+		        template: sectionTemplate
+	        };
             components[section.component] = vueOptions;
         }
         return components;

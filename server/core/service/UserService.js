@@ -1,7 +1,7 @@
 
 class UserService {
     constructor() {
-        this.db = null;
+
     }
 
     getCurrentUser() {

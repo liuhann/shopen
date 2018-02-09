@@ -8,14 +8,14 @@ class PageDataService {
     constructor() {
         this.assert = null;
         this.product = null;
-        this.siteMenu = null;
+        this.navigation = null;
     }
 
     async getGlobalData() {
-        const menus = await this.siteMenu.getMenus();
+        const navigations = await this.navigation.getNavigations();
         const products = await this.product.getProducts();
         return {
-            menus,
+	        navigations,
             products
         }
     }

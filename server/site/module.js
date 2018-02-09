@@ -1,6 +1,8 @@
 const FileLoadService = require('./service/FileLoadService');
 const ThemeService = require('./service/ThemeService');
 const PageDataService = require('./service/PageDataService');
+const NavigationService = require('./service/NavigationService');
+
 
 const ThemedController  = require('./controller/ThemedController');
 
@@ -10,7 +12,8 @@ module.exports = {
         return {
             loader: new FileLoadService(),
             theme: new ThemeService(),
-            pageData: new PageDataService(),
+            page: new PageDataService(),
+	        navigation: new NavigationService(),
         }
     },
 

@@ -55,21 +55,6 @@ class FileLoadService {
         return config;
     }
 
-    async getSectionComponent(section) {
-        const file = `${this.getBaseFolder()}/sections/${section.path}`;
-        const sectionTemplate = fs.readFileSync(file, 'utf-8');
-        const vueOptions = {
-            props: {
-                setting: {
-                    type: Object,
-                }
-            },
-            template: sectionTemplate
-        };
-        return vueOptions;
-    }
-
-
     async getAllTemplates() {
         const templates = fs.readdirSync(`${this.getBaseFolder()}/templates`);
 
@@ -83,7 +68,37 @@ class FileLoadService {
         return allTemplates;
     }
 
+    async getAllSections() {
+	    const sections = fs.readdirSync(`${this.getBaseFolder()}/sections`);
+	    const settings = [];
+	    for(const file of sections) {
+		    if (file.endsWith('.json')) {
+			    settings.push(jsonfile.readFileSync(`${this.getBaseFolder()}/sections/${file}`));
+		    }
+	    }
+	    return settings;
+    }
 
+    async getSectionTemplate(section) {
+	    const file = `${this.getBaseFolder()}/sections/${section.path}`;
+	    const sectionTemplate = fs.readFileSync(file, 'utf-8');
+	    return sectionTemplate;
+    }
+
+	async getSectionComponent(section) {
+		const file = `${this.getBaseFolder()}/sections/${section.path}`;
+		const sectionTemplate = fs.readFileSync(file, 'utf-8');
+
+		const vueOptions = {
+			props: {
+				setting: {
+					type: Object,
+				}
+			},
+			template: sectionTemplate
+		};
+		return vueOptions;
+	}
 
 }
 

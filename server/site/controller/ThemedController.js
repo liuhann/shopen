@@ -1,6 +1,6 @@
-
 const send = require('koa-send');
 
+const debug = require('debug')('site:controller');
 
 /**
  * render the index web page
@@ -22,8 +22,9 @@ async function renderSitePage(ctx, next ) {
     //Page name
     const page = ctx.params.page || 'index';
 
-    //none static page
-    if (ctx.services.theme.getAvailableRoots().indexOf(page)>-1) {
+    //ignore none-site page
+	const siteRoots = await ctx.services.theme.getAvailableRoots();
+    if (siteRoots.indexOf(page) === -1) {
         await next();
         return;
     }

@@ -1,4 +1,4 @@
-process.env.DEBUG = 'boot';
+process.env.DEBUG = 'boot,site:*';
 
 const fs        = require('fs');
 const Koa       = require('koa');
