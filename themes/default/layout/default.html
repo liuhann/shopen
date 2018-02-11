@@ -6,11 +6,11 @@
     <meta name="theme-color" content="#7796a8">
     <title>Base Template</title>
   </head>
-  <body>
-      <page-header :setting="setting.components['page-header'].data"></page-header>
-      <div class="page-container">
-            <main-content ref="main"></main-content>
-      </div>
-      <page-footer :setting="setting.components['page-footer'].data"></page-footer>
-  </body>
+<body>
+    <page-header :data="setting.components['page-header'].data"></page-header>
+        <div class="page-container">
+            <layout-content></layout-content>
+        </div>
+    <page-footer :setting="setting.components['page-footer'].data"></page-footer>
+</body>
 </html>

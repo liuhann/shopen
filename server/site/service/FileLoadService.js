@@ -8,7 +8,7 @@ class FileLoadService {
     }
 
     getBaseFolder() {
-        return this.user.getUserSetting();
+        return './themes/' + this.user.getUserSetting().theme;
     }
 
     /**
@@ -30,7 +30,6 @@ class FileLoadService {
             return null;
         }
     }
-
 
     /**
      * 加载页面body体文件

@@ -1,14 +1,13 @@
 <header class="site-header border-bottom logo--left" role="banner">
-    <link rel="stylesheet" :href="server + '/static/assets/page-header.css'">
     <div class="header-line">
         <div class="grid__item small--one-half medium-up--one-quarter logo-align--left">
-            <div class="h2 site-header__logo" itemscope="" itemtype="http://schema.org/Organization">
-                <a class="site-header__logo-link" href="/" itemprop="url">{{setting.logoText}}</a>
+            <div class="h2 site-header__logo">
+                <a  href="/" itemprop="url">{{setting.logoText}}</a>
             </div>
         </div>
         <nav class="grid__item medium-up--one-half small--hide" id="AccessibleNav" role="navigation">
             <ul class="site-nav list--inline " id="SiteNav">
-                <li v-for="menu in site_menus">
+                <li v-for="menu in navigations.menu">
                     <a :href="menu.link" class="site-nav__link site-nav__link--main">{{menu.title}}</a>
                 </li>
             </ul>

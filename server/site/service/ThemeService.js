@@ -60,7 +60,8 @@ class ThemeService {
                 }
             }
         };
-       /* //设置根模板的数据
+       /**
+        * 设置根模板的数据
         const singletonSectionsData = {};
         const settings = await themeService.getSectionSettings();
         for(const setting of settings) {
