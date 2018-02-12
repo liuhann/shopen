@@ -25,14 +25,15 @@ class ThemeService {
 
         const pageData = await this.page.getPageData(page, paths);
         const globalData = await this.page.getGlobalData();
+        const themeData = await this.loader.loadThemedSetting();
 
         const data = function() {
         	return {
                 global: globalData,
         		page: globalData,
+		        theme: themeData
 	        };
         };
-
 
         //load all section components
         const sectionComponents = await this.getAllSectionComponents();
@@ -61,15 +62,8 @@ class ThemeService {
 
         //layout name
         const layout = pageSetting.layout || 'default';
-
-        const layoutConfig = await this.loader.loadLayoutConfig(layout);
         rootVueOptions.template = await this.loader.loadLayout(layout);
-
-        rootVueOptions.data = {
-	        global: globalData,
-	        page: globalData,
-            setting: layoutConfig
-        };
+        rootVueOptions.data = data;
         //渲染
         const renderer = require('vue-server-renderer').createRenderer();
         const rendered = await renderer.renderToString(new Vue(rootVueOptions));

@@ -2,7 +2,7 @@
   "template": "index",
   "name": "Index Page",
   "path": "index.html",
-  "layout": "default",
+  "layout": "default.html",
   "components": {
     "section-list": {
       "sections": [

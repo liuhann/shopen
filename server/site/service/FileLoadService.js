@@ -11,13 +11,25 @@ class FileLoadService {
         return './themes/' + this.user.getUserSetting().theme;
     }
 
+    async loadThemedSetting() {
+	    const globalDir = fs.readdirSync(`${this.getBaseFolder()}/global`);
+	    let themeSetting = {};
+	    for(const file of globalDir) {
+		    if (file.endsWith('.json')) {
+		    	const config = jsonfile.readFileSync(`${this.getBaseFolder()}/global/${file}`);
+			    themeSetting = Object.assign(themeSetting, config);
+		    }
+	    }
+	    return themeSetting;
+    }
+
     /**
      * 加载页面layout文件
      * @param {string} template
      * @returns {Promise<any>}
      */
     async loadLayout(layout) {
-        const file = `${this.getBaseFolder()}/layout/${layout}.html`;
+        const file = `${this.getBaseFolder()}/layout/${layout}`;
         const loaded = fs.readFileSync(file, 'utf-8');
         return loaded;
     }
@@ -40,18 +52,6 @@ class FileLoadService {
         const file = `${this.getBaseFolder()}/templates/${template}`;
         const loaded = fs.readFileSync(file, 'utf-8');
         return loaded;
-    }
-
-
-    /**
-     * 加载页面layout配置文件
-     * @param {string} layout
-     * @returns {Promise<any>}
-     */
-    async loadLayoutConfig(layout) {
-        const file = `${this.getBaseFolder()}/layout/${layout}.json`;
-        const config = jsonfile.readFileSync(file);
-        return config;
     }
 
     async getAllTemplates() {
