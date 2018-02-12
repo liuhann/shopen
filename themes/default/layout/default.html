@@ -7,10 +7,10 @@
     <title>Base Template</title>
   </head>
 <body>
-    <page-header :data="setting.components['page-header'].data"></page-header>
+    <page-header :setting="setting.header"></page-header>
         <div class="page-container">
             <layout-content></layout-content>
         </div>
-    <page-footer :setting="setting.components['page-footer'].data"></page-footer>
+    <page-footer :setting="setting.footer"></page-footer>
 </body>
 </html>

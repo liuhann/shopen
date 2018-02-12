@@ -24,17 +24,34 @@ class ThemeService {
         const pageSetting = await this.loader.loadPageSetting(page);
 
         const pageData = await this.page.getPageData(page, paths);
+        const globalData = await this.page.getGlobalData();
 
-        //load all sections
+        const data = function() {
+        	return {
+                global: globalData,
+        		page: globalData,
+	        };
+        };
+
+
+        //load all section components
         const sectionComponents = await this.getAllSectionComponents();
         for(let componentName in sectionComponents) {
-            sectionComponents[componentName].data = function() {
-                //page data is available in each component
-                return pageData;
-            };
-            //register component
+            sectionComponents[componentName].data = data;
             Vue.component(componentName, sectionComponents[componentName]);
         }
+
+        //load current page component
+	    Vue.component('layout-content', {
+	    	template: await this.loader.loadTemplate(pageSetting.path),
+		    function() {
+			    return {
+			    	setting: pageSetting,
+				    global: globalData,
+				    page: globalData,
+			    };
+		    },
+	    });
 
         //section renderer
         Vue.component('section-list', SectionList);
@@ -46,31 +63,11 @@ class ThemeService {
         const layout = pageSetting.layout || 'default';
 
         const layoutConfig = await this.loader.loadLayoutConfig(layout);
-
         rootVueOptions.template = await this.loader.loadLayout(layout);
 
-        //insert page into layout
-        rootVueOptions.components = {
-            'main-content': {
-                template: await this.loader.loadTemplate(pageSetting.path),
-                data: function() {
-                    return Object.assign({
-                        setting: pageSetting
-                    }, pageData);
-                }
-            }
-        };
-       /**
-        * 设置根模板的数据
-        const singletonSectionsData = {};
-        const settings = await themeService.getSectionSettings();
-        for(const setting of settings) {
-            if (setting.singleton) {
-                singletonSectionsData[camelize(setting.component)] = setting.data;
-            }
-        }*/
         rootVueOptions.data = {
-            pageData: pageData,
+	        global: globalData,
+	        page: globalData,
             setting: layoutConfig
         };
         //渲染

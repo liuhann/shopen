@@ -20,7 +20,6 @@ class PageDataService {
         }
     }
 
-
     camelize(str) {
         return str.replace(camelizeRE, (_, c) => c ? c.toUpperCase() : '')
     }
@@ -32,7 +31,6 @@ class PageDataService {
      * @returns {Promise<any & {}>}
      */
     async getPageData(page, params) {
-        const global = await this.getGlobalData();
         const pageData = {};
 
         if (page === 'product') {
@@ -42,7 +40,7 @@ class PageDataService {
             pageData.product = product;
         }
 
-        return Object.assign(global, pageData);
+        return pageData;
 
     }
 }
