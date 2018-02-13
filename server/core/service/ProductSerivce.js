@@ -30,8 +30,13 @@ class ProductSerivce {
 
     }
 
-    getProducts(filter) {
-
+	/**
+	 * All products by product name
+	 * @param filter
+	 * @returns {Array}
+	 */
+	getProducts(filter) {
+		return [];
     }
 
     getProductByName(name) {

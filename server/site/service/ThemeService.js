@@ -45,7 +45,7 @@ class ThemeService {
         //load current page component
 	    Vue.component('layout-content', {
 	    	template: await this.loader.loadTemplate(pageSetting.path),
-		    function() {
+		    data: function() {
 			    return {
 			    	setting: pageSetting,
 				    global: globalData,

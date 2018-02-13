@@ -6,8 +6,8 @@
             </div>
         </div>
         <nav class="grid__item medium-up--one-half small--hide" id="AccessibleNav" role="navigation">
-            <ul class="site-nav list--inline " id="SiteNav">
-                <li v-for="menu in navigations.menu">
+            <ul v-if="global.navigations.menu" class="site-nav list--inline " id="SiteNav">
+                <li v-for="(menu, name) in global.navigations.menu">
                     <a :href="menu.link" class="site-nav__link site-nav__link--main">{{menu.title}}</a>
                 </li>
             </ul>
