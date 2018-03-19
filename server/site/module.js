@@ -19,15 +19,15 @@ module.exports = {
 
     async paths() {
         return {
-            '/': {
+            '/:page?/:key?': {
                 'get': ThemedController.renderSitePage
             },
-            '/:page': {
+            /*'/:page': {
                 'get': ThemedController.renderSitePage
             },
-            '/:page/*': {
+            '/:page/!*': {
                 'get': ThemedController.renderSitePage
-            }
+            }*/
         }
     },
 
