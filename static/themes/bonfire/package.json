@@ -20,7 +20,14 @@
       "data": {}
     },
     "image-title": {
-      "title": "屏宽图文",
+      "title": "图+文(1)",
+      "preview": "image-title.png",
+      "data": {
+
+      }
+    },
+    "image-title2": {
+      "title": "图+文(2)",
       "preview": "image-title.png",
       "data": {
 
