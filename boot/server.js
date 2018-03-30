@@ -1,4 +1,6 @@
-process.env.DEBUG = 'boot,site:*';
+const config    = require('../config');
+
+process.env.DEBUG = config.debug;
 
 const fs        = require('fs');
 const Koa       = require('koa');
@@ -6,6 +8,7 @@ const bodyparser= require('koa-bodyparser');
 const Router    = require('koa-router');
 const serve     = require('koa-static');
 const debug     = require('debug')('boot');
+const cors      = require('kcors');
 
 class BootStrap {
 
@@ -17,32 +20,20 @@ class BootStrap {
         this.app = new Koa();
         this.services = {};
         //default middlewares
+	    this.app.use(cors({
+		    credentials: true
+	    }));
         this.app.use(bodyparser());
-
         this.app.use(serve('./static'));
 
-        this.app.use(this.globalMiddleWare);
-
-        await this.initAppContext();
-
         const router = new Router();
-
         //load server modules
         await this.loadModules(this.app, router);
 
         //use module routes
         this.app.use(router.routes());
-
         //active http
-        this.app.listen(3000);
-    }
-
-    /**
-     * init global context and services
-     * @returns {Promise<void>}
-     */
-    async initAppContext() {
-        this.app.context.menus = [];
+        this.app.listen(config.port);
     }
 
     /**
@@ -61,10 +52,6 @@ class BootStrap {
             if (!fs.existsSync(moduleDef)) continue;
 
             const moduleConfig = require( `../server/${dir}/module.js`);
-            if (!moduleConfig) {
-                debug(`module ${dir} in server has no module.js file`);
-                continue;
-            }
 
             debug(`initialize module [${dir}]..`);
 
@@ -116,21 +103,6 @@ class BootStrap {
             }
         }
         app.context.services = this.services;
-    }
-
-    /**
-     * Attach global services to Application Context
-     * @param {Application.Context} ctx
-     * @param {Function} next
-     */
-    async globalMiddleWare(ctx, next) {
-        ctx.sendResponse = function(data) {
-            ctx.body = {
-                statusCode: '2000000',
-                response: data
-            }
-        };
-        await next();
     }
 }
 

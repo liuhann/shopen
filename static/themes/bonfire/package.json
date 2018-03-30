@@ -1,0 +1,30 @@
+{
+  "name": "shopen-theme-bonfire",
+  "version": "1.0.0",
+  "author": "liuhan@gmail.com",
+  "url": "https://www.bonfire.com/",
+  "private": true,
+  "scripts": {
+
+  },
+  "dependencies": {
+
+  },
+  "devDependencies": {
+
+  },
+  "sections": {
+    "header": {
+      "title": "头部配置",
+      "preview": "header.png",
+      "data": {}
+    },
+    "image-title": {
+      "title": "屏宽图文",
+      "preview": "image-title.png",
+      "data": {
+
+      }
+    }
+  }
+}
