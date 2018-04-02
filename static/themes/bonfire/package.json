@@ -13,26 +13,31 @@
   "devDependencies": {
 
   },
-  "sections": [{
+  "styles": ["main.css"],
+  "sections": [
+    {
+      "name": "image-title",
+      "title": "图+文(1)",
+      "preview": "image-title.png",
+      "data": {
+        "title": {
+          "type": "text",
+          "value": "Bonfire"
+        }
+      }
+    }, {
       "title": "头部配置",
       "name": "header",
       "preview": "header.png",
       "data": {
         "logo": {
           "type": "image",
-          "value": "logo.svg"
+          "value": "http://localhost:3000/themes/bonfire/images/logo.svg"
         },
         "title": {
           "type": "text",
           "value": "Bonfire"
         }
-      }
-    },
-    {
-      "name": "image-title",
-      "title": "图+文(1)",
-      "preview": "image-title.png",
-      "data": {
       }
     }
   ]
