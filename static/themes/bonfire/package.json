@@ -23,6 +23,14 @@
         "title": {
           "type": "text",
           "value": "Bonfire"
+        },
+        "desc": {
+          "type": "textarea",
+          "value": "Order direct and take advantage of bulk discounts "
+        },
+        "image": {
+          "type": "image",
+          "value": "http://localhost:3000/themes/bonfire/images/supply-hero.jpg"
         }
       }
     }, {

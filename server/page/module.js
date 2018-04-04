@@ -1,3 +1,5 @@
+const PageService     = require('./service/PageService');
+const PageController  = require('./controller/PageController');
 
 module.exports = {
     name : 'site-page-setting',
@@ -5,12 +7,11 @@ module.exports = {
 	
     async services() {
         return {
+			'page': new PageService()
         }
     },
 
-    async paths() {
-        return {
-
-        }
-    },
+	async routes(router) {
+    	router.post('/api/page/save', PageController.upsertPage);
+	}
 }

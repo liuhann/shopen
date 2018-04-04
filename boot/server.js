@@ -62,6 +62,10 @@ class BootStrap {
                 }
             }
 
+            if (moduleConfig.routes) {
+            	await moduleConfig.routes.call(null, router);
+            }
+
             if (moduleConfig.paths) {
                 const paths =  await moduleConfig.paths.call(null);
                 for(let path in paths) {

@@ -6,9 +6,12 @@ class PageService {
 		this.mongo = null
 	}
 
-	upsertPage(user, page) {
+	upsertPage(user, site, page) {
 		page.user = user;
-		const r = this.mongo.getDb().collection('page').insertOne(page);
+		page.site = site;
+		const r = this.mongo.getDb().collection('page').upsert({
+			_id: page._id
+		}, page);
 		return r;
 	}
 
@@ -17,3 +20,5 @@ class PageService {
 	}
 
 }
+
+module.exports = PageService;
