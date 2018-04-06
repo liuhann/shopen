@@ -13,10 +13,10 @@ class UserService {
     this.tokendao = new TokenDAO(this.mongo)
   }
 
-  async checkUser (user, pwd) {
-    debug(`check password ${user}/${pwd}`)
-    await this.authdao.checkUser(user, pwd)
-    const token = this.tokendao.generateToken(user)
+  async checkUser ({email, pwd}) {
+    debug(`check password ${email}/${pwd}`)
+    await this.authdao.checkUser(email, pwd)
+    const token = await this.tokendao.generateToken(email)
     
     return {
       token

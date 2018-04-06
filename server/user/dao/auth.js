@@ -5,10 +5,10 @@ class AuthDAO {
     this.mongo = db
   }
 
-  async checkUser (user, pwd) {
+  async checkUser (email, pwd) {
     const db = await this.mongo.getDb()
     const found = await db.collection('user').findOne({
-      user, pwd
+      email, pwd
     })
     if (!found) {
       throw new DAOError(403, '用户名或者密码无效')
