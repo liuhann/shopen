@@ -1,38 +1,38 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 
-import HttpClient from './common/httpclient';
-import contextProto from './common/context';
+import HttpClient from './common/httpclient'
+import contextProto from './common/context'
 
-import {SiteBuilder} from './pages/page';
-import {website} from './models/website';
+import {SiteBuilder} from './pages/page'
+import {website} from './models/website'
 
-Vue.use(VueRouter);
+Vue.use(VueRouter)
 
 const routes = [{
-    path: '/',
-    component: SiteBuilder
-}];
+  path: '/',
+  component: SiteBuilder
+}]
 
-function getContext() {
-    const ctx = Object.create(contextProto);
-    ctx.addModel('website', website);
-    ctx.servers = {
-        website: new HttpClient({})
-    };
-    return ctx;
+function getContext () {
+  const ctx = Object.create(contextProto)
+  ctx.addModel('website', website)
+  ctx.servers = {
+    website: new HttpClient({})
+  }
+  return ctx
 }
 
 Vue.mixin({
-    beforeCreate: function() {
-        this.ctx = getContext();
-    }
-});
+  beforeCreate: function () {
+    this.ctx = getContext()
+  }
+})
 
 const router = new VueRouter({
-    routes,
-});
+  routes
+})
 
 const app = new Vue({
-    router,
-}).$mount('#xbn-app');
+  router
+}).$mount('#xbn-app')

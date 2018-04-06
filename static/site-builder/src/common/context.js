@@ -1,7 +1,7 @@
-import delegates from 'delegates';
+import delegates from 'delegates'
 
-function isFunction(object) {
-    return !!(object && object.constructor && object.call && object.apply);
+function isFunction (object) {
+  return !!(object && object.constructor && object.call && object.apply)
 }
 
 /**
@@ -9,52 +9,52 @@ function isFunction(object) {
  */
 const contextProto = {
 
-    throwError(...args) {
+  throwError (...args) {
 
-    },
+  },
 
-    models: {},
+  models: {},
 
-    onerror(err) {
-        if (null == err) return;
-    },
+  onerror (err) {
+    if (err == null) return
+  },
 
-    toJSON() {
-    },
+  toJSON () {
+  },
 
-    addModel(name, model) {
-        const ctx = this;
-        const injected = {};
-        for(let key in model) {
-            let modelLambda = model[key];
-            if (isFunction(modelLambda)) {
-                injected[key] = async function(params, options={}) {
-                    let result = null;
-                    try {
-                        result = await modelLambda.call(null, params, ctx);
-                        return result;
-                    } catch (err) {
-                        err.result = result;
-                        if (options.showErrors) {
-                            ctx.onerror(err);
-                            return result;
-                        } else {
-                            throw err;
-                        }
-                    }
-                };
+  addModel (name, model) {
+    const ctx = this
+    const injected = {}
+    for (let key in model) {
+      let modelLambda = model[key]
+      if (isFunction(modelLambda)) {
+        injected[key] = async function (params, options = {}) {
+          let result = null
+          try {
+            result = await modelLambda.call(null, params, ctx)
+            return result
+          } catch (err) {
+            err.result = result
+            if (options.showErrors) {
+              ctx.onerror(err)
+              return result
             } else {
-                injected[key] = modelLambda;
+              throw err
             }
+          }
         }
-        this.models[name] = injected;
+      } else {
+        injected[key] = modelLambda
+      }
     }
+    this.models[name] = injected
+  }
 }
 
-//delegate httpclient （如果存在）的方法
+// delegate httpclient （如果存在）的方法
 delegates(contextProto, 'client')
-    .method('get')
-    .method('post')
-    .method('request');
+  .method('get')
+  .method('post')
+  .method('request')
 
-export default contextProto;
+export default contextProto

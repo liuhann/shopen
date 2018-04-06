@@ -9,45 +9,45 @@
  * @param ctx
  * @returns {Promise.<*>}
  */
-async function getAllSections(params, ctx) {
-    const response = await ctx.servers.website.get('/api/section/settings');
-    return response;
+async function getAllSections (params, ctx) {
+  const response = await ctx.servers.website.get('/api/section/settings')
+  return response
 }
 
-async function loadSectionTemplate(param, ctx) {
-    return await ctx.servers.website.get('/static/sections/' + param.section);
+async function loadSectionTemplate (param, ctx) {
+  return await ctx.servers.website.get('/static/sections/' + param.section)
 }
 
-async function loadStaticFile(path, ctx) {
-    return await ctx.servers.website.get('/static' + path, {}, {
-        authRequired: false,
-        ignoreError: true
-    });
+async function loadStaticFile (path, ctx) {
+  return await ctx.servers.website.get('/static' + path, {}, {
+    authRequired: false,
+    ignoreError: true
+  })
 }
 
-async function getGlobalData(param, ctx) {
-    const response = await ctx.servers.website.get('/api/global/data');
-    return response.global;
+async function getGlobalData (param, ctx) {
+  const response = await ctx.servers.website.get('/api/global/data')
+  return response.global
 }
 
-async function updatePageSections(param, ctx) {
-    return await ctx.servers.website.post('/api/setting/' + param.page, param);
+async function updatePageSections (param, ctx) {
+  return await ctx.servers.website.post('/api/setting/' + param.page, param)
 }
 
-async function getAllTemplates(param, ctx) {
-    return await ctx.servers.website.get('/api/template/list');
+async function getAllTemplates (param, ctx) {
+  return await ctx.servers.website.get('/api/template/list')
 }
 
-async function getPageData(param, ctx) {
-    return await ctx.servers.website.get(`/api/data/${param.template}/${param.key}`);
+async function getPageData (param, ctx) {
+  return await ctx.servers.website.get(`/api/data/${param.template}/${param.key}`)
 }
 
 export const website = {
-    loadStaticFile,
-    getAllSections,
-    loadSectionTemplate,
-    updatePageSections,
-    getGlobalData,
-    getAllTemplates,
-    getPageData
-};
+  loadStaticFile,
+  getAllSections,
+  loadSectionTemplate,
+  updatePageSections,
+  getGlobalData,
+  getAllTemplates,
+  getPageData
+}

@@ -1,30 +1,32 @@
-const MongodbService    = require('./service/MongodbService');
-const AssertService     = require('./service/AssertService');
+const MongodbService = require('./mongo/mongodb')
 
-const CoreController    = require('./controller/CoreController');
+const parser = require('koa-bodyparser')
+const cors = require('kcors')
+const serve = require('koa-static')
+const validate = require('./validate/middleware')
+const Schema = require('./validate/extend')
+const daoErrorHandler = require('./mongo/middleware')
 
 module.exports = {
-    name: 'core',
+  name: 'core',
 
-    async services() {
-        return {
-            assert: new AssertService(),
-            mongo: new MongodbService(),
-        }
-    },
+  onload (app) {
+    app.use(cors({
+      credentials: true
+    }))
+    app.use(serve('./static'))
+    app.use(parser())
 
-	async filters() {
+    app.use(validate)
+    
+    app.use(daoErrorHandler)
+    
+    app.context.Schema = Schema
+  },
 
-	},
-
-    async paths() {
-        return {
-            '/admin/user/property': {
-                'get': CoreController.getUserProperty,
-                'put': CoreController.setUserProperty
-            }
-        }
+  async services ({config}) {
+    return {
+      mongo: new MongodbService()
     }
-
-
-};
+  }
+}

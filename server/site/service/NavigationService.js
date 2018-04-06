@@ -1,19 +1,18 @@
-const _ = require('lodash');
+const _ = require('lodash')
 
 class NavigationService {
+  constructor () {
+    this.db = null
+  }
 
-    constructor() {
-        this.db = null;
-    }
+  getMenuTree (menuName) {
 
-    getMenuTree(menuName) {
+  }
 
-    }
-
-    async getNavigations() {
-	    const navigations = await this.db.find('navigations');
-        return _.keyBy(navigations, 'name');
-    }
+  async getNavigations () {
+	    const navigations = await this.db.find('navigations')
+    return _.keyBy(navigations, 'name')
+  }
 }
 
-module.exports = NavigationService;
+module.exports = NavigationService
