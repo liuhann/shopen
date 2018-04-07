@@ -1,7 +1,6 @@
 const debug = require('debug')('core:user')
 const AuthDAO = require('../dao/auth')
 const TokenDAO = require('../dao/token')
-const DAOError = require('../../core/mongo/dao-error')
 
 class UserService {
   constructor () {
