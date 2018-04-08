@@ -10,8 +10,8 @@ const debug = require('debug')('boot')
 class BootStrap {
   async start () {
     this.app = new Koa()
-    this.app.config = config
-    
+    this.app.globalConfig = config
+
     this.services = {}
 
     const router = new Router()

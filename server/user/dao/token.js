@@ -6,20 +6,20 @@ class TokenDAO {
   constructor (mongo) {
     this.mongo = mongo
   }
-  
+
   async generateToken (email) {
     const token = randomize('Aa0', 24)
-    
+
     const db = await this.mongo.getDb()
     await db.collection('token').insertOne({
       token,
       email,
       expires: expiresMill
     })
-    
+
     return token
   }
-  
+
   async checkToken (token) {
     const db = await this.mongo.getDb()
     const found = await db.collection('token').findOne({

@@ -12,6 +12,6 @@ module.exports = {
   },
 
   async routes (router) {
-    	router.post('/api/page/save', PageController.upsertPage)
+    router.post('/api/page/save', PageController.upsertPage)
   }
 }

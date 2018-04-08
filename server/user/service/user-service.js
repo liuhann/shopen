@@ -16,7 +16,7 @@ class UserService {
     debug(`check password ${email}/${pwd}`)
     await this.authdao.checkUser(email, pwd)
     const token = await this.tokendao.generateToken(email)
-    
+
     return {
       token
     }
@@ -26,9 +26,9 @@ class UserService {
     const result = await this.authdao.register({name, pwd, email})
     return result
   }
-  
+
   async getUserByToken (token) {
-  
+
   }
 }
 

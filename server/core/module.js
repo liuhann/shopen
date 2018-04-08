@@ -18,15 +18,18 @@ module.exports = {
     app.use(parser())
 
     app.use(validate)
-    
+
     app.use(daoErrorHandler)
-    
+
     app.context.Schema = Schema
   },
 
   async services ({config}) {
     return {
-      mongo: new MongodbService()
+      mongo: new MongodbService({
+        url: 'mongodb://localhost:27017',
+        dbName: 'shopen'
+      })
     }
   }
 }
