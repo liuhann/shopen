@@ -4,6 +4,8 @@ require('../utils/base64')
 require('../utils/sha1')
 const Base64 = require('../utils/base64')
 
+const shortid = require('shortid')
+
 const policyText = {
   'expiration': '2020-01-01T12:00:00.000Z', // 设置该Policy的失效时间，超过这个失效时间之后，就没有办法通过这个policy上传文件了
   'conditions': [
@@ -17,6 +19,7 @@ class ImageService {
     this.accessid = accessid
     this.accesskey = accesskey
     this.mongo = null
+    this.user = null
   }
   
   init () {
@@ -28,6 +31,7 @@ class ImageService {
   
   getPolicy () {
     return {
+      'key': '1212/' + shortid.generate(),
       'policy': this.policyBase64,
       'OSSAccessKeyId': this.accessid,
       'signature': this.signature,

@@ -33,7 +33,7 @@ class RESTFullController {
   
   async create (ctx, next) {
     let object = ctx.request.body
-    const result = await this.dao.insertOne(object)
+    const result = await ctx.dao.insertOne(object)
     
     ctx.body = result
     next()

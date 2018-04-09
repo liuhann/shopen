@@ -1,4 +1,4 @@
-const debug = require('debug')('core:mongo')
+const debug = require('debug')('shopen:core:mongo')
 const MongoClient = require('mongodb').MongoClient
 
 class MongodbService {
@@ -27,6 +27,28 @@ class MongodbService {
         }
       }
     }
+  }
+  
+  async ensureSequence (name, start) {
+    const db = await this.getDb()
+    const one = await db.collection('counter').findOne({
+      _id: name
+    })
+    if (!one) {
+      await db.collection('counter').insertOne({
+        _id: name,
+        seq: start
+      })
+    }
+  }
+  
+  async getNextSequence (name) {
+    var ret = await this.getDb().collection('counter').findOneAndUpdate({
+      _id: name
+    }, {
+      $inc: { seq: 1 }
+    })
+    return ret.seq
   }
 }
 
