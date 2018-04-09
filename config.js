@@ -1,4 +1,4 @@
 module.exports = {
-  debug: 'boot,site:*,core:*',
+  debug: 'shopen:*,site:*,core:*',
   port: 3000
 }

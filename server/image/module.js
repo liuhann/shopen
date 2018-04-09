@@ -1,8 +1,15 @@
 const imageController = require('./controller/image-controller')
 const ImageService = require('./service/image')
+const RESTFulController = require('../core/rest-mongo/restful-controller')
 
 module.exports = {
   name: 'image',
+  
+  async onload (app, router, {mongo}) {
+    const db = await mongo.getDb()
+    const controller = new RESTFulController('/api/v1', router, db, 'image')
+    return controller
+  },
   
   services () {
     return {

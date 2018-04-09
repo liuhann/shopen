@@ -15,6 +15,7 @@ module.exports = {
       credentials: true
     }))
     app.use(serve('./static'))
+    
     app.use(parser())
 
     app.use(validate)

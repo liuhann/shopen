@@ -5,7 +5,7 @@ process.env.DEBUG = config.debug
 const fs = require('fs')
 const Koa = require('koa')
 const Router = require('koa-router')
-const debug = require('debug')('boot')
+const debug = require('debug')('shopen:server')
 
 class BootStrap {
   async start () {
@@ -18,12 +18,16 @@ class BootStrap {
 
     // load server modules
     await this.loadModules(this.app, router)
+  
+    this.app.context.services = this.services
 
     // use module routes
     this.app.use(router.routes())
 
     // active http
     this.app.listen(config.port)
+  
+    debug('√ boot complete')
   }
 
   /**
@@ -34,6 +38,8 @@ class BootStrap {
  */
   async loadModules (app, router) {
     const moduleDirs = fs.readdirSync('./server')
+    
+    this.modules = []
     // loop for each module
     for (let dir of moduleDirs) {
       // find module define js
@@ -44,19 +50,20 @@ class BootStrap {
       const moduleConfig = require(`../server/${dir}/module.js`)
 
       debug(`initialize module [${dir}]..`)
-
+      
+      // call service constructor and register to services
       if (moduleConfig.services && moduleConfig.name) {
         const exposedServices = await moduleConfig.services.call(null, app)
         for (let serviceName in exposedServices) {
           this.services[serviceName] = exposedServices[serviceName]
         }
       }
-
-      moduleConfig.routes && moduleConfig.routes(router)
-      moduleConfig.onload && moduleConfig.onload(app)
+      this.modules.push(moduleConfig)
+      // apply routes
+      moduleConfig.routes && await moduleConfig.routes(router)
     }
 
-    // do some constructor injection by service name
+    // fulfill service dependencies
     for (const serviceName in this.services) {
       // service list
       let constructorDefinedRefs = Object.getOwnPropertyNames(this.services[serviceName])
@@ -70,12 +77,14 @@ class BootStrap {
         }
       }
     }
-
+    
     for (const serviceName in this.services) {
       this.services[serviceName].init && this.services[serviceName].init()
     }
-
-    app.context.services = this.services
+    
+    for (const module of this.modules) {
+      module.onload && await module.onload.call(this, app, router, this.services)
+    }
   }
 }
 
