@@ -20,7 +20,7 @@ class RESTFullController {
     let order = ctx.request.query.order
     
     let key = ctx.request.query.key
-    let value = ctx.request.query.v
+    let value = ctx.request.query.value
     
     let filter = {}
     if (key) {

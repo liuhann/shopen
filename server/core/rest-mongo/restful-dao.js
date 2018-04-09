@@ -1,22 +1,27 @@
+const debug = require('debug')('shopen:class:restdao')
+
 class RESTfulDAO {
   constructor (db, coll) {
     this.db = db
     this.coll = coll
   }
   
-  async list ({filter, page = 1, size = 50, sort, order}) {
+  async list ({filter, page, count, sort, order}) {
     const coll = this.db.collection(this.coll)
     let cursor = coll.find(filter)
     const total = await cursor.count()
     
     if (sort) {
-      cursor = cursor.sort(sort, order)
+      const sortObject = {}
+      sortObject[sort] = parseInt(order)
+      cursor = cursor.sort(sortObject)
     }
-    const result = await cursor.skip((page - 1) * size).limit(size).toArray()
+    debug(filter, page, count, sort, order)
+    const result = await cursor.skip((page - 1) * count).limit(count).toArray()
     
     return {
       page,
-      size,
+      count,
       filter,
       sort,
       order,
