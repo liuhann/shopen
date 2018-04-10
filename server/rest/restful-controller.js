@@ -11,7 +11,6 @@ class RESTFullController {
     router.get(`${basePath}/${coll}`, this.list)
     router.post(`${basePath}/${coll}`, this.create)
     router.patch(`${basePath}/${coll}/:id`, this.patch)
-    router.delete(`${basePath}/${coll}/:id`, this.delete)
   }
   
   async list (ctx, next) {
@@ -45,14 +44,6 @@ class RESTFullController {
     let objectId = ctx.params.id
     
     const result = await ctx.dao.patchObject(objectId, ctx.request.body)
-    ctx.body = result
-    await next()
-  }
-  
-  async delete (ctx, next) {
-    let objectId = ctx.params.id
-    const result = await ctx.dao.deleteObject(objectId)
-    
     ctx.body = result
     await next()
   }

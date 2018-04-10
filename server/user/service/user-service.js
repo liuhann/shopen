@@ -30,6 +30,10 @@ class UserService {
   async getUserByToken (token) {
 
   }
+  
+  async getUserId () {
+    return 'test'
+  }
 }
 
 module.exports = UserService

@@ -16,7 +16,6 @@ class TokenDAO {
       email,
       expires: expiresMill
     })
-
     return token
   }
 

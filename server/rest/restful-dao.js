@@ -49,14 +49,6 @@ class RESTfulDAO {
     })
     return updated
   }
-  
-  async deleteObject (id) {
-    const updated = await this.db.collection(this.coll).removeOne({
-      _id: new ObjectID(id)
-    })
-    
-    return updated
-  }
 }
 
 module.exports = RESTfulDAO
