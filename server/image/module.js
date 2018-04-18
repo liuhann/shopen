@@ -1,6 +1,6 @@
 const imageController = require('./controller/image-controller')
 const ImageService = require('./service/image')
-const RESTFulController = require('../core/rest-mongo/restful-controller')
+const RESTFulController = require('../rest/restful-controller')
 
 module.exports = {
   name: 'image',

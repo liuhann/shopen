@@ -1,13 +1,17 @@
-const debug = require('debug')('shopen:class:restdao')
+const debug = require('debug')('shopen:restful:dao')
 const {ObjectID} = require('mongodb')
+const compose = require('koa-compose')
 
 class RESTfulDAO {
-  constructor (db, coll) {
+  constructor (db, coll, plugins) {
     this.db = db
     this.coll = coll
+    this.middleware = plugins ? compose(plugins) : (ctx, next) => { }
   }
   
   async list ({filter, page, count, sort, order}) {
+    await this.middleware({type: 'list', filter, page, count, sort, order})
+    
     const coll = this.db.collection(this.coll)
     let cursor = coll.find(filter)
     const total = await cursor.count()
@@ -32,6 +36,7 @@ class RESTfulDAO {
   }
   
   async insertOne (object) {
+    await this.middleware({type: 'insert', object})
     const inserted = await this.db.collection(this.coll).insertOne(object)
     return {
       inserted
@@ -39,15 +44,23 @@ class RESTfulDAO {
   }
   
   async patchObject (id, set) {
-    const updated = await this.db.collection(this.coll).updateOne({
-      _id: new ObjectID(id)
-    }, {
+    const query = {}
+    query._id = new ObjectID(id)
+    await this.middleware({type: 'patch', query, set})
+    const updated = await this.db.collection(this.coll).updateOne(query, {
       $set: set
     }, {
       upsert: false,
       multi: false
     })
     return updated
+  }
+  
+  async deleteOne (id) {
+    const deleted = await this.db.collection(this.coll).deleteOne({
+      _id: new ObjectID(id)
+    })
+    return deleted
   }
 }
 

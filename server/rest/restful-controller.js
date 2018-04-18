@@ -1,3 +1,5 @@
+const debug = require('debug')('shopen:restful')
+
 const RESTFullDAO = require('./restful-dao')
 
 class RESTFullController {
@@ -10,7 +12,11 @@ class RESTFullController {
     
     router.get(`${basePath}/${coll}`, this.list)
     router.post(`${basePath}/${coll}`, this.create)
+    router.put(`${basePath}/${coll}`, this.create)
     router.patch(`${basePath}/${coll}/:id`, this.patch)
+    router.delete(`${basePath}/${coll}/:id`, this.delete)
+  
+    debug('REST deployed:' + basePath + '/' + coll)
   }
   
   async list (ctx, next) {
@@ -36,13 +42,24 @@ class RESTFullController {
     let object = ctx.request.body
     const result = await ctx.dao.insertOne(object)
     
-    ctx.body = result
+    ctx.body = {
+      result,
+      object
+    }
     await next()
   }
   
   async patch (ctx, next) {
     let objectId = ctx.params.id
     
+    const result = await ctx.dao.patchObject(objectId, ctx.request.body)
+    ctx.body = result
+    await next()
+  }
+  
+  async delete (ctx, next) {
+    let objectId = ctx.params.id
+  
     const result = await ctx.dao.patchObject(objectId, ctx.request.body)
     ctx.body = result
     await next()
