@@ -1,10 +1,11 @@
 const debug = require('debug')('shopen:restful')
 
 const RESTFullDAO = require('./restful-dao')
+const MongoIdMiddleware = require('./mongo-id')
 
 class RESTFullController {
   constructor (basePath, router, db, coll) {
-    this.dao = new RESTFullDAO(db, coll)
+    this.dao = new RESTFullDAO(db, coll, [MongoIdMiddleware])
     router.use(`${basePath}/${coll}`, async (ctx, next) => {
       ctx.dao = this.dao
       await next()
