@@ -18,7 +18,6 @@
     {
       "name": "image-title",
       "title": "图+文(1)",
-      "preview": "image-title.png",
       "data": {
         "title": {
           "type": "text",
