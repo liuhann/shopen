@@ -20,14 +20,17 @@
       "title": "图+文(1)",
       "data": {
         "title": {
+          "desc": "标题",
           "type": "text",
           "value": "Bonfire"
         },
         "desc": {
+          "desc": "描述",
           "type": "textarea",
           "value": "Order direct and take advantage of bulk discounts "
         },
         "image": {
+          "desc": "图片",
           "type": "image",
           "value": "http://localhost:3000/themes/bonfire/images/supply-hero.jpg"
         }
