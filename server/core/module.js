@@ -6,6 +6,7 @@ const serve = require('koa-static')
 const validate = require('./validate/middleware')
 const Schema = require('./validate/extend')
 const daoErrorHandler = require('./mongo/middleware')
+const multer = require('koa-multer')
 
 module.exports = {
   name: 'core',
@@ -23,8 +24,16 @@ module.exports = {
     app.use(daoErrorHandler)
 
     app.context.Schema = Schema
+
+
+    const upload = multer({ dest: 'uploads/' })
+
+    app.use()
   },
 
+  async routes (router) {
+
+  },
   async services ({config}) {
     return {
       mongo: new MongodbService({
