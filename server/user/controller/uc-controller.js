@@ -1,4 +1,3 @@
-
 async function register (ctx, next) {
   const validator = new ctx.Schema({
     email: {type: 'email', required: true, message: '请填写正确的邮件地址'},

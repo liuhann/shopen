@@ -5,8 +5,6 @@ module.exports = {
 
   onload (app) {
 
-
-
   },
 
   async routes (router) {
