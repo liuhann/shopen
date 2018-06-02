@@ -6,7 +6,6 @@ const serve = require('koa-static')
 const validate = require('./validate/middleware')
 const Schema = require('./validate/extend')
 const daoErrorHandler = require('./mongo/middleware')
-const multer = require('koa-multer')
 
 module.exports = {
   name: 'core',
