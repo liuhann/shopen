@@ -28,7 +28,7 @@ class BootStrap {
    * Load all and do service injection in packages folder
    * @returns {Promise<void>}
    */
-  async loadPackages() {
+  async loadPackages () {
     const packageDir = fs.readdirSync('./packages')
     for (let dir of packageDir) {
       const shopenPackage = this.loadPackage(`./packages/${dir}`)
@@ -38,7 +38,7 @@ class BootStrap {
     }
   }
 
-  async loadPackage(modulePath) {
+  async loadPackage (modulePath) {
     const moduleDef = `./${modulePath}/index.js`
     // return is not defined
     if (!fs.existsSync(moduleDef)) {
@@ -54,7 +54,7 @@ class BootStrap {
     return moduleConfig
   }
 
-  async initPackageService() {
+  async initPackageService () {
     // fulfill service dependencies
     const services = this.app.context.services
     for (const serviceName in services) {
@@ -72,12 +72,12 @@ class BootStrap {
     }
   }
 
-  async packagesReady() {
+  async packagesReady () {
     for (let shopenPackage of this.app.context.packages) {
       shopenPackage.ready && shopenPackage.ready(this.app)
     }
   }
-  async bootComplete() {
+  async bootComplete () {
     for (let shopenPackage of this.app.context.packages) {
       shopenPackage.bootComplete && shopenPackage.bootComplete(this.app)
     }
