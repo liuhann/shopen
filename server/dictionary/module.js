@@ -3,6 +3,9 @@ const dictionaryController = require('./controller/dictionary')
 
 module.exports = {
   name: 'dictionary',
+
+
+
   async services () {
     return {
       'dictionary': new DictionaryService()

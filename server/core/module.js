@@ -11,10 +11,21 @@ const daoErrorHandler = require('./mongo/middleware')
 module.exports = {
   name: 'core',
 
-  onload (app) {
+  created(app) {
     app.use(cors({
       credentials: true
     }))
+
+    app.use(bodyParser())
+
+  },
+
+  ready(server) {
+
+  },
+
+  onload (app) {
+
     app.use(serve('./static'))
     
     app.use(parser())
@@ -26,16 +37,12 @@ module.exports = {
     app.use(daoErrorHandler)
 
     app.context.Schema = Schema
-
-
-    const upload = multer({ dest: 'uploads/' })
-
-    app.use()
   },
 
   async routes (router) {
 
   },
+
   async services ({config}) {
     return {
       mongo: new MongodbService({
@@ -43,5 +50,9 @@ module.exports = {
         dbName: 'shopen'
       })
     }
+  },
+
+  onLoaded() {
+
   }
 }

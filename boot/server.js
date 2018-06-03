@@ -4,86 +4,82 @@ process.env.DEBUG = config.debug
 
 const fs = require('fs')
 const Koa = require('koa')
-const Router = require('koa-router')
 const debug = require('debug')('shopen:server')
 
 class BootStrap {
   async start () {
     this.app = new Koa()
-    this.app.globalConfig = config
 
-    this.services = {}
+    this.app.context.services = {}
+    this.app.context.packages = []
 
-    const router = new Router()
+    await this.loadPackages()
+    await this.initPackageService()
 
-    // load server modules
-    await this.loadModules(this.app, router)
-  
-    this.app.context.services = this.services
-
-    // use module routes
-    this.app.use(router.routes())
+    await this.packagesReady()
+    await this.bootComplete()
 
     // active http
     this.app.listen(config.port)
-  
     debug('√ boot complete')
   }
 
   /**
- * Load all modules in directory ./modules
- * @param {Application} app
- * @param {Router} router
- * @returns {Promise<void>}
- */
-  async loadModules (app, router) {
-    const moduleDirs = fs.readdirSync('./server')
-    
-    this.modules = []
-    // loop for each module
-    for (let dir of moduleDirs) {
-      // find module define js
-      const moduleDef = `./server/${dir}/module.js`
-      // return is not defined
-      if (!fs.existsSync(moduleDef)) continue
-
-      const moduleConfig = require(`../server/${dir}/module.js`)
-
-      debug(`initialize module [${dir}]..`)
-      
-      // call service constructor and register to services
-      if (moduleConfig.services && moduleConfig.name) {
-        const exposedServices = await moduleConfig.services.call(null, app)
-        for (let serviceName in exposedServices) {
-          this.services[serviceName] = exposedServices[serviceName]
-        }
+   * Load all and do service injection in packages folder
+   * @returns {Promise<void>}
+   */
+  async loadPackages() {
+    const packageDir = fs.readdirSync('./packages')
+    for (let dir of packageDir) {
+      const shopenPackage = this.loadPackage(`./packages/${dir}`)
+      if (shopenPackage) {
+        this.app.context.packages.push(shopenPackage)
       }
-      this.modules.push(moduleConfig)
-      // apply routes
-      moduleConfig.routes && await moduleConfig.routes(router)
     }
+  }
 
+  async loadPackage(modulePath) {
+    const moduleDef = `./${modulePath}/index.js`
+    // return is not defined
+    if (!fs.existsSync(moduleDef)) {
+      return null
+    }
+    const moduleConfig = require(`../${modulePath}/index.js`)
+
+    debug(`prepare module [${modulePath}]..`)
+
+    if (moduleConfig.created) {
+      moduleConfig.created(this.app)
+    }
+    return moduleConfig
+  }
+
+  async initPackageService() {
     // fulfill service dependencies
-    for (const serviceName in this.services) {
+    const services = this.app.context.services
+    for (const serviceName in services) {
       // service list
-      let constructorDefinedRefs = Object.getOwnPropertyNames(this.services[serviceName])
+      let constructorDefinedRefs = Object.getOwnPropertyNames(services[serviceName])
 
       // iterate fields of service
       for (const refName of constructorDefinedRefs) {
         // inject service by name
         if (!refName.startsWith('_') && // field start with underline is considered not to be service
-                this.services[serviceName][refName] == null) {
-          this.services[serviceName][refName] = this.services[refName]
+          services[serviceName][refName] == null) {
+          services[serviceName][refName] = services[refName]
         }
       }
     }
-    
-    for (const serviceName in this.services) {
-      this.services[serviceName].init && this.services[serviceName].init()
+  }
+
+  async packagesReady() {
+    for (let shopenPackage of this.app.context.packages) {
+      shopenPackage.ready && shopenPackage.ready(this.app)
     }
-    
-    for (const module of this.modules) {
-      module.onload && await module.onload.call(this, app, router, this.services)
+  }
+  async bootComplete() {
+    for (let shopenPackage of this.app.context.packages) {
+      shopenPackage.bootComplete && shopenPackage.bootComplete(this.app)
     }
   }
 }
