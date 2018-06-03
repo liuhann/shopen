@@ -1,5 +1,6 @@
 const MongodbService = require('./mongo/mongodb')
 
+const bodyParser = require('koa-body');
 const parser = require('koa-bodyparser')
 const cors = require('kcors')
 const serve = require('koa-static')
@@ -17,6 +18,8 @@ module.exports = {
     app.use(serve('./static'))
     
     app.use(parser())
+
+    app.use(bodyParser());
 
     app.use(validate)
 

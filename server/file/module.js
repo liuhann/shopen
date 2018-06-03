@@ -12,7 +12,6 @@ module.exports = {
     router.use(`/file/upload/`, upload);
 
     router.post(`/file/upload`, (ctx, next)=> {
-
     })
   },
   async services ({config}) {
