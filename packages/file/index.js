@@ -6,6 +6,5 @@ module.exports = {
   },
   
   ready (app) {
-    app.cont
   }
 }
