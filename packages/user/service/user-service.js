@@ -1,6 +1,7 @@
 const debug = require('debug')('core:user')
 const AuthDAO = require('../dao/auth')
 const TokenDAO = require('../dao/token')
+const HttpError = require('http-errors')
 
 class UserService {
   async init (mongo) {
@@ -10,9 +11,11 @@ class UserService {
 
   async checkUser ({email, pwd}) {
     debug(`check password ${email}/${pwd}`)
-    await this.authdao.checkUser(email, pwd)
+    const checked = this.authdao.checkUser(email, pwd)
+    if (!checked) {
+      throw new HttpError(400)
+    }
     const token = await this.tokendao.generateToken(email)
-
     return {
       token
     }
@@ -20,6 +23,9 @@ class UserService {
 
   async register ({name, pwd, email}) {
     const result = await this.authdao.register({name, pwd, email})
+    if (result === -1) {
+      throw new HttpError(400)
+    }
     return result
   }
 

@@ -1,6 +1,5 @@
 const randomize = require('randomatic')
 const expiresMill = 7 * 24 * 60 * 60 * 1000
-const DAOError = require('../../core/mongo/dao-error')
 
 class TokenDAO {
   constructor (mongo) {
@@ -25,7 +24,7 @@ class TokenDAO {
       token
     })
     if (!found) {
-      throw new DAOError(401, '用户未登录或登录失效')
+      return -1
     }
     return found
   }

@@ -1,4 +1,4 @@
-const DAOError = require('../../core/mongo/dao-error')
+const HttpError = require('http-errors')
 
 class AuthDAO {
   constructor (db) {
@@ -12,7 +12,9 @@ class AuthDAO {
       email, pwd
     })
     if (!found) {
-      throw new Error(403, '用户名或者密码无效')
+      return false
+    } else {
+      return true
     }
   }
 
@@ -22,7 +24,7 @@ class AuthDAO {
       email: userObject.email
     })
     if (found) {
-      throw new DAOError(409, '用户已经注册')
+      return -1
     }
     
     const inc = await this.mongo.getNextSequence('user')
