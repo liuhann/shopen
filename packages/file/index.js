@@ -4,5 +4,8 @@ module.exports = {
   created (app) {
   
   },
-
+  
+  ready (app) {
+    app.cont
+  }
 }
