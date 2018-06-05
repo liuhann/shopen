@@ -18,18 +18,20 @@ validator.prototype.validated = async function (object) {
 
 module.exports = {
   name: 'core',
-
+  
   created (app) {
     app.use(cors({
       credentials: true
     }))
-    app.use(bodyParser())
+    app.use(bodyParser({
+      multipart: true
+    }))
     app.context.router = new Router()
     app.context.services.validator = validator
   },
 
   ready (app) {
-
+  
   },
 
   bootComplete (app) {

@@ -31,7 +31,7 @@ class BootStrap {
   async loadPackages () {
     const packageDir = fs.readdirSync('./packages')
     for (let dir of packageDir) {
-      const shopenPackage = this.loadPackage(`./packages/${dir}`)
+      const shopenPackage = await this.loadPackage(`./packages/${dir}`)
       if (shopenPackage) {
         this.app.context.packages.push(shopenPackage)
       }
@@ -46,6 +46,10 @@ class BootStrap {
     }
     const moduleConfig = require(`../${modulePath}/index.js`)
 
+    if (moduleConfig.disabled) {
+      return null
+    }
+    
     debug(`prepare module [${modulePath}]..`)
 
     if (moduleConfig.created) {

@@ -3,6 +3,7 @@ const userController = require('./controller/uc-controller')
 
 module.exports = {
   name: 'user',
+  disabled: true,
 
   created (app) {
     app.context.services.user = new UserService()
@@ -14,5 +15,4 @@ module.exports = {
     router.post('/open/user/register', userController.register)
     router.post('/open/user/login', userController.login)
   }
-
 }
