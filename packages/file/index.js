@@ -4,7 +4,7 @@ module.exports = {
   name: 'file',
 
   created (app) {
-    app.context.services.fileUpload = new FileService(`d:/filestore`)
+    app.context.services.fileUpload = new FileService(`/data/file`)
   },
   
   ready (app) {
