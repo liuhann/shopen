@@ -34,7 +34,8 @@ class FileService {
     return result
   }
   
-  async serve (path, ctx) {
+  async serve (ctx, path) {
+    console.log('send file' + path)
     await send(ctx, path, {
       root: this.baseDir
     })

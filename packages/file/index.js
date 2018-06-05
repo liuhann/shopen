@@ -17,7 +17,7 @@ module.exports = {
     
     router.get('/file/download/:path*', async (ctx) => {
       if (ctx.params.path) {
-        await ctx.service.fileUpload.serve(ctx, ctx.params.path)
+        await ctx.services.fileUpload.serve(ctx, ctx.params.path)
       }
     })
   }
