@@ -10,9 +10,15 @@ module.exports = {
   ready (app) {
     const router = app.context.router
     router.post('/file/upload', async (ctx, next) => {
-      const fileResult = ctx.services.fileUpload.receive(ctx)
+      const fileResult = await ctx.services.fileUpload.receive(ctx)
       ctx.body = fileResult
       await next()
+    })
+    
+    router.get('/file/download/:path*', async (ctx) => {
+      if (ctx.params.path) {
+        await ctx.service.fileUpload.serve(ctx, ctx.params.path)
+      }
     })
   }
 }
