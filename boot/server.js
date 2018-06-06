@@ -1,5 +1,4 @@
 const config = require('../config')
-
 process.env.DEBUG = config.debug
 
 const fs = require('fs')

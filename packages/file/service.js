@@ -20,7 +20,7 @@ class FileService {
     
     for (const fileName in body.files) {
       const uploadFile = body.files[fileName]
-      const storePath = `${fileDir}/${shortid.generate()}`
+      const storePath = `${fileDir}/${shortid.generate()}.${this.fileExtension(uploadFile.name)}`
       await fsPromises.copyFile(uploadFile.path, storePath)
       const fileDoc = {
         path: storePath,
@@ -43,6 +43,11 @@ class FileService {
   
   async thumbnail (path) {
   
+  }
+
+  // from https://stackoverflow.com/questions/190852/how-can-i-get-file-extensions-with-javascript
+  fileExtension (fname) {
+    return fname.slice((fname.lastIndexOf('.') - 1 >>> 0) + 2)
   }
   
   async delete () {
