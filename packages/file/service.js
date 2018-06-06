@@ -1,7 +1,9 @@
 const makeDir = require('make-dir')
 const send = require('koa-send')
+const fs = require('fs')
 const fsPromises = require('fs').promises
 const shortid = require('shortid')
+const gm = require('gm').subClass({imageMagick: true})
 
 class FileService {
   constructor (baseDir) {
@@ -20,7 +22,8 @@ class FileService {
     
     for (const fileName in body.files) {
       const uploadFile = body.files[fileName]
-      const storePath = `${fileDir}/${shortid.generate()}.${this.fileExtension(uploadFile.name)}`
+      const fileExt = this.fileExtension(uploadFile.name)
+      const storePath = `${fileDir}/${shortid.generate()}.${fileExt}`
       await fsPromises.copyFile(uploadFile.path, storePath)
       const fileDoc = {
         path: storePath,
@@ -41,13 +44,26 @@ class FileService {
     })
   }
   
-  async thumbnail (path) {
-  
+  async thumbnail (ctx, path) {
+    if (fs.existsSync(path)) {
+      this.serve(ctx, path)
+    } else {
+      const paths = path.split('_')
+      if (paths.length === 2 && ['jpg', 'png'].indexOf(this.fileExtension(paths[0]))) {
+        try {
+
+          return
+        } catch (e) {
+          console.log(e)
+        }
+      }
+    }
+
   }
 
   // from https://stackoverflow.com/questions/190852/how-can-i-get-file-extensions-with-javascript
   fileExtension (fname) {
-    return fname.slice((fname.lastIndexOf('.') - 1 >>> 0) + 2)
+    return fname.slice((fname.lastIndexOf('.') - 1 >>> 0) + 2).toLowerCase()
   }
   
   async delete () {
