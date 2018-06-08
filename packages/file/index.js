@@ -20,5 +20,9 @@ module.exports = {
         await ctx.services.fileUpload.serve(ctx, ctx.params.path)
       }
     })
+
+    router.get('/file/thumbnail/:path*', async (ctx) => {
+      await ctx.services.fileUpload.thumbnail(ctx, ctx.params.path)
+    })
   }
 }

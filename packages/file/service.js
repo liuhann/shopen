@@ -1,10 +1,9 @@
 const makeDir = require('make-dir')
 const send = require('koa-send')
 const fs = require('fs')
-const fsPromises = require('fs').promises
+const fsPromises = fs.promises
 const shortid = require('shortid')
-const gm = require('gm').subClass({imageMagick: true})
-
+const GMService = require('./gm')
 class FileService {
   constructor (baseDir) {
     this.baseDir = baseDir
@@ -45,20 +44,20 @@ class FileService {
   }
   
   async thumbnail (ctx, path) {
-    if (fs.existsSync(path)) {
-      this.serve(ctx, path)
+    if (fs.existsSync(this.baseDir + path)) {
+      await this.serve(ctx, path)
     } else {
-      const paths = path.split('_')
-      if (paths.length === 2 && ['jpg', 'png'].indexOf(this.fileExtension(paths[0]))) {
+      const [filePath, transform] = path.split('_')
+      if (transform && ['jpg', 'png'].indexOf(this.fileExtension(filePath)) > -1) {
         try {
-
-          return
+          await GMService.generateThumbnail(this.baseDir + '/' + filePath, transform)
+          await this.serve(ctx, path)
         } catch (e) {
           console.log(e)
+          ctx.throw(400)
         }
       }
     }
-
   }
 
   // from https://stackoverflow.com/questions/190852/how-can-i-get-file-extensions-with-javascript
