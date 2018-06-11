@@ -2,6 +2,7 @@ const makeDir = require('make-dir')
 const send = require('koa-send')
 const fs = require('fs')
 const fsPromises = fs.promises
+const path = require('path')
 const shortid = require('shortid')
 const GMService = require('./gm')
 class FileService {
@@ -37,21 +38,23 @@ class FileService {
   }
   
   async serve (ctx, path) {
-    console.log('send file' + path)
+    console.log('send file ' + path)
     await send(ctx, path, {
       root: this.baseDir
     })
   }
-  
-  async thumbnail (ctx, path) {
-    if (fs.existsSync(this.baseDir + path)) {
-      await this.serve(ctx, path)
+
+  // request is  /2018/7/1/12/sdlkjsl_100x100.png
+  async thumbnail (ctx, fileUrl) {
+    if (fs.existsSync(this.baseDir + fileUrl)) {
+      await this.serve(ctx, fileUrl)
     } else {
-      const [filePath, transform] = path.split('_')
-      if (transform && ['jpg', 'png'].indexOf(this.fileExtension(filePath)) > -1) {
+      const parsed = path.parse(fileUrl)
+      const [fileName, transform] = parsed.name.split('_')
+      if (transform && ['.jpg', '.png'].indexOf(parsed.ext) > -1) {
         try {
-          await GMService.generateThumbnail(this.baseDir + '/' + filePath, transform)
-          await this.serve(ctx, path)
+          await GMService.generateThumbnail(this.baseDir + '/' + parsed.dir + '/' + fileName, parsed.ext, transform)
+          await this.serve(ctx, fileUrl)
         } catch (e) {
           console.log(e)
           ctx.throw(400)
