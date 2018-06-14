@@ -5,30 +5,25 @@ class MongodbService {
   constructor ({url, dbName}) {
     this.url = url
     this.dbName = dbName
-    this.db = this.getDb()
   }
 
-  async getDb () {
-    if (this.db != null) {
-      return this.db
-    } else {
-      let client
-      try {
-        // Use connect method to connect to the Server
-        client = await MongoClient.connect(this.url)
-        this.db = client.db(this.dbName)
-        debug('mongodb connected ' + this.url)
-        return this.db
-      } catch (err) {
-        debug('mongo db connect fail ' + this.url)
-        // console.log(err.stack);
-        if (client) {
-          client.close()
-        }
+  async connect () {
+    try {
+      // Use connect method to connect to the Server
+      this.client = await MongoClient.connect(this.url)
+    } catch (err) {
+      debug('mongo db connect fail ' + this.url)
+      // console.log(err.stack);
+      if (this.client) {
+        this.client.close()
       }
     }
   }
-  
+
+  async getDb (dbName) {
+    return await this.client.db(dbName || this.dbName)
+  }
+
   async ensureSequence (name, start) {
     const db = await this.getDb()
     const one = await db.collection('counter').findOne({
@@ -41,7 +36,7 @@ class MongodbService {
       })
     }
   }
-  
+
   async getNextSequence (name) {
     var ret = await this.getDb().collection('counter').findOneAndUpdate({
       _id: name

@@ -14,7 +14,7 @@ module.exports = {
 
   },
 
-  bootComplete (app) {
-
+  async bootComplete (app) {
+    await app.context.services.mongodb.connect()
   }
 }
