@@ -1,8 +1,8 @@
 const homeLabels = require('./common/home-labels')
 const fs = require('fs')
 const debug = require('debug')('shopen:story:service')
-
 const CDN_IMG = 'http://imagek.cdn.bcebos.com'
+const send = require('koa-send')
 
 module.exports = class StoryService {
   constructor (home) {
@@ -17,7 +17,9 @@ module.exports = class StoryService {
   async storyCover (ctx, next) {
     const fileid = ctx.params.id
     if (fs.existsSync(`${this.coverHome}/${fileid}`)) {
-      await this.file.serve(ctx, `${this.coverHome}/${fileid}`)
+      await send(ctx, `${fileid}`, {
+        root: this.coverHome
+      })
     } else {
       const [id] = fileid.split('.')
       const story = await this.storydao.getStoryById(id)
@@ -34,24 +36,27 @@ module.exports = class StoryService {
 
   async storyThumbNail (ctx, next) {
     const fileid = ctx.params.id
+    debug(`check ${this.thumbHome}/${fileid}`)
     if (fs.existsSync(`${this.thumbHome}/${fileid}`)) {
-      await this.file.serve(ctx, `${this.thumbHome}/${fileid}`)
+      debug('sending', `/${fileid}`, this.thumbHome)
+
+      await send(ctx, `/${fileid}`, {
+        root: this.thumbHome
+      })
     } else {
       const [id] = fileid.split('.')
       const story = await this.storydao.getStoryById(id)
       if (story) {
         debug(`transfer story thumbnail ${CDN_IMG}/${story.cover}.png@w_120,q_80 -> ${this.thumbHome}/${fileid}`)
-        await this.file.transfer(`${CDN_IMG}/${story.cover}.png@w_120,q_80`, `${this.thumbHome}/${fileid}`)
-        await this.file.serve(ctx, `${this.thumbHome}/${fileid}`)
+        await this.file.transfer(`${CDN_IMG}/${story.cover}.png@w_120,q_80`, `${this.thumbHome}`, fileid)
+        await send(ctx, `/${fileid}`, {
+          root: this.thumbHome
+        })
       } else {
         debug(`story not found ${fileid}`)
       }
     }
     await next()
-  }
-
-  async storyThumbNail () {
-
   }
 
   async listHome (labels) {

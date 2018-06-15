@@ -10,8 +10,6 @@ module.exports = {
 
   ready (app) {
     const router = app.context.router
-    app.context.services.story.dao = new StoryDAO(app.context.services.mongodb)
-
     // Init routing, Route Controller is required some times
     router.get('/story/home', async (ctx, next) => {
       const body = await ctx.services.story.listHome(ctx.query.labels.split(','))
@@ -20,6 +18,11 @@ module.exports = {
     })
 
     router.get('/story/cover/:id', app.context.services.story.storyCover)
+
+    router.get('/story/thumb/:id', async (ctx, next) => {
+      console.log('thj' + ctx.params.id)
+      await app.context.services.story.storyThumbNail(ctx, next)
+    })
   }
 
 }

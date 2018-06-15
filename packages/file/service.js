@@ -71,8 +71,10 @@ class FileService {
     return fname.slice((fname.lastIndexOf('.') - 1 >>> 0) + 2).toLowerCase()
   }
 
-  async transfer (from, dest) {
-    await download(from, dest)
+  async transfer (from, dest, filename) {
+    await download(from, dest, {
+      filename
+    })
   }
 
   async delete () {
