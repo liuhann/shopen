@@ -5,6 +5,9 @@ const fsPromises = fs.promises
 const path = require('path')
 const shortid = require('shortid')
 const GMService = require('./gm')
+
+const download = require('download')
+
 class FileService {
   constructor (baseDir) {
     this.baseDir = baseDir
@@ -67,7 +70,11 @@ class FileService {
   fileExtension (fname) {
     return fname.slice((fname.lastIndexOf('.') - 1 >>> 0) + 2).toLowerCase()
   }
-  
+
+  async transfer (from, dest) {
+    await download(from, dest)
+  }
+
   async delete () {
   
   }
