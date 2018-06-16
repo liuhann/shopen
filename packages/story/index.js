@@ -17,11 +17,8 @@ module.exports = {
       await next()
     })
 
-    router.get('/story/cover/:id', app.context.services.story.storyCover)
-
-    router.get('/story/thumb/:id', async (ctx, next) => {
-      console.log('thj' + ctx.params.id)
-      await app.context.services.story.storyThumbNail(ctx, next)
+    router.get('/story/cover/:x/:y/:cover', async (ctx, next) => {
+      await app.context.services.story.storyImage(ctx, next)
     })
   }
 

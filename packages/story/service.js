@@ -8,53 +8,25 @@ module.exports = class StoryService {
   constructor (home) {
     this.coverHome = home + '/cover'
     this.audioHome = home + '/audio'
-    this.thumbHome = home + '/thumbnail'
     this.mongodb = null
     this.file = null
     this.storydao = null
   }
 
-  async storyCover (ctx, next) {
-    const fileid = ctx.params.id
-    if (fs.existsSync(`${this.coverHome}/${fileid}`)) {
-      await send(ctx, `${fileid}`, {
+  async storyImage (ctx, next) {
+    let {x, y, cover} = ctx.params
+    let [coverId] = cover.split('.')
+    const coverHome = this.coverHome + `/${x}/${y}/` + coverId.charAt(0)
+    if (fs.existsSync(`${coverHome}/${cover}`)) {
+      await send(ctx, `/${x}/${y}/` + coverId.charAt(0) + `/${cover}`, {
         root: this.coverHome
       })
     } else {
-      const [id] = fileid.split('.')
-      const story = await this.storydao.getStoryById(id)
-      if (story) {
-        debug(`transfer story ${CDN_IMG}/${story.cover}.png@w_420,q_80 -> ${this.coverHome}/${fileid}`)
-        await this.file.transfer(`${CDN_IMG}/${story.cover}.png@w_420,q_80`, `${this.coverHome}/${fileid}`)
-        await this.file.serve(ctx, `${this.coverHome}/${fileid}`)
-      } else {
-        debug(`story not found ${fileid}`)
-      }
-    }
-    await next()
-  }
-
-  async storyThumbNail (ctx, next) {
-    const fileid = ctx.params.id
-    debug(`check ${this.thumbHome}/${fileid}`)
-    if (fs.existsSync(`${this.thumbHome}/${fileid}`)) {
-      debug('sending', `/${fileid}`, this.thumbHome)
-
-      await send(ctx, `/${fileid}`, {
-        root: this.thumbHome
+      debug(`1.transfer story ${CDN_IMG}/${coverId}.png@w_${x},h_${y},s_2,q_80 -> ${coverHome}/${cover}`)
+      await this.file.transfer(`${CDN_IMG}/${coverId}.png@w_${x},h_${y},s_2,q_80`, coverHome, cover)
+      await send(ctx, `/${cover}`, {
+        root: coverHome
       })
-    } else {
-      const [id] = fileid.split('.')
-      const story = await this.storydao.getStoryById(id)
-      if (story) {
-        debug(`transfer story thumbnail ${CDN_IMG}/${story.cover}.png@w_120,q_80 -> ${this.thumbHome}/${fileid}`)
-        await this.file.transfer(`${CDN_IMG}/${story.cover}.png@w_120,q_80`, `${this.thumbHome}`, fileid)
-        await send(ctx, `/${fileid}`, {
-          root: this.thumbHome
-        })
-      } else {
-        debug(`story not found ${fileid}`)
-      }
     }
     await next()
   }
@@ -70,6 +42,7 @@ module.exports = class StoryService {
       'home': 'true'
     }).toArray()
     this.homeListing.recommendLabels = homeLabels
+    this.homeListing.homesAlbum = await this.storydao.getTopAlbums()
 
     for (var i = 0; i < labels.length; i++) {
       let labelList = await colStories.find({

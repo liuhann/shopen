@@ -5,6 +5,13 @@ class StoryDAO {
     this.mongodb = null
   }
 
+  async getTopAlbums () {
+    const db = await this.getStoryDb()
+    return db.collection('albums').find({
+      'home': 'true'
+    }).toArray()
+  }
+
   async getStoryById (id) {
     const db = await this.getStoryDb()
     const story = await db.collection('stories').findOne({
