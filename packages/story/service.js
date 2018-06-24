@@ -31,6 +31,11 @@ module.exports = class StoryService {
     await next()
   }
 
+  async sampleStories (ctx, next) {
+    ctx.body = await this.storydao.sampleDocs()
+    await next()
+  }
+
   async listHome (labels) {
     const db = await this.mongodb.getDb('ybstory')
     const colStories = db.collection('stories')

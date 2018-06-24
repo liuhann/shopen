@@ -20,6 +20,9 @@ module.exports = {
     router.get('/story/cover/:x/:y/:cover', async (ctx, next) => {
       await app.context.services.story.storyImage(ctx, next)
     })
+    router.get('/story/samples', async (ctx, next) => {
+      await app.context.services.story.sampleStories(ctx, next)
+    })
   }
 
 }
