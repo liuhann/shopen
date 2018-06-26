@@ -41,7 +41,6 @@ class FileService {
   }
   
   async serve (ctx, path) {
-    console.log('send file ' + path)
     await send(ctx, path, {
       root: this.baseDir
     })
@@ -59,7 +58,6 @@ class FileService {
           await GMService.generateThumbnail(this.baseDir + '/' + parsed.dir + '/' + fileName, parsed.ext, transform)
           await this.serve(ctx, fileUrl)
         } catch (e) {
-          console.log(e)
           ctx.throw(400)
         }
       }

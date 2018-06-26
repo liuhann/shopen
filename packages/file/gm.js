@@ -9,7 +9,6 @@ class GmService {
       gm(path + ext).resize(parseInt(x), parseInt(y)).write(path + '_' + transform + ext, function (err) {
         debug('write complete')
         if (err) {
-          console.log(err)
           reject(err)
         } else {
           resolve()
