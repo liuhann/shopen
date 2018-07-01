@@ -5,6 +5,7 @@ const fsPromises = fs.promises
 const path = require('path')
 const shortid = require('shortid')
 const GMService = require('./gm')
+const debug = require('debug')('shopen:file:service')
 
 const download = require('download')
 
@@ -70,8 +71,15 @@ class FileService {
   }
 
   async transfer (from, dest, filename) {
-    await download(from, dest, {
-      filename
+    let folder = dest
+    let file = filename
+    if (!filename) {
+      const sepIndex = dest.lastIndexOf('/')
+      file = dest.substring(sepIndex + 1)
+      folder = dest.substring(0, sepIndex)
+    }
+    await download(from, folder, {
+      filename: file
     })
   }
 

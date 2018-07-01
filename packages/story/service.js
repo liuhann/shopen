@@ -2,6 +2,7 @@ const homeLabels = require('./common/home-labels')
 const fs = require('fs')
 const debug = require('debug')('shopen:story:service')
 const CDN_IMG = 'http://imagek.cdn.bcebos.com'
+const CDN_STORY = 'http://chuchu.cdn.bcebos.com'
 const send = require('koa-send')
 
 module.exports = class StoryService {
@@ -22,10 +23,33 @@ module.exports = class StoryService {
         root: this.coverHome
       })
     } else {
-      debug(`1.transfer story ${CDN_IMG}/${coverId}.png@w_${x},h_${y},s_2,q_80 -> ${coverHome}/${cover}`)
+      debug(`1.transfer story ${CDN_STORY}/${coverId}.png@w_${x},h_${y},s_2,q_80 -> ${coverHome}/${cover}`)
       await this.file.transfer(`${CDN_IMG}/${coverId}.png@w_${x},h_${y},s_2,q_80`, coverHome, cover)
       await send(ctx, `/${cover}`, {
         root: coverHome
+      })
+    }
+    await next()
+  }
+
+  async storyDownload (ctx, next) {
+    let {id} = ctx.params
+    const story = await this.storydao.getStoryById(id)
+    if (story == null) {
+      ctx.status = 404
+      await next()
+      return
+    }
+    let storyPath = (story.path.charAt(0) === '/') ? story.path.substring(1) : story.path
+    if (fs.existsSync(this.audioHome + '/' + storyPath)) {
+      await send(ctx, storyPath, {
+        root: this.audioHome
+      })
+    } else {
+      debug(`1.transfer story ${CDN_STORY}/${storyPath} -> ${this.audioHome}/${storyPath}`)
+      await this.file.transfer(`${CDN_STORY}/${encodeURIComponent(storyPath)}`, `${this.audioHome}/${storyPath}`)
+      await send(ctx, storyPath, {
+        root: this.audioHome
       })
     }
     await next()
