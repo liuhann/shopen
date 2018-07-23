@@ -18,7 +18,7 @@ validator.prototype.validated = async function (object) {
 
 module.exports = {
   name: 'core',
-  
+
   created (app) {
     app.use(cors({
       credentials: true
@@ -31,7 +31,7 @@ module.exports = {
   },
 
   ready (app) {
-  
+
   },
 
   bootComplete (app) {

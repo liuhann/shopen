@@ -1,10 +1,15 @@
 const StoryService = require('./service')
 const StoryDAO = require('./dao')
 const koaRange = require('koa-range')
+const vhost = require('koa-virtual-host')
+const Koa = require('koa')
 
 module.exports = {
   async created (app) {
-    app.use(require('koa-static')('packages/story/dist'))
+    // map  packages/story/dist -> m.yuanbaogushi.com'
+    const staticApp = new Koa()
+    staticApp.use(require('koa-static')('packages/story/dist'))
+    app.use(vhost('m.yuanbaogushi.com', staticApp))
     // service register
     app.context.services.story = new StoryService('/data/story')
     app.context.services.storydao = new StoryDAO()
