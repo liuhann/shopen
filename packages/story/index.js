@@ -27,6 +27,8 @@ module.exports = {
       await app.context.services.story.sampleStories(ctx, next)
     })
     router.get('/story/mp3/:id', koaRange, storySevice.storyDownload.bind(storySevice))
+
+    router.put('/story/mark/:id/:mark', storySevice.markStory.bind(storySevice))
   }
 
 }

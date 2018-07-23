@@ -87,4 +87,13 @@ module.exports = class StoryService {
     }
     return this.homeListing
   }
+
+  async markStory (ctx, next) {
+    let {id, mark} = ctx.params
+    await this.storydao.increaseStoryMarkByName(id, mark)
+    ctx.body = {
+      marked: true
+    }
+    await next()
+  }
 }
