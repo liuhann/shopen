@@ -96,4 +96,11 @@ module.exports = class StoryService {
     }
     await next()
   }
+  
+  async getStoryDetail (ctx, next) {
+    let {id} = ctx.params
+    const story = await this.storydao.getStoryById(id)
+    ctx.body = story
+    await next()
+  }
 }
