@@ -125,7 +125,7 @@ module.exports = class StoryService {
       if (fs.existsSync(`${coverHome}/${coverId}.png`)) {
         result.cover = `${coverHome}/${coverId}.png`
         fs.unlink(`${coverHome}/${coverId}.png`, (err) => {
-	        console.log(err)
+          console.log(err)
         })
       }
     }
