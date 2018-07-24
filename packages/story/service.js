@@ -103,4 +103,34 @@ module.exports = class StoryService {
     ctx.body = story
     await next()
   }
+  
+  async deleteStory (ctx, next) {
+    let {id} = ctx.params
+    debug('removeing story : ' + id)
+    const result = {}
+    const story = await this.storydao.getStoryById(id)
+    
+    if (story) {
+      debug('story found')
+      let storyPath = (story.path.charAt(0) === '/') ? story.path.substring(1) : story.path
+      if (fs.existsSync(this.audioHome + '/' + storyPath)) {
+        result.mp3 = this.audioHome + '/' + storyPath
+        debug('unlink mp3 file: ' + this.audioHome + '/' + storyPath)
+        fs.unlink(this.audioHome + '/' + storyPath, (err) => {
+          console.log(err)
+        })
+      }
+      let coverId = story.cover
+      const coverHome = this.coverHome + `/480/480/` + coverId.charAt(0)
+      if (fs.existsSync(`${coverHome}/${coverId}.png`)) {
+        result.cover = `${coverHome}/${coverId}.png`
+        fs.unlink(`${coverHome}/${coverId}.png`, (err) => {
+	        console.log(err)
+        })
+      }
+    }
+    await this.storydao.deleteStoryById(id)
+    ctx.body = result
+    await next()
+  }
 }
