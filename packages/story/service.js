@@ -96,20 +96,20 @@ module.exports = class StoryService {
     }
     await next()
   }
-  
+
   async getStoryDetail (ctx, next) {
     let {id} = ctx.params
     const story = await this.storydao.getStoryById(id)
     ctx.body = story
     await next()
   }
-  
+
   async deleteStory (ctx, next) {
     let {id} = ctx.params
     debug('removeing story : ' + id)
     const result = {}
     const story = await this.storydao.getStoryById(id)
-    
+
     if (story) {
       debug('story found')
       let storyPath = (story.path.charAt(0) === '/') ? story.path.substring(1) : story.path
@@ -131,6 +131,16 @@ module.exports = class StoryService {
     }
     await this.storydao.deleteStoryById(id)
     ctx.body = result
+    await next()
+  }
+
+  async updateStory (ctx, next) {
+    const story = ctx.request.body
+    const setProperties = {
+
+    }
+    await this.storydao.updateStory(story._id, setProperties)
+    ctx.body = setProperties
     await next()
   }
 }

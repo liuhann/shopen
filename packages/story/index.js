@@ -36,6 +36,7 @@ module.exports = {
     router.put('/story/mark/:id/:mark', storySevice.markStory.bind(storySevice))
     router.get('/story/detail/:id', storySevice.getStoryDetail.bind(storySevice))
     router.get('/story/delete/:id', storySevice.deleteStory.bind(storySevice))
+    router.post('/story/update', storySevice.updateStory.bind(storySevice))
   }
 
 }
