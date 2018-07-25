@@ -60,6 +60,13 @@ module.exports = class StoryService {
     await next()
   }
 
+  async searchStories (ctx, next) {
+    const {query, skip, limit} = ctx.query
+    const result = await this.storydao.searchStoryTitleContains(query, parseInt(skip) || 0, parseInt(limit) || 20)
+    ctx.body = result
+    await next()
+  }
+
   async listHome (labels) {
     const db = await this.mongodb.getDb('ybstory')
     const colStories = db.collection('stories')
