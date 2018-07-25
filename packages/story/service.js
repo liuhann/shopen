@@ -137,7 +137,8 @@ module.exports = class StoryService {
   async updateStory (ctx, next) {
     const story = ctx.request.body
     const setProperties = {
-
+      title: story.title,
+      desc: story.desc
     }
     await this.storydao.updateStory(story._id, setProperties)
     ctx.body = setProperties
