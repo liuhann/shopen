@@ -60,6 +60,11 @@ module.exports = class StoryService {
     await next()
   }
 
+  async randomStory (ctx, next) {
+    ctx.body = await this.storydao.sampleDocs(ctx.query.desc)
+    await next()
+  }
+
   async searchStories (ctx, next) {
     const {query, skip, limit} = ctx.query
     const result = await this.storydao.searchStoryTitleContains(query, parseInt(skip) || 0, parseInt(limit) || 20)
