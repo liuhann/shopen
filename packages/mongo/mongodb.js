@@ -21,7 +21,7 @@ class MongodbService {
   }
 
   async getDb (dbName) {
-    return await this.client.db(dbName || this.dbName)
+    return this.client.db(dbName || this.dbName)
   }
 
   async ensureSequence (name, start) {

@@ -1,9 +1,9 @@
-const config = require('../config')
-process.env.DEBUG = config.debug
-
 const fs = require('fs')
 const Koa = require('koa')
+
+const config = require('../config')
 const debug = require('debug')('shopen:server')
+process.env.DEBUG = config.debug
 
 class BootStrap {
   async start () {
@@ -48,9 +48,7 @@ class BootStrap {
     if (moduleConfig.disabled) {
       return null
     }
-    
     debug(`prepare module [${modulePath}]..`)
-
     if (moduleConfig.created) {
       moduleConfig.created(this.app)
     }
@@ -64,6 +62,7 @@ class BootStrap {
       // service list
       let constructorDefinedRefs = Object.getOwnPropertyNames(services[serviceName])
 
+      console.log(serviceName + ':' + (typeof constructorDefinedRefs))
       // iterate fields of service
       for (const refName of constructorDefinedRefs) {
         // inject service by name

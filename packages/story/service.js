@@ -41,6 +41,7 @@ module.exports = class StoryService {
       return
     }
     let storyPath = (story.path.charAt(0) === '/') ? story.path.substring(1) : story.path
+    ctx.storyPath = storyPath
     if (fs.existsSync(this.audioHome + '/' + storyPath)) {
       await send(ctx, storyPath, {
         root: this.audioHome
@@ -102,7 +103,11 @@ module.exports = class StoryService {
 
   async markStory (ctx, next) {
     let {id, mark} = ctx.params
-    await this.storydao.increaseStoryMarkByName(id, mark)
+    const header = ctx.request.header
+    const agent = header['user-agent']
+    const ip = ctx.request.ip
+    
+    await this.storydao.increaseStoryMarkByName(id, mark, ip, agent)
     ctx.body = {
       marked: true
     }

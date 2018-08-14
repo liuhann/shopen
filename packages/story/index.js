@@ -30,6 +30,9 @@ module.exports = {
     })
     router.get('/story/samples', async (ctx, next) => {
       await app.context.services.story.sampleStories(ctx, next)
+    }, async (ctx, next) => {
+      await next()
+      ctx.services.visitdao.insertVisit('sample', ctx.request.ip, ctx.request.header['user-agent'])
     })
     router.get('/story/mp3/:id', koaRange, storySevice.storyDownload.bind(storySevice))
 
