@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue"></script>
+    <script src="jsoneditor.min.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <!-- 引入样式 -->
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+    <link rel="stylesheet" href="jsoneditor.min.css">
+    <!-- 引入组件库 -->
+    <script src="https://unpkg.com/element-ui/lib/index.js"></script>
+</head>
+<body>
+<div id="app">
+    <el-row>
+        <el-col :span="12"><div class="grid-content bg-purple">
+            <el-table
+                    :data="tableData"
+                    style="width: 100%">
+                <el-table-column
+                        prop="title"
+                        label="标题"
+                        width="180">
+                </el-table-column>
+                <el-table-column
+                        prop="path"
+                        label="路径"
+                        width="280">
+                </el-table-column>
+                <el-table-column
+                        prop="u"
+                        label="更新时间">
+                </el-table-column>
+                <el-table-column
+                        label="操作"
+                        width="100">
+                    <template slot-scope="scope">
+                        <el-button @click="editStory(scope.row)" type="text" size="small">编辑</el-button>
+                    </template>
+                </el-table-column>
+            </el-table>
+            <el-pagination
+                    @current-change="handleCurrentChange"
+                    :current-page="currentPage"
+                    layout="total, sizes, prev, pager, next, jumper"
+                    :total="total">
+            </el-pagination>
+        </div></el-col>
+        <el-col :span="12">
+            <div class="grid-content bg-purple-light" id="json-editor">
+
+            </div>
+        </el-col>
+    </el-row>
+</div>
+
+<script type="module">
+  const app = new Vue({
+    el: '#app',
+    data() {
+      return {
+        currentPage: 1,
+        pageSize: 100,
+        total: 0,
+        tableData: []
+      }
+    },
+
+    mounted() {
+      this.loadCurrentPage()
+      let container = document.getElementById("json-editor")
+      var options = {};
+      this.editor = new JSONEditor(container, options);
+    },
+
+    methods: {
+      async loadCurrentPage () {
+        const result = await axios.get('http://118.25.210.124/story/admin/list?skip=' + (this.currentPage - 1) * this.pageSize + '&limit=' + this.pageSize)
+        this.tableData = result.data.list
+        this.total = result.data.total
+      },
+
+      handleCurrentChange(page) {
+        this.currentPage = page
+        this.loadCurrentPage()
+      },
+
+      editStory (story) {
+        this.editor.set(story)
+      }
+    }
+  })
+</script>
+</body>
+</html>

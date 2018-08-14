@@ -13,7 +13,7 @@ class VisitDAO {
       name,
       ip,
       agent,
-      'time': now.getFullYear() + '-' + (now.getMonth() + 1) + '-' + now.getDay() + '  ' + now.getHours() + ':' + now.getMinutes() + ':' + now.getSeconds()
+      'time': now.getFullYear() + '-' + (now.getMonth() + 1) + '-' + now.getDate() + '  ' + now.getHours() + ':' + now.getMinutes() + ':' + now.getSeconds()
     })
   }
 }

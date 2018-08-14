@@ -25,6 +25,7 @@ module.exports = {
       await next()
     })
 
+    router.get('/story/admin/list', storySevice.listStory.bind(storySevice))
     router.get('/story/cover/:x/:y/:cover', async (ctx, next) => {
       await app.context.services.story.storyImage(ctx, next)
     })

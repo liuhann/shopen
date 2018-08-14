@@ -106,11 +106,17 @@ module.exports = class StoryService {
     const header = ctx.request.header
     const agent = header['user-agent']
     const ip = ctx.request.ip
-    
     await this.storydao.increaseStoryMarkByName(id, mark, ip, agent)
     ctx.body = {
       marked: true
     }
+    await next()
+  }
+
+  async listStory (ctx, next) {
+    let {skip, limit} = ctx.query
+    const result = await this.storydao.listStory(parseInt(skip), parseInt(limit))
+    ctx.body = result
     await next()
   }
 
