@@ -8,7 +8,7 @@ module.exports = {
   async created (app) {
     // map  packages/story/dist -> m.yuanbaogushi.com'
     const staticApp = new Koa()
-    staticApp.use(require('koa-static')('packages/story/dist'))
+    staticApp.use(require('koa-static')('packages/story/dist', {maxage: 30 * 24 * 60 * 60 * 1000}))
     app.use(vhost('m.yuanbaogushi.com', staticApp))
     // service register
     app.context.services.story = new StoryService('/data/story')

@@ -11,6 +11,12 @@
     <link rel="stylesheet" href="jsoneditor.min.css">
     <!-- 引入组件库 -->
     <script src="https://unpkg.com/element-ui/lib/index.js"></script>
+    <style>
+        #json-editor {
+            position: fixed;
+            width: 50%;
+        }
+    </style>
 </head>
 <body>
 <div id="app">
@@ -49,8 +55,8 @@
             </el-pagination>
         </div></el-col>
         <el-col :span="12">
+            <el-button type="primary" @click="saveStory">保存</el-button>
             <div class="grid-content bg-purple-light" id="json-editor">
-
             </div>
         </el-col>
     </el-row>
@@ -64,7 +70,7 @@
         currentPage: 1,
         pageSize: 100,
         total: 0,
-        tableData: []
+        tableData: [],
       }
     },
 
@@ -89,6 +95,16 @@
 
       editStory (story) {
         this.editor.set(story)
+      },
+
+      async saveStory () {
+        var json = this.editor.get()
+        await axios.post('http://118.25.210.124/story/update', {
+          _id: json._id,
+          title: json.title,
+          desc: json.desc
+        })
+
       }
     }
   })
