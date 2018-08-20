@@ -6,6 +6,7 @@
     <script src="https://cdn.jsdelivr.net/npm/vue"></script>
     <script src="jsoneditor.min.js"></script>
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.0.14/howler.core.min.js"></script>
     <!-- 引入样式 -->
     <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
     <link rel="stylesheet" href="jsoneditor.min.css">
@@ -57,6 +58,7 @@
                             width="100">
                         <template slot-scope="scope">
                             <el-button @click="editStory(scope.row)" type="text" size="small">编辑</el-button>
+                            <el-button @click="playStory(scope.row)" type="text" size="small">播放</el-button>
                         </template>
                     </el-table-column>
                 </el-table>
@@ -72,6 +74,7 @@
             <el-button type="primary" @click="saveStory">保存</el-button>
             <div class="grid-content bg-purple-light" id="json-editor">
             </div>
+            <audio v-if="currentPlayingUrl" :src="currentPlayingUrl" controls autoplay preload="none"></audio>
         </el-col>
     </el-row>
 </div>
@@ -85,7 +88,8 @@
         pageSize: 100,
         total: 0,
         tableData: [],
-        loading: false
+        loading: false,
+        currentPlaying: null,
       }
     },
 
@@ -94,6 +98,16 @@
       let container = document.getElementById("json-editor")
       var options = {};
       this.editor = new JSONEditor(container, options);
+    },
+
+    computed: {
+      currentPlayingUrl() {
+        if (this.currentPlaying) {
+          return '/story/mp3/' + this.currentPlaying._id
+        } else {
+          return null
+        }
+      }
     },
 
     methods: {
@@ -112,6 +126,18 @@
 
       editStory (story) {
         this.editor.set(story)
+      },
+
+      playStory (story) {
+        this.currentPlaying = story
+        /*if (this.howlStory) {
+          this.howlStory.unload()
+        }
+        this.howlStory = new Howl({
+          src: ['/story/mp3/' + story._id],
+          format: ['mp3']
+        });
+        this.howlStory.play();*/
       },
 
       formateMill (mill) {
