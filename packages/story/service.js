@@ -4,6 +4,7 @@ const debug = require('debug')('shopen:story:service')
 const CDN_IMG = 'http://imagek.cdn.bcebos.com'
 const CDN_STORY = 'http://chuchu.cdn.bcebos.com'
 const send = require('koa-send')
+const labels = require('./story-labels')
 
 module.exports = class StoryService {
   constructor (home) {
@@ -161,10 +162,16 @@ module.exports = class StoryService {
     const story = ctx.request.body
     const setProperties = {
       title: story.title,
-      desc: story.desc
+      desc: story.desc,
+      u: new Date().getTime()
     }
     await this.storydao.updateStory(story._id, setProperties)
     ctx.body = setProperties
+    await next()
+  }
+
+  async getLabels (ctx, next) {
+    ctx.body = labels
     await next()
   }
 }
