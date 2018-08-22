@@ -160,6 +160,14 @@ module.exports = class StoryService {
 
   async updateStory (ctx, next) {
     const story = ctx.request.body
+
+    const labels = story.title.match(/#[^\s]+/g)
+    if (labels) {
+      for (let label of labels) {
+        await this.storydao.upsertLabels(label)
+      }
+    }
+
     const setProperties = {
       title: story.title,
       desc: story.desc,
