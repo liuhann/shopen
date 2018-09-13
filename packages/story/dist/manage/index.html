@@ -23,6 +23,11 @@
             overflow: hidden;
         }
 
+        .cover-image {
+            width: 60px;
+            height: 60px;
+        }
+
     </style>
 </head>
 <body>
@@ -32,13 +37,24 @@
             <div class="grid-content bg-purple">
                 <el-table
                         max-height="900px"
-                        v-loading="loading"
+                        v-loading.fullscreen.lock="loading"
+                        :row-key="_id"
                         :data="tableData"
                         size="mini">
+                    <el-table-column label=" " width="120">
+                        <template slot-scope="scope">
+                            <img class="cover-image" v-if="scope.row.cover" :src="'/story/cover/480/480/' + scope.row.cover + '.png'">
+                            <div class="cover-image" v-else style="background: #aaa"></div>
+                        </template>
+                    </el-table-column>
                     <el-table-column
                             prop="title"
                             label="标题"
                             width="480">
+                        <template slot-scope="scope">
+                            <div>{{scope.row.title}}</div>
+                            <div>{{scope.row.album || scrope.row.path.split('/')[0]}}</div>
+                        </template>
                     </el-table-column>
                     <el-table-column
                             width="120"
@@ -57,8 +73,9 @@
                             label="操作"
                             width="100">
                         <template slot-scope="scope">
+                            <el-button @click="removeStory(scope.row)" type="text" size="small">删除</el-button>
                             <el-button @click="editStory(scope.row)" type="text" size="small">编辑</el-button>
-                            <el-button @click="playStory(scope.row)" type="text" size="small">播放</el-button>
+                            <!--<el-button @click="playStory(scope.row)" type="text" size="small">播放</el-button>-->
                         </template>
                     </el-table-column>
                 </el-table>
@@ -82,88 +99,95 @@
 </div>
 
 <script type="module">
-  const app = new Vue({
-    el: '#app',
-    data() {
-      return {
-        currentPage: 1,
-        pageSize: 100,
-        total: 0,
-        tableData: [],
-        loading: false,
-        currentPlaying: null,
-      }
-    },
+import ky from './js/ky.js'
 
-    mounted() {
-      this.loadCurrentPage()
-      let container = document.getElementById("json-editor")
-      var options = {};
-      this.editor = new JSONEditor(container, options);
-    },
+const app = new Vue({
+el: '#app',
+data() {
+  return {
+    currentPage: 1,
+    pageSize: 100,
+    total: 0,
+    tableData: [],
+    loading: false,
+    currentPlaying: null,
+  }
+},
 
-    computed: {
-      currentPlayingUrl() {
-        if (this.currentPlaying) {
-          return '/story/mp3/' + this.currentPlaying._id
-        } else {
-          return null
-        }
-      }
-    },
+mounted() {
+  this.loadCurrentPage()
+  let container = document.getElementById("json-editor")
+  var options = {};
+  this.editor = new JSONEditor(container, options);
+},
 
-    methods: {
-      async loadCurrentPage () {
-        this.loading = true;
-        const result = await axios.get('http://118.25.210.124/story/admin/list?skip=' + (this.currentPage - 1) * this.pageSize + '&limit=' + this.pageSize);
-        this.loading = false;
-        this.tableData = result.data.list
-        this.total = result.data.total
-      },
-
-      async sizeChange (size) {
-        debugger;
-        this.pageSize = size;
-        await this.loadCurrentPage();
-      },
-
-      async handleCurrentChange(page) {
-        this.currentPage = page
-        await this.loadCurrentPage()
-      },
-
-      editStory (story) {
-        this.editor.set(story)
-      },
-
-      playStory (story) {
-        this.currentPlaying = story
-        /*if (this.howlStory) {
-          this.howlStory.unload()
-        }
-        this.howlStory = new Howl({
-          src: ['/story/mp3/' + story._id],
-          format: ['mp3']
-        });
-        this.howlStory.play();*/
-      },
-
-      formateMill (mill) {
-        const d = new Date(mill);
-        return d.getFullYear() + '-' + (d.getMonth()+1) + '-' + d.getDate();
-      },
-
-      async saveStory () {
-        var json = this.editor.get()
-        await axios.post('http://118.25.210.124/story/update', {
-          _id: json._id,
-          title: json.title,
-          desc: json.desc
-        })
-        this.loadCurrentPage();
-      }
+computed: {
+  currentPlayingUrl() {
+    if (this.currentPlaying) {
+      return '/story/mp3/' + this.currentPlaying._id
+    } else {
+      return null
     }
-  })
+  }
+},
+
+methods: {
+  async loadCurrentPage () {
+    this.loading = true;
+    const result = await axios.get('http://118.25.210.124/story/admin/list?skip=' + (this.currentPage - 1) * this.pageSize + '&limit=' + this.pageSize);
+    this.loading = false;
+    this.tableData = result.data.list
+    this.total = result.data.total
+  },
+
+  async sizeChange (size) {
+    this.pageSize = size;
+    await this.loadCurrentPage();
+  },
+
+  async handleCurrentChange(page) {
+    this.currentPage = page
+    await this.loadCurrentPage()
+  },
+
+  editStory (story) {
+    this.editor.set(story)
+  },
+
+  playStory (story) {
+    this.currentPlaying = story
+    /*if (this.howlStory) {
+      this.howlStory.unload()
+    }
+    this.howlStory = new Howl({
+      src: ['/story/mp3/' + story._id],
+      format: ['mp3']
+    });
+    this.howlStory.play();*/
+  },
+
+  async removeStory (story) {
+    const json = await ky.get('/story/delete/' + story._id).json();
+    this.$message('删除成功' + json);
+    await this.loadCurrentPage ()
+  },
+
+  formateMill (mill) {
+    const d = new Date(mill);
+    return d.getFullYear() + '-' + (d.getMonth()+1) + '-' + d.getDate();
+  },
+
+  async saveStory () {
+    var json = this.editor.get()
+    await axios.post('http://118.25.210.124/story/update', {
+      _id: json._id,
+      title: json.title,
+      desc: json.desc
+    })
+    this.loadCurrentPage();
+  }
+}
+})
 </script>
 </body>
 </html>

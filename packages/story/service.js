@@ -144,13 +144,15 @@ module.exports = class StoryService {
           console.log(err)
         })
       }
-      let coverId = story.cover
-      const coverHome = this.coverHome + `/480/480/` + coverId.charAt(0)
-      if (fs.existsSync(`${coverHome}/${coverId}.png`)) {
-        result.cover = `${coverHome}/${coverId}.png`
-        fs.unlink(`${coverHome}/${coverId}.png`, (err) => {
-          console.log(err)
-        })
+      if (story.cover) {
+        let coverId = story.cover
+        const coverHome = this.coverHome + `/480/480/` + coverId.charAt(0)
+        if (fs.existsSync(`${coverHome}/${coverId}.png`)) {
+          result.cover = `${coverHome}/${coverId}.png`
+          fs.unlink(`${coverHome}/${coverId}.png`, (err) => {
+            console.log(err)
+          })
+        }
       }
     }
     await this.storydao.deleteStoryById(id)
