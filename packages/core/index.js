@@ -2,6 +2,7 @@ const bodyParser = require('koa-body')
 const cors = require('kcors')
 const Router = require('koa-router')
 const HttpError = require('http-errors')
+const serve = require('koa-static')
 
 const validator = require('async-validator')
 validator.prototype.validated = async function (object) {
@@ -28,6 +29,8 @@ module.exports = {
     }))
     app.context.router = new Router()
     app.context.services.validator = validator
+
+    app.use(serve('public'))
   },
 
   ready (app) {

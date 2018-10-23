@@ -5710,7 +5710,7 @@ strats.computed = function (
         // args order: tag, data, children, normalizationType, alwaysNormalize
         // internal version is used by render functions compiled from templates
         vm._c = function (a, b, c, d) { return createElement(vm, a, b, c, d, false) }
-        // normalization is always applied for the public version, used in
+        // normalization is always applied for the danke version, used in
         // user-written render functions.
         vm.$createElement = function (a, b, c, d) { return createElement(vm, a, b, c, d, true) }
 
@@ -6264,7 +6264,7 @@ strats.computed = function (
         Object.defineProperty(Vue, 'config', configDef)
 
         // exposed util methods.
-        // NOTE: these are not considered part of the public API - avoid relying on
+        // NOTE: these are not considered part of the danke API - avoid relying on
         // them unless you are aware of the risk.
         Vue.util = {
           warn: warn,
@@ -9712,7 +9712,7 @@ strats.computed = function (
       // install platform patch function
       Vue$3.prototype.__patch__ = inBrowser ? patch : noop
 
-      // public mount method
+      // danke mount method
       Vue$3.prototype.$mount = function (
         el,
         hydrating
@@ -18131,7 +18131,7 @@ exports.clearInterval = function (timeout) {
  *
  * @param {Object} proto
  * @param {String} target
- * @api public
+ * @api danke
  */
 
     function Delegator (proto, target) {
@@ -18149,7 +18149,7 @@ exports.clearInterval = function (timeout) {
  *
  * @param {String} name
  * @return {Delegator} self
- * @api public
+ * @api danke
  */
 
     Delegator.prototype.method = function (name) {
@@ -18169,7 +18169,7 @@ exports.clearInterval = function (timeout) {
  *
  * @param {String} name
  * @return {Delegator} self
- * @api public
+ * @api danke
  */
 
     Delegator.prototype.access = function (name) {
@@ -18181,7 +18181,7 @@ exports.clearInterval = function (timeout) {
  *
  * @param {String} name
  * @return {Delegator} self
- * @api public
+ * @api danke
  */
 
     Delegator.prototype.getter = function (name) {
@@ -18201,7 +18201,7 @@ exports.clearInterval = function (timeout) {
  *
  * @param {String} name
  * @return {Delegator} self
- * @api public
+ * @api danke
  */
 
     Delegator.prototype.setter = function (name) {
@@ -18221,7 +18221,7 @@ exports.clearInterval = function (timeout) {
  *
  * @param {String} name
  * @return {Delegator} self
- * @api public
+ * @api danke
  */
 
     Delegator.prototype.fluent = function (name) {
