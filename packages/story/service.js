@@ -5,6 +5,15 @@ const CDN_IMG = 'http://imagek.cdn.bcebos.com'
 const CDN_STORY = 'http://chuchu.cdn.bcebos.com'
 const send = require('koa-send')
 const labels = require('./story-labels')
+const { BosClient } = require('bce-sdk-js')
+
+const bosConfig = {
+  endpoint: 'http://bj.bcebos.com',         //传入Bucket所在区域域名
+  credentials: {
+    ak: 'i29vPdGTUyjE6HD0xaKsfq6Y',         //您的AccessKey
+    sk: 'bHAU6NrGLVOD710kHinHMUjeeC4UVoiN'      //您的SecretAccessKey
+  }
+}
 
 module.exports = class StoryService {
   constructor (home) {
@@ -154,6 +163,19 @@ module.exports = class StoryService {
           })
         }
       }
+      let client = new BosClient(bosConfig)
+
+      try {
+        console.log('delete in bos chuchu', storyPath)
+        const result = await client.deleteObject('chuchu', storyPath)
+        console.log('result', result)
+        if (story.cover) {
+          console.log('delete in bos imagek', story.cover)
+          await client.deleteObject('imagek', story.cover)
+        }
+      } catch (e) {
+        console.error(e)
+      }
     }
     await this.storydao.deleteStoryById(id)
     ctx.body = result
@@ -162,7 +184,6 @@ module.exports = class StoryService {
 
   async updateStory (ctx, next) {
     const story = ctx.request.body
-
     const labels = story.title.match(/#[^\s]+/g)
     if (labels) {
       for (let label of labels) {
