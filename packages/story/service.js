@@ -8,10 +8,10 @@ const labels = require('./story-labels')
 const { BosClient } = require('bce-sdk-js')
 
 const bosConfig = {
-  endpoint: 'http://bj.bcebos.com',         //传入Bucket所在区域域名
+  endpoint: 'http://bj.bcebos.com',
   credentials: {
-    ak: 'i29vPdGTUyjE6HD0xaKsfq6Y',         //您的AccessKey
-    sk: 'bHAU6NrGLVOD710kHinHMUjeeC4UVoiN'      //您的SecretAccessKey
+    ak: 'i29vPdGTUyjE6HD0xaKsfq6Y',
+    sk: 'bHAU6NrGLVOD710kHinHMUjeeC4UVoiN'
   }
 }
 
@@ -79,6 +79,25 @@ module.exports = class StoryService {
   async searchStories (ctx, next) {
     const {query, skip, limit} = ctx.query
     const result = await this.storydao.searchStoryTitleContains(query, parseInt(skip) || 0, parseInt(limit) || 20)
+    ctx.body = result
+    await next()
+  }
+
+  async autoSetCover (ctx, next) {
+    let {id} = ctx.params
+    const result = {}
+    const story = await this.storydao.getStoryById(id)
+    const sameNames = await this.storydao.searchStoryTitleContains(story.title, 0, 20)
+    for (let same of sameNames) {
+      if (same.cover && same.cover !== story.cover) {
+        console.log('update cover from', same)
+        story.cover = same.cover
+        await this.storydao.updateStory(story._id, {
+          cover: same.cover
+        })
+        break
+      }
+    }
     ctx.body = result
     await next()
   }

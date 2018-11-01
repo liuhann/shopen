@@ -51,6 +51,7 @@
                 :thumb="story.cover? ('/story/cover/480/480/' + story.cover + '.png') : ''"
                 origin-price="10.00">
             <div slot="footer">
+                <van-button @click="refreshCover(story)" size="mini">封面</van-button>
                 <van-button @click="playStory(story)" size="mini">播放</van-button>
                 <van-button @click="removeStory(story)" size="mini">删除</van-button>
             </div>
@@ -212,7 +213,13 @@ const app = new Vue({
 
       async removeStory (story) {
         const json = await ky.get('/story/delete/' + story._id).json();
-        vant.Toast('删除成功');
+        //vant.Toast('删除成功');
+        await this.loadCurrentPage ()
+      },
+
+      async refreshCover (story) {
+        const json = await ky.get('/story/cover/update/' + story._id).json();
+        //vant.Toast('删除成功');
         await this.loadCurrentPage ()
       },
 

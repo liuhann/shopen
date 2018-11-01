@@ -44,5 +44,6 @@ module.exports = {
     router.get('/story/search', storySevice.searchStories.bind(storySevice))
     router.get('/story/random', storySevice.randomStory.bind(storySevice))
     router.get('/story/labels', storySevice.getLabels.bind(storySevice))
+    router.get('/story/cover/update/:id', storySevice.autoSetCover.bind(storySevice))
   }
 }
