@@ -19,7 +19,9 @@
     &lt;!&ndash; 引入组件库 &ndash;&gt;
     <script src="https://unpkg.com/element-ui/lib/index.js"></script>-->
     <style>
-
+        .van-popup--right {
+            left: 30px;
+        }
         body {
             margin: 0;
             padding: 0;
@@ -51,13 +53,29 @@
                 :thumb="story.cover? ('/story/cover/480/480/' + story.cover + '.png') : ''"
                 origin-price="10.00">
             <div slot="footer">
-                <van-button @click="refreshCover(story)" size="mini">封面</van-button>
+                <van-button @click="getSameAlbum(story)"  size="mini">同专辑</van-button>
+                <van-button @click="getSameTitle(story)" size="mini">同封面</van-button>
                 <van-button @click="playStory(story)" size="mini">播放</van-button>
                 <van-button @click="removeStory(story)" size="mini">删除</van-button>
             </div>
         </van-card>
         <van-popup v-model="loading">
             加载中
+        </van-popup>
+
+        <van-popup v-model="showRelatedStory" position="right">
+            <van-button @click="removeAllRelated">全部删除</van-button>
+            <van-card v-for="(story, index) in relatedStories" :key="story._id"
+                      :tag="story.u?formateMill(story.u): ''"
+                      :desc="story.path"
+                      :title="story.title"
+                      :thumb="story.cover? ('/story/cover/480/480/' + story.cover + '.png') : ''">
+                <div slot="footer">
+                    <van-button @click="replaceStoryTitle(story)" size="mini">替换</van-button>
+                    <van-button @click="relatedStories.splice(index, 1)" size="mini">排除</van-button>
+                    <van-button @click="removeStory(story, true); relatedStories.splice(index, 1)" size="mini">删除</van-button>
+                </div>
+            </van-card>
         </van-popup>
 
         <van-pagination
@@ -127,6 +145,8 @@ const app = new Vue({
     el: '#app',
     data() {
       return {
+        showRelatedStory: false,
+        relatedStories: [],
         currentPage: 1,
         pageSize: 10,
         total: 0,
@@ -211,21 +231,72 @@ const app = new Vue({
         }
       },
 
-      async removeStory (story) {
+      async removeStory (story, notRefresh) {
         const json = await ky.get('/story/delete/' + story._id).json();
         //vant.Toast('删除成功');
-        await this.loadCurrentPage ()
+        if (notRefresh) {
+          return
+        } else {
+          await this.loadCurrentPage ()
+        }
       },
 
-      async refreshCover (story) {
-        const json = await ky.get('/story/cover/update/' + story._id).json();
-        //vant.Toast('删除成功');
-        await this.loadCurrentPage ()
+      async getSameTitle (story) {
+        this.currentEditing = story;
+        const sameNames = await ky.get(`/story/search?query=${story.title}&skip=0&limit=200`).json();
+        if (sameNames.length > 1) {
+          this.relatedStories = []
+          for (let same of sameNames) {
+            if (same._id !== story._id) {
+              this.relatedStories.push(same)
+            }
+          }
+          this.showRelatedStory = true
+        }
+      },
+
+      async getSameAlbum (story) {
+        const paths = story.path.split('/')
+        let path = paths[0] || paths[1]
+        const sameNames = await ky.get(`/story/search/path?query=${path}`).json();
+        this.relatedStories = sameNames;
+        this.showRelatedStory = true
+      },
+
+      async replaceStoryTitle (story) {
+        await ky.post(`/story/props/${this.currentEditing._id}`, {json: {
+            cover: story.cover
+        }})
+        this.showRelatedStory = false;
+        this.loadCurrentPage();
       },
 
       formateMill (mill) {
         const d = new Date(mill);
         return d.getFullYear() + '-' + (d.getMonth()+1) + '-' + d.getDate();
+      },
+
+      unRelatedThis(index) {
+        this.relatedStories.splice(index, 1)
+      },
+
+      async removeAllRelated () {
+        let story = this.relatedStories.pop()
+        while (story) {
+          await this.removeStory(story, true)
+          await this.sleep(300)
+          story = this.relatedStories.pop()
+        }
+        this.showRelatedStory = false
+        this.loadCurrentPage()
+      },
+
+      async sleep(mill) {
+        return new Promise((resolve, reject) => {
+          setTimeout(()=>{
+            resolve()
+          }, mill)
+        })
       },
 
       async saveStory () {

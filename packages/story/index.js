@@ -42,8 +42,9 @@ module.exports = {
     router.get('/story/delete/:id', storySevice.deleteStory.bind(storySevice))
     router.post('/story/update', storySevice.updateStory.bind(storySevice))
     router.get('/story/search', storySevice.searchStories.bind(storySevice))
+    router.get('/story/search/path', storySevice.searchStoryInPath.bind(storySevice))
     router.get('/story/random', storySevice.randomStory.bind(storySevice))
     router.get('/story/labels', storySevice.getLabels.bind(storySevice))
-    router.get('/story/cover/update/:id', storySevice.autoSetCover.bind(storySevice))
+    router.post('/story/props/:id', storySevice.updateStoryProps.bind(storySevice))
   }
 }

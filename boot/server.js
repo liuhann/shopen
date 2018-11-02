@@ -1,9 +1,9 @@
+const config = require('../config')
+process.env.DEBUG = config.debug
+
 const fs = require('fs')
 const Koa = require('koa')
-
-const config = require('../config')
 const debug = require('debug')('shopen:server')
-process.env.DEBUG = config.debug
 
 class BootStrap {
   async start () {

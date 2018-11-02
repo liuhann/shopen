@@ -83,22 +83,48 @@ module.exports = class StoryService {
     await next()
   }
 
+  async searchStoryInPath (ctx, next) {
+    const {query} = ctx.query
+    const result = await this.storydao.searchStoryInSamePath(query)
+    ctx.body = result
+    await next()
+  }
+
   async autoSetCover (ctx, next) {
     let {id} = ctx.params
     const result = {}
     const story = await this.storydao.getStoryById(id)
-    const sameNames = await this.storydao.searchStoryTitleContains(story.title, 0, 20)
-    for (let same of sameNames) {
+    const sameNames = await this.storydao.searchStoryTitleContains(story.title, 0, 200)
+
+    console.log('found ' + sameNames.length + ' story')
+    if (story.copyCoverIdx === sameNames.length - 1) {
+      story.copyCoverIdx = 0
+    }
+    for (let i = story.copyCoverIdx || 0; i < sameNames.length; i++) {
+      let same = sameNames[i]
       if (same.cover && same.cover !== story.cover) {
-        console.log('update cover from', same)
+        console.log('update cover from', same.path)
         story.cover = same.cover
         await this.storydao.updateStory(story._id, {
-          cover: same.cover
+          cover: same.cover,
+          copyCoverIdx: i
         })
+        result.index = i
         break
       }
     }
+    result.sameNames = sameNames
     ctx.body = result
+    await next()
+  }
+
+  async updateStoryProps (ctx, next) {
+    let {id} = ctx.params
+    const story = await this.storydao.getStoryById(id)
+    if (story) {
+      await this.storydao.updateStory(story._id, ctx.request.body)
+    }
+    ctx.body = {}
     await next()
   }
 
@@ -169,29 +195,33 @@ module.exports = class StoryService {
         result.mp3 = this.audioHome + '/' + storyPath
         debug('unlink mp3 file: ' + this.audioHome + '/' + storyPath)
         fs.unlink(this.audioHome + '/' + storyPath, (err) => {
-          console.log(err)
+          if (err) {
+            console.log(err)
+          } else {
+            debug(`local mp3 removed ` + this.audioHome + '/' + storyPath)
+          }
         })
       }
       if (story.cover) {
         let coverId = story.cover
         const coverHome = this.coverHome + `/480/480/` + coverId.charAt(0)
+        debug(`remove local ${coverHome}/${coverId}.png`)
         if (fs.existsSync(`${coverHome}/${coverId}.png`)) {
           result.cover = `${coverHome}/${coverId}.png`
           fs.unlink(`${coverHome}/${coverId}.png`, (err) => {
-            console.log(err)
+            if (err) {
+              console.log(err)
+            } else {
+              debug(`local image removed`)
+            }
           })
         }
       }
       let client = new BosClient(bosConfig)
-
       try {
-        console.log('delete in bos chuchu', storyPath)
-        const result = await client.deleteObject('chuchu', storyPath)
-        console.log('result', result)
-        if (story.cover) {
-          console.log('delete in bos imagek', story.cover)
-          await client.deleteObject('imagek', story.cover)
-        }
+        debug('delete in bos chuchu', storyPath)
+        await client.deleteObject('chuchu', storyPath)
+        debug('bos mp3 deleted')
       } catch (e) {
         console.error(e)
       }
@@ -199,6 +229,10 @@ module.exports = class StoryService {
     await this.storydao.deleteStoryById(id)
     ctx.body = result
     await next()
+  }
+
+  async deleteStoryResources (story) {
+
   }
 
   async updateStory (ctx, next) {
@@ -209,7 +243,6 @@ module.exports = class StoryService {
         await this.storydao.upsertLabels(label)
       }
     }
-
     const setProperties = {
       title: story.title,
       desc: story.desc,
