@@ -14,10 +14,6 @@
     <script src="https://unpkg.com/vant/lib/vant.min.js"></script>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.0.14/howler.core.min.js"></script>
-    <!--&lt;!&ndash; 引入样式 &ndash;&gt;
-    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
-    &lt;!&ndash; 引入组件库 &ndash;&gt;
-    <script src="https://unpkg.com/element-ui/lib/index.js"></script>-->
     <style>
         .van-popup--right {
             left: 30px;
@@ -83,58 +79,6 @@
                 @change="handleCurrentChange"
                 :total-items="total"
                 :items-per-page="10"/>
-
-        <!--<el-table
-                max-height="900px"
-                v-loading.fullscreen.lock="loading"
-                :data="tableData"
-                size="mini">
-            <el-table-column label=" " width="120">
-                <template slot-scope="scope">
-                    <img class="cover-image" v-if="scope.row.cover" :src="'/story/cover/480/480/' + scope.row.cover + '.png'">
-                    <div class="cover-image" v-else style="background: #aaa"></div>
-                </template>
-            </el-table-column>
-            <el-table-column
-                    prop="title"
-                    label="标题"
-                    width="480">
-                <template slot-scope="scope">
-                    <div>{{scope.row.title}}</div>
-                    <div>{{scope.row.album || scrope.row.path.split('/')[0]}}</div>
-                </template>
-            </el-table-column>
-            <el-table-column
-                    width="120"
-                    label="更新时间">
-                <template slot-scope="scope">
-                    <span class="desc" v-if="scope.row.u">{{formateMill(scope.row.u)}}</span>
-                </template>
-            </el-table-column>
-            <el-table-column
-                    label="描述">
-                <template slot-scope="scope">
-                    <span class="desc">{{scope.row.desc}}</span>
-                </template>
-            </el-table-column>
-            <el-table-column
-                    label="操作"
-                    width="100">
-                <template slot-scope="scope">
-                    <el-button @click="removeStory(scope.row)" type="text" size="small">删除</el-button>
-                    <el-button @click="editStory(scope.row)" type="text" size="small">编辑</el-button>
-                    &lt;!&ndash;<el-button @click="playStory(scope.row)" type="text" size="small">播放</el-button>&ndash;&gt;
-                </template>
-            </el-table-column>
-        </el-table>
-        <el-pagination
-                :page-size="pageSize"
-                :current-page="currentPage"
-                @current-change="handleCurrentChange"
-                @size-change="sizeChange"
-                layout="total, sizes, prev, pager, next, jumper"
-                :total="total">
-        </el-pagination>-->
     </div>
 </div>
 
