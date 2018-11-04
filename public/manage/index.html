@@ -10,6 +10,7 @@
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
     <!-- 引入样式 -->
     <link rel="stylesheet" href="https://unpkg.com/vant/lib/vant-css/index.css">
+    <link rel="stylesheet" href="https://unpkg.com/vant@1.4.1/lib/index.css">
     <!-- 引入组件 -->
     <script src="https://unpkg.com/vant/lib/vant.min.js"></script>
 
@@ -202,8 +203,12 @@ const app = new Vue({
       async getSameAlbum (story) {
         const paths = story.path.split('/')
         let path = paths[0] || paths[1]
-        const sameNames = await ky.get(`/story/search/path?query=${path}`).json();
-        this.relatedStories = sameNames;
+        const sameNames = await ky.get(`/story/search/path?query=${path}&skip=0&limit=50`).json();
+        if (sameNames.length > 100) {
+          this.relatedStories = sameNames.slice(0, 100)
+        } else {
+	        this.relatedStories = sameNames
+        }
         this.showRelatedStory = true
       },
 
