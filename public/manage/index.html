@@ -9,8 +9,7 @@
     <script src="https://cdn.jsdelivr.net/npm/vue@2.5.17/dist/vue.js"></script>
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
     <!-- 引入样式 -->
-    <link rel="stylesheet" href="https://unpkg.com/vant/lib/vant-css/index.css">
-    <link rel="stylesheet" href="https://unpkg.com/vant@1.4.1/lib/index.css">
+    <link rel="stylesheet" href="https://unpkg.com/vant/lib/index.css">
     <!-- 引入组件 -->
     <script src="https://unpkg.com/vant/lib/vant.min.js"></script>
 
@@ -42,6 +41,7 @@
 </head>
 <body>
 <div id="app">
+    <van-button type="primary" @click="loadCurrentPage" size="mini">刷新</van-button>
     <div class="grid-content bg-purple">
         <van-card v-for="(story, index) in tableData" :key="story._id"
                 :tag="story.u?formateMill(story.u): ''"
@@ -50,10 +50,9 @@
                 :thumb="story.cover? ('/story/cover/480/480/' + story.cover + '.png') : ''"
                 origin-price="10.00">
             <div slot="footer">
-                <van-button @click="getSameAlbum(story)"  size="mini">同专辑</van-button>
-                <van-button @click="getSameTitle(story)" size="mini">同封面</van-button>
+                <van-button @click="showQueryBox(story)"  size="mini">查找</van-button>
                 <van-button @click="playStory(story)" size="mini">播放</van-button>
-                <van-button @click="removeStory(story)" size="mini">删除</van-button>
+                <van-button @click="removeStory(story, true)" size="mini">删除</van-button>
             </div>
         </van-card>
         <van-popup v-model="loading">
@@ -75,6 +74,23 @@
             </van-card>
         </van-popup>
 
+        <van-dialog
+                v-model="showSearchDialog"
+                show-cancel-button
+                confirm-button-text="按标题"
+                cancel-button-text="按路径"
+                @confirm="getSameTitle"
+                @cancel="getSameAlbum
+">
+            <van-field
+                    v-model="queryText"
+            />
+        </van-dialog>
+
+        <van-field
+                v-model="pageToGo">
+            <van-button slot="button" size="small" type="primary" @click="gotoPage">GO</van-button>
+        </van-field>
         <van-pagination
                 v-model="currentPage"
                 @change="handleCurrentChange"
@@ -90,7 +106,10 @@ const app = new Vue({
     el: '#app',
     data() {
       return {
+        pageToGo: '',
+        queryText: '',
         showRelatedStory: false,
+        showSearchDialog: false,
         relatedStories: [],
         currentPage: 1,
         pageSize: 10,
@@ -125,6 +144,10 @@ const app = new Vue({
     },
 
     methods: {
+      async gotoPage () {
+        this.currentPage = parseInt(this.pageToGo)
+        this.loadCurrentPage();
+      },
       async loadCurrentPage () {
         this.loading = true;
         const result = await axios.get('/story/admin/list?skip=' + (this.currentPage - 1) * this.pageSize + '&limit=' + this.pageSize);
@@ -180,28 +203,39 @@ const app = new Vue({
         const json = await ky.get('/story/delete/' + story._id).json();
         //vant.Toast('删除成功');
         if (notRefresh) {
+          for (let i = 0; i < this.tableData.length; i++) {
+            if (this.tableData[i]._id === story._id) {
+              this.tableData.splice(i, 1)
+              break
+            }
+          }
           return
         } else {
-          await this.loadCurrentPage ()
+          await this.loadCurrentPage()
         }
       },
 
-      async getSameTitle (story) {
-        this.currentEditing = story;
-        const sameNames = await ky.get(`/story/search?query=${story.title}&skip=0&limit=200`).json();
+      async showQueryBox (story) {
+        this.showSearchDialog = true
+        this.currentEditing = story
+        this.queryText = story.path
+      },
+
+      // 标题中包含
+      async getSameTitle () {
+        const sameNames = await ky.get(`/story/search?query=${this.queryText}&skip=0&limit=100`).json();
         if (sameNames.length > 1) {
           this.relatedStories = []
           for (let same of sameNames) {
-            if (same._id !== story._id) {
-              this.relatedStories.push(same)
-            }
+            this.relatedStories.push(same)
           }
           this.showRelatedStory = true
         }
       },
 
-      async getSameAlbum (story) {
-        const paths = story.path.split('/')
+      // 按路径搜索
+      async getSameAlbum () {
+        const paths = this.queryText.split('/')
         let path = paths[0] || paths[1]
         const sameNames = await ky.get(`/story/search/path?query=${path}&skip=0&limit=50`).json();
         if (sameNames.length > 100) {
