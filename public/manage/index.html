@@ -41,7 +41,6 @@
 </head>
 <body>
 <div id="app">
-    <van-button type="primary" @click="loadCurrentPage" size="mini">刷新</van-button>
     <div class="grid-content bg-purple">
         <van-card v-for="(story, index) in tableData" :key="story._id"
                 :tag="story.u?formateMill(story.u): ''"
@@ -80,17 +79,16 @@
                 confirm-button-text="按标题"
                 cancel-button-text="按路径"
                 @confirm="getSameTitle"
-                @cancel="getSameAlbum
-">
-            <van-field
-                    v-model="queryText"
-            />
+                @cancel="getSameAlbum">
+            <van-field v-model="queryText"/>
         </van-dialog>
-
-        <van-field
-                v-model="pageToGo">
-            <van-button slot="button" size="small" type="primary" @click="gotoPage">GO</van-button>
-        </van-field>
+        <van-cell-group>
+            <van-field
+                    v-model="pageToGo">
+                <van-button type="primary" @click="loadCurrentPage" size="small" slot="label">刷新</van-button>
+                <van-button slot="button" size="small" type="primary" @click="gotoPage">GO</van-button>
+            </van-field>
+        </van-cell-group>
         <van-pagination
                 v-model="currentPage"
                 @change="handleCurrentChange"
