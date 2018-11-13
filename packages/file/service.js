@@ -14,16 +14,16 @@ class FileService {
     this.baseDir = baseDir
     this.mongodb = null
   }
-  
+
   async receive (ctx) {
     const body = ctx.request.body
     const date = new Date()
     const fileDir = `${this.baseDir}/${date.getFullYear()}/${date.getMonth() + 1}/${date.getDate()}/${date.getHours()}`
     // create file store dir
     await makeDir(fileDir)
-    
+
     const result = []
-    
+
     for (const fileName in body.files) {
       const uploadFile = body.files[fileName]
       const fileExt = this.fileExtension(uploadFile.name)
@@ -40,7 +40,7 @@ class FileService {
     }
     return result
   }
-  
+
   async serve (ctx, path) {
     await send(ctx, path, {
       root: this.baseDir
@@ -84,7 +84,7 @@ class FileService {
   }
 
   async delete () {
-  
+
   }
 }
 
