@@ -58,11 +58,11 @@ class BootStrap {
   async initPackageService () {
     // fulfill service dependencies
     const services = this.app.context.services
+
     for (const serviceName in services) {
       // service list
       let constructorDefinedRefs = Object.getOwnPropertyNames(services[serviceName])
-
-      console.log(serviceName + ':' + (typeof constructorDefinedRefs))
+      debug('service ' + serviceName + ':' + (typeof constructorDefinedRefs))
       // iterate fields of service
       for (const refName of constructorDefinedRefs) {
         // inject service by name

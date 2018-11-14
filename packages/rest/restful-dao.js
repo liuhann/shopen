@@ -3,19 +3,31 @@ const {ObjectID} = require('mongodb')
 const compose = require('koa-compose')
 
 class RESTfulDAO {
-  constructor (db, coll, plugins) {
-    this.db = db
+  constructor (mongodb, dbName, coll, plugins) {
+    this.mongodb = mongodb
+    this.dbName = dbName
     this.coll = coll
-    this.middleware = plugins ? compose(plugins) : (ctx, next) => { }
+    this.middleware = plugins ? compose(plugins) : null
   }
-  
+
+  getDb () {
+    return this.mongodb.getDb(this.dbName)
+  }
+
   async list ({filter, page, count, sort, order}) {
-    await this.middleware({type: 'list', filter, page, count, sort, order})
-    
-    const coll = this.db.collection(this.coll)
+    const db = await this.getDb()
+    page = page || 1
+    if (page < 1) {
+      page = 1
+    }
+    count = count || 100
+    if (this.middleware) {
+      await this.middleware({type: 'list', filter, page, count, sort, order})
+    }
+    const coll = db.collection(this.coll)
     let cursor = coll.find(filter)
     const total = await cursor.count()
-    
+
     if (sort) {
       const sortObject = {}
       sortObject[sort] = parseInt(order)
@@ -23,7 +35,7 @@ class RESTfulDAO {
     }
     debug(filter, page, count, sort, order)
     const result = await cursor.skip((page - 1) * count).limit(count).toArray()
-    
+
     return {
       page,
       count,
@@ -34,20 +46,39 @@ class RESTfulDAO {
       list: result
     }
   }
-  
+
+  async getOne (query) {
+    const db = await this.getDb()
+    const found = await db.collection(this.coll).findOne(query)
+    return found
+  }
+
   async insertOne (object) {
-    await this.middleware({type: 'insert', object})
-    const inserted = await this.db.collection(this.coll).insertOne(object)
+    const db = await this.getDb()
+    if (this.middleware) {
+      await this.middleware({type: 'insert', object})
+    }
+    const inserted = await db.collection(this.coll).insertOne(object)
     return {
       inserted
     }
   }
-  
-  async patchObject (id, set) {
+
+  async patchObject (key, set) {
+    const db = await this.getDb()
     const query = {}
-    query._id = new ObjectID(id)
-    await this.middleware({type: 'patch', query, set})
-    const updated = await this.db.collection(this.coll).updateOne(query, {
+    const value = set[key]
+    if (!value) {
+      return {
+        'desc': 'value required'
+      }
+    }
+    if (key === '_id') {
+      query._id = new ObjectID(value)
+    } else {
+      query[key] = value
+    }
+    const updated = await db.collection(this.coll).updateOne(query, {
       $set: set
     }, {
       upsert: false,
@@ -55,9 +86,10 @@ class RESTfulDAO {
     })
     return updated
   }
-  
+
   async deleteOne (id) {
-    const deleted = await this.db.collection(this.coll).deleteOne({
+    const db = await this.getDb()
+    const deleted = await db.collection(this.coll).deleteOne({
       _id: new ObjectID(id)
     })
     return deleted
