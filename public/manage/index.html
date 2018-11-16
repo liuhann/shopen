@@ -140,11 +140,12 @@ const app = new Vue({
         }
       }
     },
-
     methods: {
       async gotoPage () {
-        this.currentPage = parseInt(this.pageToGo)
-        this.loadCurrentPage();
+        if (this.pageToGo) {
+          this.currentPage = parseInt(this.pageToGo)
+          this.loadCurrentPage();
+        }
       },
       async loadCurrentPage () {
         this.loading = true;
