@@ -19,7 +19,8 @@ module.exports = {
     router.get('/danke/mini/file/transfer', controller.miniFileTransfer.bind(controller))
 
     router.post('/danke/work', controller.addWork.bind(controller))
+    router.post('/danke/work/share', controller.shareWork.bind(controller))
     router.get('/danke/work/:id', controller.getWork.bind(controller))
-    router.get('/danke/work/recommend', controller.getRecommendList.bind(controller))
+    router.get('/danke/work/featured', controller.getFeaturedList.bind(controller))
   }
 }

@@ -33,13 +33,53 @@ module.exports = class DankController {
   }
 
   async addWork (ctx, next) {
+    const work = ctx.request.body
+    work.openId = ctx.query.openId
+    work.uid = shortid.generate()
     const result = await this.workdao.insertOne(ctx.request.body)
-    ctx.body = result
+    ctx.body = {
+      uid: work.uid,
+      result
+    }
     await next()
   }
 
-  async getRecommendList (ctx, next) {
-    const result = await this.workdao.list(ctx.request.body)
+  async shareWork (ctx, next) {
+    await this.workdao.patchOne('uid', {
+      uid: ctx.request.body.uid,
+
+    })
+  }
+
+  async getWork (ctx, next) {
+    const result = await this.workdao.getOne({
+      name: ctx.params.id
+    })
+    if (result == null) {
+      ctx.body = {
+        code: 404
+      }
+    } else {
+      ctx.body = result
+    }
+    await next()
+  }
+
+  async getFeaturedList (ctx, next) {
+    const result = await this.workdao.list({
+      page: 1,
+      count: 24
+    })
+    const list = []
+    for (let work of result.list) {
+      list.push({
+        name: work.name,
+        uid: work.uid,
+        cover: work.cover,
+        template: work.template
+      })
+    }
+    result.list = list
     ctx.body = result
     await next()
   }
