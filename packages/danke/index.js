@@ -13,8 +13,13 @@ module.exports = {
     router.get('/danke/template/:name', controller.getTemplate.bind(controller))
     router.post('/danke/template', controller.addTemplate.bind(controller))
     router.patch('/danke/template', controller.patchTemplate.bind(controller))
+    router.delete('/danke/template/:name', controller.deleteTemplate.bind(controller))
 
     router.get('/danke/show/images/:show', controller.getShowImages.bind(controller))
     router.get('/danke/mini/file/transfer', controller.miniFileTransfer.bind(controller))
+
+    router.post('/danke/work', controller.addWork.bind(controller))
+    router.get('/danke/work/:id', controller.getWork.bind(controller))
+    router.get('/danke/work/recommend', controller.getRecommendList.bind(controller))
   }
 }

@@ -64,7 +64,7 @@ class RESTfulDAO {
     }
   }
 
-  async patchObject (key, set) {
+  async patchOne (key, set) {
     const db = await this.getDb()
     const query = {}
     const value = set[key]
@@ -87,12 +87,19 @@ class RESTfulDAO {
     return updated
   }
 
-  async deleteOne (id) {
+  async deleteOne (key, value) {
+    let result = null
     const db = await this.getDb()
-    const deleted = await db.collection(this.coll).deleteOne({
-      _id: new ObjectID(id)
-    })
-    return deleted
+    if (key && value) {
+      const q = {}
+      q[key] = value
+      result = await db.collection(this.coll).deleteOne(q)
+    } else if (key) {
+      result = await db.collection(this.coll).deleteOne({
+        _id: new ObjectID(key)
+      })
+    }
+    return result
   }
 }
 

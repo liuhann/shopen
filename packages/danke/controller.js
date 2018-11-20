@@ -7,6 +7,7 @@ module.exports = class DankController {
   constructor (ctx) {
     this.templatedao = new RestfullDAO(ctx.services.mongodb, 'danke', 'templates')
     this.imagedao = new RestfullDAO(ctx.services.mongodb, 'danke', 'images')
+    this.workdao = new RestfullDAO(ctx.services.mongodb, 'danke', 'works')
   }
   async getTemplateList (ctx, next) {
     const result = await this.templatedao.list(ctx.request.query)
@@ -31,8 +32,26 @@ module.exports = class DankController {
     await next()
   }
 
+  async addWork (ctx, next) {
+    const result = await this.workdao.insertOne(ctx.request.body)
+    ctx.body = result
+    await next()
+  }
+
+  async getRecommendList (ctx, next) {
+    const result = await this.workdao.list(ctx.request.body)
+    ctx.body = result
+    await next()
+  }
+
   async patchTemplate (ctx, next) {
-    const result = await this.templatedao.patchObject('name', ctx.request.body)
+    const result = await this.templatedao.patchOne('name', ctx.request.body)
+    ctx.body = result
+    await next()
+  }
+
+  async deleteTemplate (ctx, next) {
+    const result = await this.templatedao.deleteOne('name', ctx.params.name)
     ctx.body = result
     await next()
   }
