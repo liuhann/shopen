@@ -87,18 +87,13 @@ class RESTfulDAO {
     return updated
   }
 
-  async deleteOne (key, value) {
+  async deleteOne (query) {
     let result = null
     const db = await this.getDb()
-    if (key && value) {
-      const q = {}
-      q[key] = value
-      result = await db.collection(this.coll).deleteOne(q)
-    } else if (key) {
-      result = await db.collection(this.coll).deleteOne({
-        _id: new ObjectID(key)
-      })
+    if (query['_id'] && typeof query['_id'] === 'string') {
+      query['_id'] = new ObjectID(query['_id'])
     }
+    result = await db.collection(this.coll).deleteOne(query)
     return result
   }
 }
