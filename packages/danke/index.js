@@ -1,5 +1,4 @@
 const DankeController = require('./controller')
-const DankeDAO = require('./DankeDAO')
 module.exports = {
   async created (app) {
 
