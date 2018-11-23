@@ -54,8 +54,10 @@ module.exports = class DankController {
   async addWork (ctx, next) {
     const work = ctx.request.body
     work.openId = ctx.query.openId
-    work.uid = shortid.generate()
-    const result = await this.workdao.insertOne(ctx.request.body)
+    await this.workdao.deleteOne({
+      uid: work.uid
+    })
+    const result = await this.workdao.insertOne(work)
     ctx.body = {
       uid: work.uid,
       result
@@ -65,8 +67,7 @@ module.exports = class DankController {
 
   async shareWork (ctx, next) {
     await this.workdao.patchOne('uid', {
-      uid: ctx.request.body.uid,
-
+      uid: ctx.request.body.uid
     })
   }
 
@@ -125,6 +126,7 @@ module.exports = class DankController {
         uid: work.uid,
         cover: work.cover,
         template: work.template,
+        isDraft: work.isDraft,
         scenesCount: work.scenes.length
       })
     }
