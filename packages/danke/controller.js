@@ -55,8 +55,10 @@ module.exports = class DankController {
     const work = ctx.request.body
     work.openId = ctx.query.openId
     await this.workdao.deleteOne({
-      uid: work.uid
+      uid: work.uid,
+      openId: work.openId
     })
+    debug(`work added ${work.name} ${work.isDraft} ${work.uid} ${work.openId}`)
     const result = await this.workdao.insertOne(work)
     ctx.body = {
       uid: work.uid,
@@ -66,9 +68,9 @@ module.exports = class DankController {
   }
 
   async shareWork (ctx, next) {
-    await this.workdao.patchOne('uid', {
-      uid: ctx.request.body.uid
-    })
+    const shares = ctx.request.body
+    ctx.body = shares
+    await next()
   }
 
   async getWork (ctx, next) {
@@ -86,10 +88,12 @@ module.exports = class DankController {
   }
 
   async deleteWork (ctx, next) {
+    debug(`deleting work ${ctx.params.uid} ${ctx.query.openId}`)
     const result = await this.workdao.deleteOne({
       uid: ctx.params.uid,
       openId: ctx.query.openId
     })
+    debug(`deleted work ${ctx.params.uid}`)
     ctx.body = result
     await next()
   }
@@ -149,7 +153,7 @@ module.exports = class DankController {
 
   async miniFileTransfer (ctx, next) {
     debug(`transfer ${ctx.query.url} ${ctx.query.workId}`)
-    const uuid = shortid.generate() + '.' + ctx.services.file.fileExtension(ctx.query.url)
+    const uuid = ctx.query.openId + '/' + shortid.generate() + '.' + ctx.services.file.fileExtension(ctx.query.url)
     const localFile = `${TransferHome}/${uuid}`
     await ctx.services.file.transfer(ctx.query.url, localFile)
     await ctx.services.bos.uploadLocalFileToBOS('danke', uuid, localFile)

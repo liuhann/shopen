@@ -33,7 +33,7 @@ class RESTfulDAO {
       sortObject[sort] = parseInt(order)
       cursor = cursor.sort(sortObject)
     }
-    debug(filter, page, count, sort, order)
+    debug(`listing ${this.coll} ${filter} ${page} ${count}`)
     const result = await cursor.skip((page - 1) * count).limit(count).toArray()
 
     return {
