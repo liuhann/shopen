@@ -33,7 +33,7 @@ class RESTfulDAO {
       sortObject[sort] = parseInt(order)
       cursor = cursor.sort(sortObject)
     }
-    debug(filter, page, count, sort, order)
+    debug(`listing ${this.coll} ${filter} ${page} ${count}`)
     const result = await cursor.skip((page - 1) * count).limit(count).toArray()
 
     return {
@@ -64,7 +64,7 @@ class RESTfulDAO {
     }
   }
 
-  async patchObject (key, set) {
+  async patchOne (key, set) {
     const db = await this.getDb()
     const query = {}
     const value = set[key]
@@ -87,12 +87,14 @@ class RESTfulDAO {
     return updated
   }
 
-  async deleteOne (id) {
+  async deleteOne (query) {
+    let result = null
     const db = await this.getDb()
-    const deleted = await db.collection(this.coll).deleteOne({
-      _id: new ObjectID(id)
-    })
-    return deleted
+    if (query['_id'] && typeof query['_id'] === 'string') {
+      query['_id'] = new ObjectID(query['_id'])
+    }
+    result = await db.collection(this.coll).deleteOne(query)
+    return result
   }
 }
 
