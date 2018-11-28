@@ -4,9 +4,11 @@ const RestfullDAO = require('../rest/restful-dao')
 const debug = require('debug')('danke:rest')
 
 const travel = require('./templates/travel')
+const lightcircle = require('./templates/lightcircle')
 
 const Templates = {
-  travel
+  travel,
+  lightcircle
 }
 
 module.exports = class DankController {
