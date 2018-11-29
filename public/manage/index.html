@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <title>Title</title>
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
 
     <script src="https://cdn.jsdelivr.net/npm/vue@2.5.17/dist/vue.js"></script>
@@ -12,7 +14,11 @@
     <link rel="stylesheet" href="https://unpkg.com/vant/lib/index.css">
     <!-- 引入组件 -->
     <script src="https://unpkg.com/vant/lib/vant.min.js"></script>
+    <!-- 引入样式 -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/vant@1.4/lib/index.css">
 
+    <!-- 引入组件 -->
+    <script src="https://cdn.jsdelivr.net/npm/vant@1.4/lib/vant.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.0.14/howler.core.min.js"></script>
     <style>
         .van-popup--right {
@@ -36,7 +42,6 @@
             width: 60px;
             height: 60px;
         }
-
     </style>
 </head>
 <body>
@@ -51,7 +56,7 @@
             <div slot="footer">
                 <van-button @click="showQueryBox(story)"  size="mini">查找</van-button>
                 <van-button @click="playStory(story)" size="mini">播放</van-button>
-                <van-button @click="removeStory(story, true)" size="mini">删除</van-button>
+                <van-button @click="removeStory(story)" size="mini">删除</van-button>
             </div>
         </van-card>
         <van-popup v-model="loading">
@@ -140,11 +145,12 @@ const app = new Vue({
         }
       }
     },
-
     methods: {
       async gotoPage () {
-        this.currentPage = parseInt(this.pageToGo)
-        this.loadCurrentPage();
+        if (this.pageToGo) {
+          this.currentPage = parseInt(this.pageToGo)
+          this.loadCurrentPage();
+        }
       },
       async loadCurrentPage () {
         this.loading = true;
