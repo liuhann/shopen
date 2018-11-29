@@ -5,10 +5,12 @@ const debug = require('debug')('danke:rest')
 
 const travel = require('./templates/travel')
 const lightcircle = require('./templates/lightcircle')
+const joint = require('./templates/joint')
 
 const Templates = {
   travel,
-  lightcircle
+  lightcircle,
+  joint
 }
 
 module.exports = class DankController {
