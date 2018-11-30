@@ -6,8 +6,10 @@ const debug = require('debug')('danke:rest')
 const travel = require('./templates/travel')
 const lightcircle = require('./templates/lightcircle')
 const joint = require('./templates/joint')
+const slide = require('./templates/slide')
 
 const Templates = {
+  slide,
   travel,
   lightcircle,
   joint
