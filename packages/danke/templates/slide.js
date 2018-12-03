@@ -3,7 +3,7 @@ module.exports = {
   'name': '滑动',
   'coordinate': 'tl',
   'desc': '横向切换',
-  'cover': '000/travel.jpg',
+  'cover': '000/slide.jpg',
   'scenes': [0, 0, 0],
   'templates': [{
     'template': 'designed',

@@ -3,7 +3,7 @@ module.exports = {
   'name': '一览',
   'coordinate': 'tl',
   'desc': '色彩荟聚',
-  'cover': '000/travel.jpg',
+  'cover': '000/joint.jpg',
   'scenes': [0, 0],
   'templates': [{
     'template': 'designed',

@@ -3,7 +3,7 @@ module.exports = {
   'name': '淡圆',
   'coordinate': 'center',
   'desc': '素雅专注，平淡是一种习惯',
-  'cover': '000/travel.jpg',
+  'cover': '000/lightcircle.jpg',
   'scenes': [0, 0],
   'templates': [{
     'template': 'designed',

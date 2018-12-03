@@ -106,6 +106,9 @@ module.exports = class DankController {
 
   async getFeaturedList (ctx, next) {
     const result = await this.workdao.list({
+      filter: {
+        'featured': true
+      },
       page: 1,
       count: 24
     })

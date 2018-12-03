@@ -21,19 +21,15 @@ class RESTfulDAO {
       page = 1
     }
     count = count || 100
-    if (this.middleware) {
-      await this.middleware({type: 'list', filter, page, count, sort, order})
-    }
     const coll = db.collection(this.coll)
     let cursor = coll.find(filter)
     const total = await cursor.count()
-
     if (sort) {
       const sortObject = {}
       sortObject[sort] = parseInt(order)
       cursor = cursor.sort(sortObject)
     }
-    debug(`listing ${this.coll} ${filter} ${page} ${count}`)
+    debug(`listing ${this.coll} filter: ${filter && JSON.stringify(filter)} page: ${page} count: ${count}`)
     const result = await cursor.skip((page - 1) * count).limit(count).toArray()
 
     return {
