@@ -182,14 +182,23 @@ module.exports = class StoryService {
     await next()
   }
 
+  async markDelete (ctx, next) {
+    let {id} = ctx.params
+    await this.storydao.updateStory(id, {
+      deleted: true
+    })
+    ctx.body = {}
+    await next()
+  }
+
   async deleteStory (ctx, next) {
     let {id} = ctx.params
-    debug('removeing story : ' + id)
+    debug('pop remove story')
     const result = {}
-    const story = await this.storydao.getStoryById(id)
-
+    const story = await this.storydao.getOneDeletedStory()
     if (story) {
-      debug('story found')
+      result.path = story.path
+      debug('story found' + story.path)
       let storyPath = (story.path.charAt(0) === '/') ? story.path.substring(1) : story.path
       if (fs.existsSync(this.audioHome + '/' + storyPath)) {
         result.mp3 = this.audioHome + '/' + storyPath
@@ -226,7 +235,7 @@ module.exports = class StoryService {
         console.error(e)
       }
     }
-    await this.storydao.deleteStoryById(id)
+    await this.storydao.deleteStoryById(story._id.toString())
     ctx.body = result
     await next()
   }
