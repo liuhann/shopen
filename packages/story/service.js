@@ -1,3 +1,6 @@
+const Duration = require('mp3-cutter/src/duration')
+const MP3Cutter = require('mp3-cutter')
+
 const homeLabels = require('./common/home-labels')
 const fs = require('fs')
 const debug = require('debug')('shopen:story:service')
@@ -59,6 +62,14 @@ module.exports = class StoryService {
     } else {
       debug(`1.transfer story ${CDN_STORY}/${storyPath} -> ${this.audioHome}/${storyPath}`)
       await this.file.transfer(`${CDN_STORY}/${encodeURIComponent(storyPath)}`, `${this.audioHome}/${storyPath}`)
+
+      // 调用剪切mp3  去除最后5s  lizhi.fm 的声音
+      MP3Cutter.cut({
+        src: `${this.audioHome}/${storyPath}`,
+        target: `${this.audioHome}/${storyPath}`,
+        start: 0,
+        end: Duration.getDuration(`${this.audioHome}/${storyPath}`) - 5
+      })
       await send(ctx, storyPath, {
         root: this.audioHome
       })

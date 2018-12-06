@@ -252,7 +252,7 @@ const app = new Vue({
       async getSameAlbum () {
         const paths = this.queryText.split('/')
         let path = paths[0] || paths[1]
-        const sameNames = await ky.get(`/story/search/path?query=${path}&skip=0&limit=50`).json();
+        const sameNames = await ky.get(`/story/search/path?query=${path}/&skip=0&limit=50`).json();
         if (sameNames.length > 100) {
           this.relatedStories = sameNames.slice(0, 100)
         } else {
