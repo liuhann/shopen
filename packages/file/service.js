@@ -30,7 +30,7 @@ class FileService {
       const storePath = `${fileDir}/${shortid.generate()}.${fileExt}`
       await fsPromises.copyFile(uploadFile.path, storePath)
       const fileDoc = {
-        path: storePath,
+        path: storePath.substr(this.baseDir.length),
         name: uploadFile.name,
         size: uploadFile.size
       }

@@ -7,6 +7,7 @@ module.exports = {
   'scenes': [0, 0],
   'templates': [{
     'template': 'designed',
+    'type': 'scene',
     'display': '',
     'style': 'background-color: #F5FBFF',
     'hideDelay': 2000,
