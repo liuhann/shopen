@@ -20,6 +20,7 @@
   },
   "homepage": "https://github.com/liuhann/shopen#readme",
   "dependencies": {
+    "ali-oss": "^6.1.0",
     "async-validator": "^1.8.2",
     "bce-sdk-js": "^0.2.9",
     "bson": "^3.0.0",
