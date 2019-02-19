@@ -1,5 +1,7 @@
 const DankeController = require('./controller')
 const DankeV2Controler = require('./v2controler')
+const UploadControler = require('./upload')
+
 module.exports = {
   async created (app) {
 
@@ -29,5 +31,8 @@ module.exports = {
 
     const v2controler = new DankeV2Controler(app.context)
     v2controler.initRoutes(router)
+    
+    const uploader = new UploadControler(app.context)
+    uploader.initRoutes(router)
   }
 }
