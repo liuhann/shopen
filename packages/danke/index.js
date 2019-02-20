@@ -31,7 +31,6 @@ module.exports = {
 
     const v2controler = new DankeV2Controler(app.context)
     v2controler.initRoutes(router)
-    
     const uploader = new UploadControler(app.context)
     uploader.initRoutes(router)
   }

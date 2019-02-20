@@ -6,9 +6,9 @@ module.exports = class DankeV2Controller {
   }
 
   initRoutes (router) {
-    router.get('/danke/v2/work/:uid', this.getWork.bind(this))
-    router.post('/danke/v2/work', this.addWork.bind(this))
-    router.get('/danke/v2/works/mine', this.getMyWork.bind(this))
+    router.get('/api/danke/v2/work/:uid', this.getWork.bind(this))
+    router.post('/api/danke/v2/work', this.addWork.bind(this))
+    router.get('/api/danke/v2/works/mine', this.getMyWork.bind(this))
   }
 
   async getMyWork (ctx, next) {

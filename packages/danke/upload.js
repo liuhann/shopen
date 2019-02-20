@@ -8,8 +8,7 @@ module.exports = class UploadController {
   initRoutes (router) {
     router.get('/dankev2/file/upload/image', this.uploadImage.bind(this))
   }
-  
   uploadImage (ctx, next) {
-		
+
   }
 }
