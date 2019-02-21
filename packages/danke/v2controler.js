@@ -7,6 +7,7 @@ module.exports = class DankeV2Controller {
 
   initRoutes (router) {
     router.get('/api/danke/v2/work/:uid', this.getWork.bind(this))
+    router.delete('/api/danke/v2/work/:uid', this.deleteWork.bind(this))
     router.post('/api/danke/v2/work', this.addWork.bind(this))
     router.get('/api/danke/v2/works/mine', this.getMyWork.bind(this))
   }
@@ -30,6 +31,19 @@ module.exports = class DankeV2Controller {
     await next()
   }
 
+  async deleteWork (ctx, next) {
+	  ctx.user = 'test'
+	  await this.workdao.deleteOne({
+		  uid: ctx.params.uid,
+      user: ctx.user
+	  })
+    ctx.body = {
+	    result: 'ok'
+    }
+    
+    await next()
+  }
+  
   async addWork (ctx, next) {
     const work = ctx.request.body
     work.openId = ctx.query.openId
