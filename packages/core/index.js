@@ -4,6 +4,8 @@ const Router = require('koa-router')
 const HttpError = require('http-errors')
 const serve = require('koa-static')
 
+const sessoinInit = require('./session')
+
 const validator = require('async-validator')
 validator.prototype.validated = async function (object) {
   return new Promise((resolve, reject) => {
@@ -31,6 +33,8 @@ module.exports = {
     app.context.services.validator = validator
 
     app.use(serve('public'))
+    
+    sessoinInit(app)
   },
 
   ready (app) {

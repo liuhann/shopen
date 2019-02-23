@@ -7,6 +7,9 @@ module.exports = {
 
   created (app) {
     app.context.services.user = new UserService()
+    app.use(ctx => {
+      ctx.user = 'test'
+    })
   },
 
   ready (app) {
