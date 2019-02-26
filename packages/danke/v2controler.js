@@ -6,8 +6,8 @@ module.exports = class DankeV2Controller {
   }
 
   initRoutes (router) {
-    router.get('/api/danke/v2/work/:uid', this.getWork.bind(this))
-    router.delete('/api/danke/v2/work/:uid', this.deleteWork.bind(this))
+    router.get('/api/danke/v2/work/:id', this.getWork.bind(this))
+    router.delete('/api/danke/v2/work/:id', this.deleteWork.bind(this))
     router.post('/api/danke/v2/work', this.addWork.bind(this))
     router.get('/api/danke/v2/works/mine', this.getMyWork.bind(this))
   }
@@ -15,15 +15,18 @@ module.exports = class DankeV2Controller {
   async getMyWork (ctx, next) {
     ctx.user = 'test'
     const works = await this.workdao.list({
-      user: ctx.user
+      filter: {
+        user: ctx.user
+      }
     })
     const result = {
       list: []
     }
     for (let work of works.list) {
       result.list.push({
-        id: work.uid,
+        id: work.id,
         user: work.user,
+        image: work.images ? work.images[0] : '',
         scenes: work.scenes && work.scenes.length
       })
     }
@@ -32,15 +35,14 @@ module.exports = class DankeV2Controller {
   }
 
   async deleteWork (ctx, next) {
-	  ctx.user = 'test'
-	  await this.workdao.deleteOne({
-		  uid: ctx.params.uid,
+    ctx.user = 'test'
+    await this.workdao.deleteOne({
+      id: ctx.params.id,
       user: ctx.user
-	  })
+    })
     ctx.body = {
-	    result: 'ok'
+      result: 'ok'
     }
-    
     await next()
   }
   
@@ -48,13 +50,13 @@ module.exports = class DankeV2Controller {
     const work = ctx.request.body
     work.openId = ctx.query.openId
     await this.workdao.deleteOne({
-      uid: work.uid,
+      id: work.id,
       openId: work.openId
     })
     work.modified = new Date().getTime()
     const result = await this.workdao.insertOne(work)
     ctx.body = {
-      uid: work.uid,
+      id: work.id,
       result
     }
     await next()
@@ -62,7 +64,7 @@ module.exports = class DankeV2Controller {
 
   async getWork (ctx, next) {
     const result = await this.workdao.getOne({
-      uid: ctx.params.uid
+      id: ctx.params.id
     })
     if (result == null) {
       ctx.body = {
