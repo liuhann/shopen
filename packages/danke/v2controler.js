@@ -2,10 +2,13 @@ const RestfullDAO = require('../rest/restful-dao')
 
 module.exports = class DankeV2Controller {
   constructor (ctx) {
+    this.ctx = ctx
     this.workdao = new RestfullDAO(ctx.services.mongodb, 'dankev2', 'works')
   }
 
   initRoutes (router) {
+    router.use('/api/danke', this.ctx.userController.bind(this.ctx.userController))
+
     router.get('/api/danke/v2/work/:id', this.getWork.bind(this))
     router.delete('/api/danke/v2/work/:id', this.deleteWork.bind(this))
     router.post('/api/danke/v2/work', this.addWork.bind(this))
@@ -13,10 +16,13 @@ module.exports = class DankeV2Controller {
   }
 
   async getMyWork (ctx, next) {
-    ctx.user = 'test'
+    if (ctx.phone == null) {
+      ctx.throw(401)
+      return
+    }
     const works = await this.workdao.list({
       filter: {
-        user: ctx.user
+        user: ctx.phone
       }
     })
     const result = {
@@ -35,10 +41,9 @@ module.exports = class DankeV2Controller {
   }
 
   async deleteWork (ctx, next) {
-    ctx.user = 'test'
     await this.workdao.deleteOne({
       id: ctx.params.id,
-      user: ctx.user
+      user: ctx.phone
     })
     ctx.body = {
       result: 'ok'
@@ -46,12 +51,13 @@ module.exports = class DankeV2Controller {
     await next()
   }
   async addWork (ctx, next) {
+    if (ctx.phone == '')
     const work = ctx.request.body
-    work.openId = ctx.query.openId
     await this.workdao.deleteOne({
       id: work.id,
-      openId: work.openId
+      user: ctx.phone
     })
+    work.user = ctx.phone
     work.modified = new Date().getTime()
     const result = await this.workdao.insertOne(work)
     ctx.body = {

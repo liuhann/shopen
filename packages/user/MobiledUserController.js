@@ -38,18 +38,15 @@ module.exports = class MobiledUserController {
   async setUserMiddleWare (ctx, next) {
     const token = ctx.query.token
     if (token == null) {
-      ctx.body = {
-        'code': '400',
+      ctx.throw(400, 'token required', {
         'msg': 'token required'
-      }
-      await next()
-    }
-    if (this.tokenUsers[token] == null) {
+      })
+    } else if (this.tokenUsers[token] === undefined) {
       const tokenUser = this.tokendao.getOne({
         token
       })
       if (tokenUser == null) {
-        this.tokenUsers[token] = ''
+        this.tokenUsers[token] = null
       } else {
         this.tokenUsers[token] = tokenUser.phone
       }

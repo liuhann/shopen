@@ -1,8 +1,6 @@
 const MobileUserController = require('./MobiledUserController')
 module.exports = {
   name: 'user',
-  disabled: true,
-
   created (app) {
     const controller = new MobileUserController(app.context)
     app.context.userController = controller
