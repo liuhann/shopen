@@ -45,7 +45,6 @@ module.exports = class DankeV2Controller {
     }
     await next()
   }
-  
   async addWork (ctx, next) {
     const work = ctx.request.body
     work.openId = ctx.query.openId

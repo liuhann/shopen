@@ -32,7 +32,6 @@ class UserService {
   async getUserByToken (token) {
 
   }
-  
   async getUserId () {
     return 'test'
   }

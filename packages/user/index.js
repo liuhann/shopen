@@ -1,21 +1,15 @@
-const UserService = require('./service/user-service')
-const userController = require('./controller/uc-controller')
-
+const MobileUserController = require('./MobiledUserController')
 module.exports = {
   name: 'user',
   disabled: true,
 
   created (app) {
-    app.context.services.user = new UserService()
-    app.use(ctx => {
-      ctx.user = 'test'
-    })
+    const controller = new MobileUserController(app.context)
+    app.context.userController = controller
   },
 
   ready (app) {
-    app.context.services.user.init(app.context.services.mongodb)
     const router = app.context.router
-    router.post('/open/user/register', userController.register)
-    router.post('/open/user/login', userController.login)
+    app.context.userController.initRoutes(router)
   }
 }
