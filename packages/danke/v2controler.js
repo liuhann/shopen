@@ -7,7 +7,7 @@ module.exports = class DankeV2Controller {
   }
 
   initRoutes (router) {
-    router.use('/api/danke', this.ctx.userController.bind(this.ctx.userController))
+    router.use('/api/danke', this.ctx.userController.setUserMiddleWare.bind(this.ctx.userController))
 
     router.get('/api/danke/v2/work/:id', this.getWork.bind(this))
     router.delete('/api/danke/v2/work/:id', this.deleteWork.bind(this))
@@ -51,7 +51,10 @@ module.exports = class DankeV2Controller {
     await next()
   }
   async addWork (ctx, next) {
-    if (ctx.phone == '')
+    if (ctx.phone == null) {
+      ctx.throw(401)
+      return
+    }
     const work = ctx.request.body
     await this.workdao.deleteOne({
       id: work.id,
