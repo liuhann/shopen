@@ -18,16 +18,16 @@ module.exports = class UploadController {
   initRoutes (router) {
     router.post('/api/danke/v2/image/upload', this.uploadImage.bind(this))
   }
-  
+
   async uploadImage (ctx, next) {
     const body = ctx.request.body
     const result = {}
-    
+
     for (const fileName in body.files) {
       const uploadFile = body.files[fileName]
       const fileExt = this.fileExtension(uploadFile.name)
       try {
-        const fileId = ctx.user + '/' + shortid.generate() + '.' + fileExt
+        const fileId = ctx.phone + '/' + shortid.generate() + '.' + fileExt
         // object表示上传到OSS的Object名称，localfile表示本地文件或者文件路径
         let r1 = await this.client.put(fileId, uploadFile.path)
         result.r1 = r1
