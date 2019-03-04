@@ -3,6 +3,7 @@ const cors = require('kcors')
 const Router = require('koa-router')
 const HttpError = require('http-errors')
 const serve = require('koa-static')
+const httplog = require('debug')('http')
 
 const validator = require('async-validator')
 validator.prototype.validated = async function (object) {
@@ -21,6 +22,11 @@ module.exports = {
   name: 'core',
 
   created (app) {
+    app.use(async (ctx, next) => {
+      httplog(`${ctx.path} ${ctx.querystring}`)
+      await next()
+    })
+
     app.use(cors({
       credentials: true
     }))
@@ -30,7 +36,9 @@ module.exports = {
     app.context.router = new Router()
     app.context.services.validator = validator
 
-    app.use(serve('public'))
+    app.use(serve('public', {
+      maxage: 30 * 24 * 60 * 60 * 1000
+    }))
   },
 
   ready (app) {
