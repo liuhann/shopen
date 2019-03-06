@@ -32,6 +32,7 @@ module.exports = class DankeV2Controller {
       result.list.push({
         id: work.id,
         user: work.user,
+        title: work.title,
         image: work.images ? work.images[0] : '',
         scenes: work.scenes && work.scenes.length
       })
