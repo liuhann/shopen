@@ -3,7 +3,9 @@ const cors = require('kcors')
 const Router = require('koa-router')
 const HttpError = require('http-errors')
 const serve = require('koa-static')
+const send = require('koa-send')
 const httplog = require('debug')('http')
+const { resolve } = require('path')
 
 const validator = require('async-validator')
 validator.prototype.validated = async function (object) {
@@ -49,5 +51,13 @@ module.exports = {
     app
       .use(app.context.router.routes())
       .use(app.context.router.allowedMethods())
+    app.use(async (ctx, next) => {
+      if (ctx.status === 404) {
+        await send(ctx, '/index.html', {
+          root: resolve('public')
+        })
+      }
+      await next()
+    })
   }
 }
