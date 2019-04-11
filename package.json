@@ -43,7 +43,8 @@
     "mongodb": "^3.0.7",
     "mp3-cutter": "^1.0.0",
     "randomatic": "^3.0.0",
-    "shortid": "^2.2.8"
+    "shortid": "^2.2.8",
+    "urllib": "^2.33.3"
   },
   "devDependencies": {
     "eslint": "^4.19.1",

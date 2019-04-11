@@ -26,9 +26,9 @@ class AuthDAO {
     if (found) {
       return -1
     }
-    
+
     const inc = await this.mongo.getNextSequence('user')
-    
+
     userObject.inc = inc
     const result = await db.collection('user').insertOne(userObject)
     return result

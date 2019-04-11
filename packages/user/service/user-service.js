@@ -1,12 +1,11 @@
+const urllib = require('urllib')
 const debug = require('debug')('core:user')
 const AuthDAO = require('../dao/auth')
-const TokenDAO = require('../dao/token')
 const HttpError = require('http-errors')
 
 class UserService {
   async init (mongo) {
     this.authdao = new AuthDAO(mongo)
-    this.tokendao = new TokenDAO(mongo)
   }
 
   async checkUser ({email, pwd}) {

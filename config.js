@@ -1,5 +1,5 @@
 module.exports = {
   // debug: 'shopen:server,shopen:core:mongo,shopen:restful',
-  debug: 'shopen:*,shopen:story:*,danke:*,http,koa-send',
+  debug: 'shopen:*,shopen:story:*,danke:*,http,oauth',
   port: 80
 }
