@@ -5,6 +5,7 @@ const shortid = require('shortid')
  User {
   id: 'mobile' or 'email' (from github),
   pwd: 'mobile needed',
+  nick: 'nike name '
   ip: '',
   logined: time,
   token: '',
@@ -18,8 +19,7 @@ module.exports = class UserController {
     this.userdao = new RestfullDAO(ctx.services.mongodb, 'danke', 'user')
   }
   initRoutes (router) {
-    router.use('/api/user', this.setUserMiddleWare.bind(this))
-    router.post('api/user/register', this.register.bind(this))
+    router.post('/api/user/register', this.register.bind(this))
     router.post('/api/user/login', this.login.bind(this))
     router.get('/api/user/current', this.getCurrentUser.bind(this))
     router.get('/api/user/sms/:phone', this.sendPhoneSmsCode.bind(this))
@@ -50,7 +50,7 @@ module.exports = class UserController {
   }
 
   async register (ctx, next) {
-    const { name, password } = ctx.request.body
+    const { name, password, nickname } = ctx.request.body
     const result = {}
     if (/^[1][3,4,5,7,8][0-9]{9}$/.test(name)) {
       const user = await this.userdao.getOne({
@@ -63,6 +63,7 @@ module.exports = class UserController {
         await this.userdao.insertOne({
           id: name,
           pwd: password,
+          nick: nickname,
           ip: this.getRemoteIp(ctx.req),
           logined: new Date().getTime(),
           token: token,
@@ -86,9 +87,8 @@ module.exports = class UserController {
   }
 
   async getCurrentUser (ctx, next) {
-    ctx.body = {
-      phone: ctx.phone
-    }
+    console.log(ctx.app.tokenUsers)
+    ctx.body = ctx.user
     await next()
   }
 

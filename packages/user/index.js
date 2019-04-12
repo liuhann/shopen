@@ -12,7 +12,7 @@ module.exports = {
       async (ctx, next) => {
         const token = ctx.query.token
         if (token == null) {
-          ctx.userid = ''
+          ctx.user = {}
           await next()
           return
         } else if (app.tokenUsers[token] == null /* 未查询过token */) {
@@ -22,10 +22,10 @@ module.exports = {
           if (tokenUser == null) {
             app.tokenUsers[token] = ''
           } else {
-            app.tokenUsers[token] = tokenUser.id
+            app.tokenUsers[token] = tokenUser
           }
         }
-        ctx.userid = app.tokenUsers[token]
+        ctx.user = app.tokenUsers[token]
         await next()
       })
   },

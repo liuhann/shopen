@@ -50,7 +50,12 @@ class BootStrap {
     }
     debug(`prepare module [${modulePath}]..`)
     if (moduleConfig.created) {
-      moduleConfig.created(this.app)
+      try {
+        moduleConfig.created(this.app)
+      } catch (e) {
+        debug(`module created fail: ${modulePath}`)
+        return null
+      }
     }
     return moduleConfig
   }
@@ -76,7 +81,11 @@ class BootStrap {
 
   async packagesReady () {
     for (let shopenPackage of this.app.context.packages) {
-      shopenPackage.ready && shopenPackage.ready(this.app)
+      try {
+        shopenPackage.ready && shopenPackage.ready(this.app)
+      } catch (e) {
+        debug()
+      }
     }
   }
   async bootComplete () {

@@ -7,8 +7,6 @@ module.exports = class DankeV2Controller {
   }
 
   initRoutes (router) {
-    router.use('/api/animation/add', this.ctx.userController.setUserMiddleWare.bind(this.ctx.userController))
-
     router.put('/api/animation', this.addAnimation.bind(this))
 
     router.get('/api/animation/list', this.listAnimations.bind(this))
@@ -17,14 +15,28 @@ module.exports = class DankeV2Controller {
   async addAnimation (ctx, next) {
     const animation = ctx.request.body
 
+    if (!ctx.user.id) {
+      ctx.body = {
+        code: 401
+      }
+      await next()
+      return
+    }
+
     const found = await this.animationdao.getOne({
       name: animation.name
     })
-    if (found) {
+    if (found && ctx.user.id !== found.userid) {
       ctx.body = {
         code: 409
       }
     } else {
+      if (found) {
+        await this.animationdao.deleteOne({
+          name: animation.name
+        })
+      }
+      animation.userid = ctx.user.id
       const result = await this.animationdao.insertOne(animation)
       ctx.body = {
         result

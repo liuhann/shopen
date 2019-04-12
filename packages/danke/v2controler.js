@@ -7,8 +7,6 @@ module.exports = class DankeV2Controller {
   }
 
   initRoutes (router) {
-    router.use('/api/danke', this.ctx.userController.setUserMiddleWare.bind(this.ctx.userController))
-
     router.get('/api/danke/v2/work/:id', this.getWork.bind(this))
     router.delete('/api/danke/v2/work/:id', this.deleteWork.bind(this))
     router.post('/api/danke/v2/work', this.addWork.bind(this))
