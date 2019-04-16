@@ -1,5 +1,5 @@
 const RestfullDAO = require('../rest/restful-dao')
-
+const debug = require('debug')('animation')
 module.exports = class DankeV2Controller {
   constructor (ctx) {
     this.ctx = ctx
@@ -8,7 +8,7 @@ module.exports = class DankeV2Controller {
 
   initRoutes (router) {
     router.put('/api/animation', this.addAnimation.bind(this))
-
+    router.delete('/api/animation', this.deleteAnimation.bind(this))
     router.get('/api/animation/list', this.listAnimations.bind(this))
   }
 
@@ -45,6 +45,25 @@ module.exports = class DankeV2Controller {
     await next()
   }
 
+  async deleteAnimation (ctx, next) {
+    debug('delete animation', ctx.query._id)
+    if (!ctx.user.id) {
+      ctx.body = {
+        code: 401
+      }
+      await next()
+      return
+    }
+    const deleted = await this.animationdao.deleteOne({
+      userid: ctx.user.id,
+      _id: ctx.query._id
+    })
+    ctx.body = {
+      deleted
+    }
+    await next()
+  }
+
   async listAnimations (ctx, next) {
     const filters = {}
     if (ctx.params.name) {
@@ -57,9 +76,5 @@ module.exports = class DankeV2Controller {
     const animations = await this.animationdao.list(Object.assign({}, ctx.params, filters))
     ctx.body = animations
     await next()
-  }
-
-  deleteAnimation () {
-
   }
 }
