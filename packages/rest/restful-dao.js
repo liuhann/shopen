@@ -28,6 +28,10 @@ class RESTfulDAO {
       const sortObject = {}
       sortObject[sort] = parseInt(order)
       cursor = cursor.sort(sortObject)
+    } else {
+      cursor = cursor.sort({
+        $natural: -1
+      })
     }
     debug(`listing ${this.coll} filter: ${filter && JSON.stringify(filter)} page: ${page} count: ${count}`)
     const result = await cursor.skip((page - 1) * count).limit(count).toArray()
