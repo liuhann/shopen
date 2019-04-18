@@ -33,7 +33,7 @@ module.exports = class UserController {
     let captcha = svgCaptcha.create({
       background: '#eef'
     })
-    this.captchMap[ctx.token] = captcha.text
+    this.captchMap[ctx.token] = captcha.text.toLowerCase()
     ctx.body = {
       svg: captcha.data
     }
@@ -43,8 +43,7 @@ module.exports = class UserController {
   async login (ctx, next) {
     const { name, password, captcha } = ctx.request.body
     const result = {}
-    
-    // capcha first
+    // captcha first
     if (this.captchMap[ctx.token] !== captcha) {
       delete this.captchMap[ctx.token]
       result.code = 400
