@@ -11,20 +11,20 @@ module.exports = {
      */
       async (ctx, next) => {
         const token = ctx.query.token
-        if (token == null) {
-          ctx.user = {}
-          await next()
+        if (token == null || token === '') {
+          ctx.throw(400)
           return
         } else if (app.tokenUsers[token] == null /* 未查询过token */) {
           const tokenUser = await controller.userdao.getOne({
             token
           })
           if (tokenUser == null) {
-            app.tokenUsers[token] = ''
+            app.tokenUsers[token] = {}
           } else {
             app.tokenUsers[token] = tokenUser
           }
         }
+        ctx.token = token
         ctx.user = app.tokenUsers[token]
         await next()
       })

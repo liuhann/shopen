@@ -1,5 +1,6 @@
 const RestfullDAO = require('../rest/restful-dao')
 const shortid = require('shortid')
+const svgCaptcha = require('svg-captcha');
 
 /**
  User {
@@ -17,33 +18,48 @@ const shortid = require('shortid')
 module.exports = class UserController {
   constructor (ctx) {
     this.userdao = new RestfullDAO(ctx.services.mongodb, 'danke', 'user')
+    this.captchMap = {}
   }
+  
   initRoutes (router) {
     router.post('/api/user/register', this.register.bind(this))
     router.post('/api/user/login', this.login.bind(this))
     router.get('/api/user/current', this.getCurrentUser.bind(this))
     router.get('/api/user/sms/:phone', this.sendPhoneSmsCode.bind(this))
+    router.get('/api/captcha', this.getCaptcha.bind(this))
+  }
+  
+  async getCaptcha (ctx, next) {
+    let captcha = svgCaptcha.create()
+    this.captchMap[ctx.token] = captcha.text
+    ctx.body = {
+      svg: captcha.data
+    }
+    await next()
   }
 
   async login (ctx, next) {
-    const { name, password } = ctx.request.body
+    const { name, password, captcha } = ctx.request.body
     const result = {}
-    if (/^[1][3,4,5,7,8][0-9]{9}$/.test(name)) {
+    
+    // capcha first
+    if (this.captchMap[ctx.token] !== captcha) {
+      delete this.captchMap[ctx.token]
+      result.code = 400
+    } else {
+      delete this.captchMap[ctx.token]
       const user = await this.userdao.getOne({
         id: name,
         pwd: password
       })
       if (user) {
-
-      } else {
-        result.code = 401
+        this.userdao.patchOne('id', {
+          id: name,
+          token: ctx.token
+        })
+        result.code = 200
+        result.user = user
       }
-      this.tokenUsers[ctx.query.token] = phone
-      result.token = ctx.query.token
-      result.phone = phone
-      result.ok = '1'
-    } else {
-      result.code = 400
     }
     ctx.body = result
     await next()
