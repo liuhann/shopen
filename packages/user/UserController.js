@@ -1,6 +1,6 @@
 const RestfullDAO = require('../rest/restful-dao')
 const shortid = require('shortid')
-const svgCaptcha = require('svg-captcha');
+const svgCaptcha = require('svg-captcha')
 
 /**
  User {
@@ -30,7 +30,9 @@ module.exports = class UserController {
   }
   
   async getCaptcha (ctx, next) {
-    let captcha = svgCaptcha.create()
+    let captcha = svgCaptcha.create({
+      background: '#eef'
+    })
     this.captchMap[ctx.token] = captcha.text
     ctx.body = {
       svg: captcha.data
