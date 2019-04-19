@@ -20,7 +20,7 @@ module.exports = class UserController {
     this.userdao = new RestfullDAO(ctx.services.mongodb, 'danke', 'user')
     this.captchMap = {}
   }
-  
+
   initRoutes (router) {
     router.post('/api/user/register', this.register.bind(this))
     router.post('/api/user/login', this.login.bind(this))
@@ -28,7 +28,7 @@ module.exports = class UserController {
     router.get('/api/user/sms/:phone', this.sendPhoneSmsCode.bind(this))
     router.get('/api/captcha', this.getCaptcha.bind(this))
   }
-  
+
   async getCaptcha (ctx, next) {
     let captcha = svgCaptcha.create({
       background: '#eef'
@@ -60,6 +60,9 @@ module.exports = class UserController {
         })
         result.code = 200
         result.user = user
+      } else {
+        result.code = 401
+        result.message = '用户名或密码错误'
       }
     }
     ctx.body = result

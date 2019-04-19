@@ -66,14 +66,17 @@ module.exports = class DankeV2Controller {
 
   async listAnimations (ctx, next) {
     const filters = {}
-    if (ctx.params.name) {
+    if (ctx.query.name) {
       filters.filter = {
         $text: {
-          $search: ctx.params.name
+          $search: ctx.query.name
         }
       }
     }
-    const animations = await this.animationdao.list(Object.assign({}, ctx.params, filters))
+    if (ctx.query.type) {
+      filters.type = ctx.query.type
+    }
+    const animations = await this.animationdao.list(Object.assign({}, ctx.query, {filter: filters}))
     ctx.body = animations
     await next()
   }
