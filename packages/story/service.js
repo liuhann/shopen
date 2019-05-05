@@ -1,4 +1,4 @@
-const Duration = require('mp3-cutter/src/duration')
+const Duration = require('mp3-cutter/lib/duration')
 const MP3Cutter = require('mp3-cutter')
 
 const homeLabels = require('./common/home-labels')

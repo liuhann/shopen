@@ -7,9 +7,9 @@ module.exports = class DankeV2Controller {
   }
 
   initRoutes (router) {
-    router.put('/api/animation', this.addAnimation.bind(this))
-    router.delete('/api/animation', this.deleteAnimation.bind(this))
-    router.get('/api/animation/list', this.listAnimations.bind(this))
+    router.put('/animation', this.addAnimation.bind(this))
+    router.delete('/animation', this.deleteAnimation.bind(this))
+    router.get('/animation/list', this.listAnimations.bind(this))
   }
 
   async addAnimation (ctx, next) {

@@ -44,8 +44,8 @@ class BootStrap {
       return null
     }
     const moduleConfig = require(`../${modulePath}/index.js`)
-
     if (moduleConfig.disabled) {
+      debug(`module [${modulePath}] disabled`)
       return null
     }
     debug(`prepare module [${modulePath}]..`)

@@ -22,11 +22,11 @@ module.exports = class UserController {
   }
 
   initRoutes (router) {
-    router.post('/api/user/register', this.register.bind(this))
-    router.post('/api/user/login', this.login.bind(this))
-    router.get('/api/user/current', this.getCurrentUser.bind(this))
-    router.get('/api/user/sms/:phone', this.sendPhoneSmsCode.bind(this))
-    router.get('/api/captcha', this.getCaptcha.bind(this))
+    router.post('/user/register', this.register.bind(this))
+    router.post('/user/login', this.login.bind(this))
+    router.get('/user/current', this.getCurrentUser.bind(this))
+    router.get('/user/sms/:phone', this.sendPhoneSmsCode.bind(this))
+    router.get('/captcha', this.getCaptcha.bind(this))
   }
 
   async getCaptcha (ctx, next) {
@@ -107,7 +107,6 @@ module.exports = class UserController {
   }
 
   async getCurrentUser (ctx, next) {
-    console.log(ctx.app.tokenUsers)
     ctx.body = ctx.user
     await next()
   }

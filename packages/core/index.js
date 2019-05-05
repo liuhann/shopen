@@ -26,6 +26,9 @@ module.exports = {
     app.use(serve('public', {
       maxage: 30 * 24 * 60 * 60 * 1000
     }))
+    app.use(serve('ybstory', {
+      maxage: 30 * 24 * 60 * 60 * 1000
+    }))
   },
 
   ready (app) {
@@ -33,14 +36,23 @@ module.exports = {
   },
 
   bootComplete (app) {
-    app
-      .use(app.context.router.routes())
-      .use(app.context.router.allowedMethods())
+    const apiRouter = new Router()
+    apiRouter.use('/api', app.context.router.routes(), app.context.router.allowedMethods())
+    app.use(apiRouter.routes())
     app.use(async (ctx, next) => {
       if (ctx.status === 404) {
-        await send(ctx, '/index.html', {
-          root: resolve('public')
-        })
+        if (ctx.path.indexOf('/api') === 0) {
+          // api request is 404
+          ctx.body = {
+            code: 404,
+            msg: 'no such api'
+          }
+        } else {
+          // other return home page
+          await send(ctx, '/index.html', {
+            root: resolve('public')
+          })
+        }
       }
       await next()
     })
