@@ -7,9 +7,6 @@ const Koa = require('koa')
 module.exports = {
   async created (app) {
     // map  packages/story/dist -> m.yuanbaogushi.com'
-    const staticApp = new Koa()
-    staticApp.use(require('koa-static')('packages/story/dist', {maxage: 30 * 24 * 60 * 60 * 1000}))
-    app.use(vhost('h5.yuanbaogushi.com', staticApp))
     // service register
     app.context.services.story = new StoryService('/data/story')
     app.context.services.storydao = new StoryDAO()
@@ -17,10 +14,13 @@ module.exports = {
 
   ready (app) {
     const router = app.context.router
-    const storySevice = app.context.services.story
+
+    const storyDao = new StoryDAO(app.ctx.services.mongodb)
+    const storySevice = new StoryService(storyDao)
+
     // Init routing, Route Controller is required some times
     router.get('/story/home', async (ctx, next) => {
-      const body = await ctx.services.story.listHome(ctx.query.labels.split(','))
+      const body = await storySevice.listHome()
       ctx.body = body
       await next()
     })

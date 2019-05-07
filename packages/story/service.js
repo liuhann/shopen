@@ -19,14 +19,43 @@ const bosConfig = {
 }
 
 module.exports = class StoryService {
-  constructor (home) {
-    this.coverHome = home + '/cover'
-    this.audioHome = home + '/audio'
-    this.mongodb = null
-    this.file = null
-    this.storydao = null
+  constructor (dao) {
+    this.storydao = dao
+    this.todayCache = {}
   }
+  async listHome (labels) {
+    let d = new Date()
+    const today = d.getFullYear() + '-' + d.getMonth() + '-' + d.getDate()
+    if (!this.todayCache[today]) {
+      this.todayCache[today] = {}
+      this.todayCache[today].sample = this.storydao.sampleDocs()
+    }
+    const db = await this.mongodb.getDb('ybstory')
+    const colStories = db.collection('stories')
+    this.homeListing = {
+      list: []
+    }
 
+    this.homeListing.homesAlbum = db.collection('albums').find({
+      'home': 'true'
+    }).toArray()
+    this.homeListing.recommendLabels = homeLabels
+    this.homeListing.homesAlbum = await this.storydao.getTopAlbums()
+
+    for (var i = 0; i < labels.length; i++) {
+      let labelList = await colStories.find({
+        label: labels[i]
+      }).sort({
+        'u': -1
+      }).limit(6).toArray()
+
+      this.homeListing.list.push({
+        label: labels[i],
+        list: labelList
+      })
+    }
+    return this.homeListing
+  }
   async storyImage (ctx, next) {
     let {x, y, cover} = ctx.params
     let [coverId] = cover.split('.')
@@ -44,7 +73,6 @@ module.exports = class StoryService {
     }
     await next()
   }
-
   async storyDownload (ctx, next) {
     let {id} = ctx.params
     const story = await this.storydao.getStoryById(id)
@@ -139,34 +167,6 @@ module.exports = class StoryService {
     await next()
   }
 
-  async listHome (labels) {
-    const db = await this.mongodb.getDb('ybstory')
-    const colStories = db.collection('stories')
-    this.homeListing = {
-      list: []
-    }
-
-    this.homeListing.homesAlbum = db.collection('albums').find({
-      'home': 'true'
-    }).toArray()
-    this.homeListing.recommendLabels = homeLabels
-    this.homeListing.homesAlbum = await this.storydao.getTopAlbums()
-
-    for (var i = 0; i < labels.length; i++) {
-      let labelList = await colStories.find({
-        label: labels[i]
-      }).sort({
-        'u': -1
-      }).limit(6).toArray()
-
-      this.homeListing.list.push({
-        label: labels[i],
-        list: labelList
-      })
-    }
-    return this.homeListing
-  }
-
   async markStory (ctx, next) {
     let {id, mark} = ctx.params
     const header = ctx.request.header
@@ -203,7 +203,6 @@ module.exports = class StoryService {
   }
 
   async deleteStory (ctx, next) {
-    let {id} = ctx.params
     debug('pop remove story')
     const result = {}
     const story = await this.storydao.getOneDeletedStory()
