@@ -7,7 +7,6 @@ const debug = require('debug')('shopen:story:service')
 const CDN_IMG = 'http://imagek.cdn.bcebos.com'
 const CDN_STORY = 'http://chuchu.cdn.bcebos.com'
 const send = require('koa-send')
-const labels = require('./story-labels')
 const { BosClient } = require('bce-sdk-js')
 
 const bosConfig = {
@@ -18,43 +17,38 @@ const bosConfig = {
   }
 }
 
+const labels = ['绘本故事', '品格培养', '温馨感人', '童话故事', '睡前故事', '幽默风趣']
+
 module.exports = class StoryService {
   constructor (dao) {
     this.storydao = dao
     this.todayCache = {}
   }
-  async listHome (labels) {
+
+  /**
+   * V4 Home
+   */
+  async listHome (ctx, next) {
     let d = new Date()
     const today = d.getFullYear() + '-' + d.getMonth() + '-' + d.getDate()
+    console.log('list home')
     if (!this.todayCache[today]) {
       this.todayCache[today] = {}
-      this.todayCache[today].sample = this.storydao.sampleDocs()
+      this.todayCache[today].samples = await this.storydao.sampleDocs()
+      this.todayCache[today].teller = {
+        name: '马修',
+        list: (await this.storydao.searchStoryInSamePath('马修', 0, 6)).slice(0, 6)
+      }
+      this.todayCache[today].labels = []
+      for (let label of labels) {
+        this.todayCache[today].labels.push({
+          name: label,
+          stories: await this.storydao.listStoryByLabel(label, 0, 6)
+        })
+      }
     }
-    const db = await this.mongodb.getDb('ybstory')
-    const colStories = db.collection('stories')
-    this.homeListing = {
-      list: []
-    }
-
-    this.homeListing.homesAlbum = db.collection('albums').find({
-      'home': 'true'
-    }).toArray()
-    this.homeListing.recommendLabels = homeLabels
-    this.homeListing.homesAlbum = await this.storydao.getTopAlbums()
-
-    for (var i = 0; i < labels.length; i++) {
-      let labelList = await colStories.find({
-        label: labels[i]
-      }).sort({
-        'u': -1
-      }).limit(6).toArray()
-
-      this.homeListing.list.push({
-        label: labels[i],
-        list: labelList
-      })
-    }
-    return this.homeListing
+    ctx.body = this.todayCache[today]
+    await next()
   }
   async storyImage (ctx, next) {
     let {x, y, cover} = ctx.params

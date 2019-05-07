@@ -84,7 +84,7 @@ class BootStrap {
       try {
         shopenPackage.ready && shopenPackage.ready(this.app)
       } catch (e) {
-        debug()
+        debug(e)
       }
     }
   }

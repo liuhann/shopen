@@ -1,30 +1,17 @@
 const StoryService = require('./service')
 const StoryDAO = require('./dao')
 const koaRange = require('koa-range')
-const vhost = require('koa-virtual-host')
-const Koa = require('koa')
 
 module.exports = {
   async created (app) {
-    // map  packages/story/dist -> m.yuanbaogushi.com'
-    // service register
-    app.context.services.story = new StoryService('/data/story')
-    app.context.services.storydao = new StoryDAO()
   },
 
   ready (app) {
     const router = app.context.router
-
-    const storyDao = new StoryDAO(app.ctx.services.mongodb)
+    const storyDao = new StoryDAO(app.context.services.mongodb)
     const storySevice = new StoryService(storyDao)
-
     // Init routing, Route Controller is required some times
-    router.get('/story/home', async (ctx, next) => {
-      const body = await storySevice.listHome()
-      ctx.body = body
-      await next()
-    })
-
+    router.get('/story/home', storySevice.listHome.bind(storySevice))
     router.get('/story/admin/list', storySevice.listStory.bind(storySevice))
     router.get('/story/cover/:x/:y/:cover', async (ctx, next) => {
       await app.context.services.story.storyImage(ctx, next)

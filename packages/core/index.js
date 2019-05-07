@@ -26,9 +26,6 @@ module.exports = {
     app.use(serve('public', {
       maxage: 30 * 24 * 60 * 60 * 1000
     }))
-    app.use(serve('ybstory', {
-      maxage: 30 * 24 * 60 * 60 * 1000
-    }))
   },
 
   ready (app) {

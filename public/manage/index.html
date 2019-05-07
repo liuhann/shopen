@@ -219,12 +219,11 @@ const app = new Vue({
       },
 
       async deleteMarked () {
-        let json = await axios.get('/api/story/delete/one').json();
-
+        let json = (await axios.get('/api/story/delete/one')).data
         while (json.path) {
           vant.Notify(json.path)
           await this.sleep(500)
-          json = await ky.get('/api/story/delete/one').json();
+          json = (await axios.get('/api/story/delete/one')).data
         }
       },
 

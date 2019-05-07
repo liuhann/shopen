@@ -36,7 +36,6 @@ class StoryDAO {
   async searchStoryInSamePath (query) {
     const db = await this.getStoryDb()
     const cursor = await db.collection('stories').find({
-      deleted: {$ne: true},
       path: {
         $regex: query
       }
@@ -48,7 +47,6 @@ class StoryDAO {
   async searchStoryTitleContains (query, skip, limit) {
     const db = await this.getStoryDb()
     const cursor = await db.collection('stories').find({
-      deleted: {$ne: true},
       title: {
         $regex: query
       }
@@ -82,14 +80,9 @@ class StoryDAO {
 
   async listStoryByLabel (label, skip, limit) {
     const db = await this.getStoryDb()
-    const cursor = await db.collection('stories').find({deleted: {$ne: true}}).skip(skip).limit(limit)
-    const list = await cursor.toArray()
-
-    const total = await db.collection('stories').find({
-      deleted: {
-        $ne: true
-      }
-    }).count()
+    const cursor = await db.collection('stories').find({label})
+    const total = await cursor.count()
+    const list = await cursor.skip(skip).limit(limit).toArray()
     return {
       list,
       total
