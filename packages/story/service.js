@@ -31,7 +31,6 @@ module.exports = class StoryService {
   async listHome (ctx, next) {
     let d = new Date()
     const today = d.getFullYear() + '-' + d.getMonth() + '-' + d.getDate()
-    console.log('list home')
     if (!this.todayCache[today]) {
       this.todayCache[today] = {}
       this.todayCache[today].samples = await this.storydao.sampleDocs()
@@ -50,6 +49,20 @@ module.exports = class StoryService {
     ctx.body = this.todayCache[today]
     await next()
   }
+
+  async getStoryRelated (ctx, next) {
+    let { id } = ctx.params
+    const story = await this.storydao.getStoryById(id)
+    const result = {}
+    if (story.teller) {
+      result.teller = await this.storydao.listStoryByTeller(story.teller, 0, 12)
+    } else if (story.album) {
+      result.album = await this.storydao.listStoryByAlbum(story.album, 0, 12)
+    }
+    ctx.body = result
+    await next()
+  }
+
   async storyImage (ctx, next) {
     let {x, y, cover} = ctx.params
     let [coverId] = cover.split('.')

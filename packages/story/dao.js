@@ -89,6 +89,28 @@ class StoryDAO {
     }
   }
 
+  async listStoryByTeller (teller, skip, limit) {
+    const db = await this.getStoryDb()
+    const cursor = await db.collection('stories').find({teller})
+    const total = await cursor.count()
+    const list = await cursor.skip(skip).limit(limit).toArray()
+    return {
+      list,
+      total
+    }
+  }
+
+  async listStoryByAlbum (album, skip, limit) {
+    const db = await this.getStoryDb()
+    const cursor = await db.collection('stories').find({album})
+    const total = await cursor.count()
+    const list = await cursor.skip(skip).limit(limit).toArray()
+    return {
+      list,
+      total
+    }
+  }
+
   async sampleDocs (query) {
     const db = await this.getStoryDb()
     const aggregates = []
@@ -138,7 +160,6 @@ class StoryDAO {
 
   async increaseStoryMarkByName (id, markName, ip, agent) {
     const db = await this.getStoryDb()
-
     const incObject = {}
     incObject[markName] = 1
     await db.collection('stories').findOneAndUpdate({
@@ -146,7 +167,6 @@ class StoryDAO {
     }, {
       $inc: incObject
     })
-
     const now = new Date()
     db.collection('marks').insertOne({
       'story': id,
@@ -156,8 +176,6 @@ class StoryDAO {
       'time': now.getFullYear() + '-' + (now.getMonth() + 1) + '-' + now.getDay() + '  ' + now.getHours() + ':' + now.getMinutes() + ':' + now.getSeconds()
     })
   }
-  
-
   async updateStory (id, set) {
     const db = await this.getStoryDb()
     await db.collection('stories').findOneAndUpdate({

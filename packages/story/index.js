@@ -12,6 +12,7 @@ module.exports = {
     const storySevice = new StoryService(storyDao)
     // Init routing, Route Controller is required some times
     router.get('/story/home', storySevice.listHome.bind(storySevice))
+    router.get('/story/related/:id', storySevice.getStoryRelated.bind(storySevice))
     router.get('/story/admin/list', storySevice.listStory.bind(storySevice))
     router.get('/story/cover/:x/:y/:cover', async (ctx, next) => {
       await app.context.services.story.storyImage(ctx, next)

@@ -40,11 +40,26 @@
             width: 60px;
             height: 60px;
         }
+
+        .one-story {
+          width: 200px;
+          font-size: 12px;
+          height: 120px;
+          float: left;
+        }
     </style>
 </head>
 <body>
 <div id="app">
     <div class="grid-content bg-purple">
+      <div class="one-story" v-for="(story, index) in tableData" :key="story._id">
+        <img v-if="story.cover" :src="CDN_IMG + '/' + story.cover + '.png@!w80'">
+        <input v-model="story.title">
+        <input v-model="story.album">
+        <input v-model="story.label">
+        <input v-model="story.teller">
+        <span>{{story.path}}</span>
+      </div>
         <van-card v-for="(story, index) in tableData" :key="story._id"
                 :tag="story.u?formateMill(story.u): ''"
                 :desc="story.path"
