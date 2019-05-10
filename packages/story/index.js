@@ -1,7 +1,7 @@
 const StoryService = require('./service')
 const StoryDAO = require('./dao')
 const koaRange = require('koa-range')
-
+const RestFulController = require('../rest/restful-controller.js')
 module.exports = {
   async created (app) {
   },
@@ -10,6 +10,9 @@ module.exports = {
     const router = app.context.router
     const storyDao = new StoryDAO(app.context.services.mongodb)
     const storySevice = new StoryService(storyDao)
+
+    const albumctl = new RestFulController('/story', router, app.services.mongodb, 'ybstory', 'albums')
+
     // Init routing, Route Controller is required some times
     router.get('/story/home', storySevice.listHome.bind(storySevice))
     router.get('/story/related/:id', storySevice.getStoryRelated.bind(storySevice))

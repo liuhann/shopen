@@ -263,15 +263,11 @@ module.exports = class StoryService {
 
   async updateStory (ctx, next) {
     const story = ctx.request.body
-    const labels = story.title.match(/#[^\s]+/g)
-    if (labels) {
-      for (let label of labels) {
-        await this.storydao.upsertLabels(label)
-      }
-    }
     const setProperties = {
       title: story.title,
-      desc: story.desc,
+      album: story.album,
+      label: story.label.split(','),
+      teller: story.teller,
       u: new Date().getTime()
     }
     await this.storydao.updateStory(story._id, setProperties)

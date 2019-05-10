@@ -1,22 +1,16 @@
 const debug = require('debug')('shopen:restful')
-const RESTFullDAO = require('./restful-dao')
-const MongoIdMiddleware = require('./mongo-id')
-
 class RESTFullController {
-  constructor (basePath, router, db, coll) {
-    this.dao = new RESTFullDAO(db, coll, [MongoIdMiddleware])
-    router.use(`${basePath}/${coll}`, async (ctx, next) => {
-      ctx.dao = this.dao
-      await next()
-    })
-
-    router.get(`${basePath}/${coll}`, this.list)
-    router.post(`${basePath}/${coll}`, this.create)
-    router.put(`${basePath}/${coll}`, this.create)
-    router.patch(`${basePath}/${coll}/:id`, this.patch)
-    router.delete(`${basePath}/${coll}/:id`, this.delete)
-
-    debug('REST deployed:' + basePath + '/' + coll)
+  constructor (router, mongodb, dbName, coll) {
+    this.mongodb = mongodb
+    this.dbName = dbName
+    this.coll = coll
+    router.get(`${dbName}/${coll}`, this.list.bind(this))
+    router.post(`${dbName}/${coll}`, this.create.bind(this))
+    router.patch(`${dbName}/${coll}/:id`, this.patch)
+    router.delete(`${dbName}/${coll}/:id`, this.delete)
+  }
+  getDb () {
+    return this.mongodb.getDb(this.dbName)
   }
 
   async list (ctx, next) {
@@ -33,6 +27,7 @@ class RESTFullController {
     if (key) {
       filter[key] = value
     }
+    await getDb()
     const result = await ctx.dao.list({filter, page, count, sort, order})
     ctx.body = result
     await next()
