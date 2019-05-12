@@ -11,7 +11,7 @@ module.exports = {
     const storyDao = new StoryDAO(app.context.services.mongodb)
     const storySevice = new StoryService(storyDao)
 
-    const albumctl = new RestFulController('/story', router, app.services.mongodb, 'ybstory', 'albums')
+    const albumctl = new RestFulController(router, app.context.services.mongodb, 'ybstory', 'albums')
 
     // Init routing, Route Controller is required some times
     router.get('/story/home', storySevice.listHome.bind(storySevice))

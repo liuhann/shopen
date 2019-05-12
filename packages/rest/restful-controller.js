@@ -27,7 +27,7 @@ class RESTFullController {
     if (key) {
       filter[key] = value
     }
-    await getDb()
+    const db = await this.getDb()
     const result = await ctx.dao.list({filter, page, count, sort, order})
     ctx.body = result
     await next()
