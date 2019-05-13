@@ -1,6 +1,5 @@
 const StoryService = require('./service')
 const StoryDAO = require('./dao')
-const koaRange = require('koa-range')
 const RestFulController = require('../rest/restful-controller.js')
 module.exports = {
   async created (app) {
@@ -11,7 +10,21 @@ module.exports = {
     const storyDao = new StoryDAO(app.context.services.mongodb)
     const storySevice = new StoryService(storyDao)
 
-    const albumctl = new RestFulController(router, app.context.services.mongodb, 'ybstory', 'albums')
+    app.context.services.storyAlbumRest = new RestFulController({
+      router,
+      mongodb: app.context.services.mongodb,
+      dbName: 'ybstory',
+      coll: 'albums',
+      path: '/ybstory/album'
+    })
+
+    app.context.services.storyRest = new RestFulController({
+      router,
+      mongodb: app.context.services.mongodb,
+      dbName: 'ybstory',
+      coll: 'stories',
+      path: '/ybstory/story'
+    })
 
     // Init routing, Route Controller is required some times
     router.get('/story/home', storySevice.listHome.bind(storySevice))
@@ -26,7 +39,8 @@ module.exports = {
       await next()
       ctx.services.visitdao.insertVisit('sample', ctx.request.ip, ctx.request.header['user-agent'])
     })
-    router.get('/story/mp3/:id', koaRange, storySevice.storyDownload.bind(storySevice))
+
+    // router.get('/story/mp3/:id', koaRange, storySevice.storyDownload.bind(storySevice))
 
     router.put('/story/mark/:id/:mark', storySevice.markStory.bind(storySevice))
     router.get('/story/detail/:id', storySevice.getStoryDetail.bind(storySevice))
@@ -37,6 +51,6 @@ module.exports = {
     router.get('/story/search/path', storySevice.searchStoryInPath.bind(storySevice))
     router.get('/story/random', storySevice.randomStory.bind(storySevice))
     router.get('/story/labels', storySevice.getLabels.bind(storySevice))
-    router.post('/story/props/:id', storySevice.updateStoryProps.bind(storySevice))
+    // router.post('/story/props/:id', storySevice.updateStoryProps.bind(storySevice))
   }
 }
