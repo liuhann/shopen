@@ -5,14 +5,18 @@
     <title>Title</title>
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
-    <script src="https://unpkg.com/vue/dist/vue.js"></script>
-      <!-- 引入样式 -->
-    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
-    <!-- 引入组件库 -->
-    <script src="https://unpkg.com/element-ui/lib/index.js"></script>
 
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.5.17/dist/vue.js"></script>
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
     <!-- 引入样式 -->
+    <link rel="stylesheet" href="https://unpkg.com/vant/lib/index.css">
+    <!-- 引入组件 -->
+    <script src="https://unpkg.com/vant/lib/vant.min.js"></script>
+    <!-- 引入样式 -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/vant@1.4/lib/index.css">
+
+    <!-- 引入组件 -->
+    <script src="https://cdn.jsdelivr.net/npm/vant@1.4/lib/vant.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.0.14/howler.core.min.js"></script>
     <style>
         .van-popup--right {
@@ -36,46 +40,69 @@
             width: 60px;
             height: 60px;
         }
-
-        .one-story {
-          width: 200px;
-          font-size: 12px;
-          height: 120px;
-          float: left;
-          border: 1px solid #ccc;
-          margin: 10px;
-        }
     </style>
 </head>
 <body>
 <div id="app">
-  <el-container>
-    <el-header>
-        <div class="pager">
-            <a @click="jumpPage(-1)">上页</a>
-            <a @click="jumpPage(1)">下页</a>
-            <input v-model.number="currentPage">
-            <a @click="jumpPage(0)">跳转</a>
-        </div>
-    </el-header>
-    <el-aside>
+    <div class="grid-content bg-purple">
+        <van-card v-for="(story, index) in tableData" :key="story._id"
+                :tag="story.u?formateMill(story.u): ''"
+                :desc="story.path"
+                :title="story.title"
+                :thumb="story.cover ? (CDN_IMG + '/' + story.cover + '.png@!w80') : ''"
+                origin-price="10.00">
+            <div slot="footer">
+                {{story.label && story.label.join(' ')}}
+                <van-button @click="showQueryBox(story)"  size="mini">查找</van-button>
+                <van-button @click="playStory(story)" size="mini">播放</van-button>
+                <van-button @click="removeStory(story)" size="mini">删除</van-button>
+            </div>
+        </van-card>
+        <van-popup v-model="loading">
+            加载中
+        </van-popup>
 
-    </el-aside>
-    <el-main>
-      <div class="one-story" v-for="(story, index) in tableData" :key="story._id">
-        <img v-if="story.cover" :src="CDN_IMG + '/' + story.cover + '.png@w_24,h_24,s_2,q_80'">
-        <input v-model="story.title">
-        <input v-model="story.album">
-        <input v-model="story.label">
-        <input v-model="story.teller">
-        <a @click="saveStory(story)">更新</a>
-        <span>{{story.path}}</span>
-      </div>
-    </el-main>
-  </el-container>
+        <van-popup v-model="showRelatedStory" position="right">
+            <van-button @click="removeAllRelated">全部删除</van-button>
+            <van-card v-for="(story, index) in relatedStories" :key="story._id"
+                      :tag="story.u?formateMill(story.u): ''"
+                      :desc="story.path"
+                      :title="story.title"
+                      :thumb="story.cover? ('/api/story/cover/480/480/' + story.cover + '.png') : ''">
+                <div slot="footer">
+                    <van-button @click="replaceStoryTitle(story)" size="mini">替换</van-button>
+                    <van-button @click="relatedStories.splice(index, 1)" size="mini">排除</van-button>
+                    <van-button @click="removeStory(story, true); relatedStories.splice(index, 1)" size="mini">删除</van-button>
+                </div>
+            </van-card>
+        </van-popup>
+
+        <van-dialog
+                v-model="showSearchDialog"
+                show-cancel-button
+                confirm-button-text="按标题"
+                cancel-button-text="按路径"
+                @confirm="getSameTitle"
+                @cancel="getSameAlbum">
+            <van-field v-model="queryText"/>
+        </van-dialog>
+        <van-cell-group>
+            <van-field
+                    v-model="pageToGo">
+                <van-button type="primary" @click="loadCurrentPage" size="small" slot="label">刷新</van-button>
+                <van-button slot="button" size="small" type="primary" @click="gotoPage">GO</van-button>
+                <van-button slot="button" size="small" type="primary" @click="deleteMarked">标记删除</van-button>
+            </van-field>
+        </van-cell-group>
+        <van-pagination
+                v-model="currentPage"
+                @change="handleCurrentChange"
+                :total-items="total"
+                :items-per-page="10"/>
+    </div>
 </div>
 
-<script>
+<script type="module">
 const app = new Vue({
     el: '#app',
     data() {
@@ -87,17 +114,25 @@ const app = new Vue({
         showSearchDialog: false,
         relatedStories: [],
         currentPage: 1,
-        pageSize: 100,
+        pageSize: 10,
         total: 0,
         tableData: [],
         loading: false,
         currentPlaying: null,
         dialogFormVisible: false,
+        currentEditing: null
       }
     },
 
     mounted() {
       this.loadCurrentPage()
+      setTimeout(() => {
+        if (localStorage.getItem('page')) {
+          this.currentPage = parseInt(localStorage.getItem('page'));
+          this.loadCurrentPage();
+        }
+      }, 2000)
+      //this.loadCurrentPage()
     },
 
     computed: {
@@ -110,27 +145,15 @@ const app = new Vue({
       }
     },
     methods: {
-      jumpPage (inc) {
-        this.currentPage += inc
-        this.loadCurrentPage()
+      async gotoPage () {
+        if (this.pageToGo) {
+          this.currentPage = parseInt(this.pageToGo)
+          this.loadCurrentPage();
+        }
       },
-
-      async loadAlbums () {
-
-      },
-
-      async loadLabels () {
-
-      },
-
-      async loadTellers () {
-
-      },
-
       async loadCurrentPage () {
         this.loading = true;
         const result = await axios.get('/api/story/admin/list?skip=' + (this.currentPage - 1) * this.pageSize + '&limit=' + this.pageSize);
-        debugger
         this.loading = false;
         this.tableData = result.data.list
         this.total = result.data.total
@@ -270,15 +293,16 @@ const app = new Vue({
         })
       },
 
-      async saveStory (story) {
+      async saveStory () {
+        this.dialogFormVisible = false;
         try {
-          await axios.post('/api/story/update', {
-            _id: story._id,
-            title: story.title,
-            album: story.album,
-            label: story.label,
-            teller: story.teller
+          let json = JSON.parse(this.currentEditing)
+          await axios.post('http://118.25.210.124/api/story/update', {
+            _id: json._id,
+            title: json.title,
+            desc: json.desc
           })
+          this.loadCurrentPage();
         } catch (e) {
 
         }

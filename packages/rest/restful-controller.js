@@ -22,11 +22,12 @@ class RESTFullController {
   async regex (ctx, next) {
     const db = await this.getDb()
     const coll = db.collection(this.coll)
+    const count = ctx.request.query.count || 1000
     const query = {}
     query[ctx.params.prop] = {
       $regex: ctx.params.value
     }
-    const cursor = await coll.find(query)
+    const cursor = await coll.find(query).limit(count)
     const result = await cursor.toArray()
     ctx.body = {
       result
@@ -45,6 +46,7 @@ class RESTFullController {
     delete query.sort
     delete query.page
     delete query.token
+    delete query.order
     const db = await this.getDb()
     const coll = db.collection(this.coll)
     let cursor = coll.find(query)
