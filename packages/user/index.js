@@ -10,7 +10,7 @@ module.exports = {
      * 设置用户信息 如果无token 不设置 有token则查找
      */
       async (ctx, next) => {
-        const token = ctx.query.token
+        const token = ctx.headers.token || ctx.query.token
         if (token == null || token === '') {
           ctx.user = {}
         } else if (app.tokenUsers[token] == null /* 未查询过token */) {

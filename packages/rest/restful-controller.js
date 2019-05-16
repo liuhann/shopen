@@ -36,6 +36,7 @@ class RESTFullController {
   }
 
   async list (ctx, next) {
+    debug(`REST list ${ctx.path}?${ctx.querystring}`)
     let page = parseInt(ctx.request.query.page) || 1
     let count = parseInt(ctx.request.query.count) || 10
     let sort = ctx.request.query.sort
@@ -60,7 +61,6 @@ class RESTFullController {
         $natural: -1
       })
     }
-    debug(`listing ${this.coll} filter: ${query && JSON.stringify(query)} page: ${page} count: ${count}`)
     const list = await cursor.skip((page - 1) * count).limit(count).toArray()
     ctx.body = {
       page,
