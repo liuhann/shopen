@@ -1,4 +1,5 @@
 const MobileUserController = require('./UserController')
+const debug = require('debug')('shopen:user')
 module.exports = {
   name: 'user',
   created (app) {
@@ -11,9 +12,11 @@ module.exports = {
      */
       async (ctx, next) => {
         const token = ctx.headers.token || ctx.query.token
+        ctx.token = token
         if (token == null || token === '') {
           ctx.user = {}
         } else if (app.tokenUsers[token] == null /* 未查询过token */) {
+          debug('load user by token', token)
           const tokenUser = await controller.userdao.getOne({
             token
           })
@@ -22,9 +25,8 @@ module.exports = {
           } else {
             app.tokenUsers[token] = tokenUser
           }
-          ctx.token = token
-          ctx.user = app.tokenUsers[token]
         }
+        ctx.user = app.tokenUsers[token]
         await next()
       })
   },

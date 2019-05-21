@@ -1,6 +1,7 @@
 const RestfullDAO = require('../rest/restful-dao')
 const shortid = require('shortid')
 const svgCaptcha = require('svg-captcha')
+const debug = require('debug')('shopen:user')
 
 /**
  User {
@@ -54,6 +55,7 @@ module.exports = class UserController {
         pwd: password
       })
       if (user) {
+        debug('update user token', name, ctx.token)
         this.userdao.patchOne('id', {
           id: name,
           token: ctx.token
