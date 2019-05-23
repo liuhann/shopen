@@ -61,6 +61,8 @@ module.exports = class UserController {
           token: ctx.token
         })
         result.code = 200
+        delete user.pwd
+        ctx.app.tokenUsers[ctx.token] = user
         result.user = user
       } else {
         result.code = 401

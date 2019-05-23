@@ -1,9 +1,10 @@
 const OSS = require('ali-oss')
+const bodyParser = require('koa-body')
 const shortid = require('shortid')
 const OSS_CONFIG = {
   region: 'oss-cn-beijing',
   accessKeyId: 'qOqcheyFld6oyr9L',
-  accessKeySecret: '7icKekeMgToGgfXzOIyMai7mOb8rMx',
+  accessKeySecret: '7icKekeMgToGgfXzOIyMai7mOb8rMx'
 }
 
 module.exports = class OSSObjectService {
@@ -13,8 +14,10 @@ module.exports = class OSSObjectService {
     this.client = new OSS(OSS_CONFIG)
   }
 
-  initRoutes (router) {
-    router.post(`/file/${this.bucket}/image/upload`, this.uploadImage.bind(this))
+  initRoutes (router, app) {
+    router.post(`/image/upload`, app.middlewares.loginRequired, bodyParser({
+      multipart: true
+    }), this.uploadImage.bind(this))
   }
   async uploadImage (ctx, next) {
     const body = ctx.request.body
@@ -22,8 +25,7 @@ module.exports = class OSSObjectService {
     for (const fileName in body.files) {
       const uploadFile = body.files[fileName]
       try {
-        const date = new Date()
-        const fileDir = `${date.getFullYear()}/${date.getMonth() + 1}/${date.getDate()}`
+        const fileDir = ctx.user.id
         const fileId = fileDir + '/' + shortid.generate() + '_' + uploadFile.name
         // object表示上传到OSS的Object名称，localfile表示本地文件或者文件路径
         let r1 = await this.client.put(fileId, uploadFile.path)

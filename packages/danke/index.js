@@ -1,6 +1,6 @@
 const DankeController = require('./controller')
 const DankeV2Controler = require('./v2controler')
-const UploadControler = require('./upload')
+const RestFulController = require('../rest/restful-controller.js')
 
 module.exports = {
   async created (app) {
@@ -31,7 +31,14 @@ module.exports = {
 
     const v2controler = new DankeV2Controler(app.context)
     v2controler.initRoutes(router)
-    const uploader = new UploadControler(app.context)
-    uploader.initRoutes(router)
+
+    app.context.services.sceneRest = new RestFulController({
+      router,
+      mongodb: app.context.services.mongodb,
+      dbName: 'danke',
+      coll: 'scenes',
+      path: '/danke/scene',
+      filter: app.middlewares.loginRequired
+    })
   }
 }

@@ -2,15 +2,18 @@ const bson = require('bson')
 const debug = require('debug')('shopen:restful')
 
 class RESTFullController {
-  constructor ({ path, router, mongodb, dbName, coll }) {
+  constructor ({ path, router, mongodb, dbName, coll, filter }) {
     this.mongodb = mongodb
     this.dbName = dbName
     this.coll = coll
     router.get(`${path}/list`, this.list.bind(this))
     router.get(`${path}/regex/:prop/:value`, this.regex.bind(this))
-    router.post(`${path}/${coll}`, this.create.bind(this))
-    router.patch(`${path}/:id`, this.patch.bind(this))
-    router.delete(`${path}/:id`, this.delete.bind(this))
+    let middleware = filter || (async (ctx, next) => {
+      await next()
+    })
+    router.post(`${path}`, middleware, this.create.bind(this))
+    router.patch(`${path}/:id`, middleware, this.patch.bind(this))
+    router.delete(`${path}/:id`, middleware, this.delete.bind(this))
   }
   getDb () {
     return this.mongodb.getDb(this.dbName)
@@ -76,8 +79,8 @@ class RESTFullController {
 
   async create (ctx, next) {
     let object = ctx.request.body
+    object.creator = ctx.user.id
     const result = await ctx.dao.insertOne(object)
-
     ctx.body = {
       result,
       object

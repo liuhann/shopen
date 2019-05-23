@@ -5,7 +5,7 @@ module.exports = {
 
   ready (app) {
     const router = app.context.router
-    const common = new OSSObjectService('common')
-    common.initRoutes(router)
+    const common = new OSSObjectService('dankev3')
+    common.initRoutes(router, app)
   }
 }

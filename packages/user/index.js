@@ -23,12 +23,21 @@ module.exports = {
           if (tokenUser == null) {
             app.tokenUsers[token] = {}
           } else {
+            delete tokenUser.pwd
             app.tokenUsers[token] = tokenUser
           }
         }
         ctx.user = app.tokenUsers[token]
         await next()
       })
+
+    app.middlewares.loginRequired = async (ctx, next) => {
+      if (!ctx.user || !ctx.user.id) {
+        ctx.throw(401)
+      } else {
+        await next()
+      }
+    }
   },
 
   ready (app) {
