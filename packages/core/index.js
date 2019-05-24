@@ -1,4 +1,4 @@
-// const bodyParser = require('koa-body')
+const bodyParser = require('koa-body')
 const cors = require('kcors')
 const Router = require('koa-router')
 const serve = require('koa-static')
@@ -17,9 +17,9 @@ module.exports = {
     app.use(cors({
       credentials: true
     }))
-    // app.use(bodyParser({
-    //   multipart: true
-    // }))
+    app.use(bodyParser({
+      multipart: true
+    }))
     app.context.router = new Router()
 
     app.use(serve('public', {

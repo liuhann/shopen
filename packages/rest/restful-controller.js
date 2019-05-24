@@ -80,7 +80,9 @@ class RESTFullController {
   async create (ctx, next) {
     let object = ctx.request.body
     object.creator = ctx.user.id
-    const result = await ctx.dao.insertOne(object)
+    const db = await this.getDb()
+    const coll = db.collection(this.coll)
+    const result = await coll.insertOne(object)
     ctx.body = {
       result,
       object

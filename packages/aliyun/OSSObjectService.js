@@ -1,5 +1,4 @@
 const OSS = require('ali-oss')
-const bodyParser = require('koa-body')
 const shortid = require('shortid')
 const OSS_CONFIG = {
   region: 'oss-cn-beijing',
@@ -9,15 +8,13 @@ const OSS_CONFIG = {
 
 module.exports = class OSSObjectService {
   constructor (bucket) {
-    this.bucket = bucket
-    OSS_CONFIG.bucket = bucket
-    this.client = new OSS(OSS_CONFIG)
+    this.config = Object.assign({}, OSS_CONFIG)
+    this.config.bucket = bucket
+    this.client = new OSS(this.config)
   }
 
   initRoutes (router, app) {
-    router.post(`/image/upload`, app.middlewares.loginRequired, bodyParser({
-      multipart: true
-    }), this.uploadImage.bind(this))
+    router.post(`/image/upload`, app.middlewares.loginRequired, this.uploadImage.bind(this))
   }
   async uploadImage (ctx, next) {
     const body = ctx.request.body
@@ -30,7 +27,7 @@ module.exports = class OSSObjectService {
         // object表示上传到OSS的Object名称，localfile表示本地文件或者文件路径
         let r1 = await this.client.put(fileId, uploadFile.path)
         result.r1 = r1
-        result.url = `https://${OSS_CONFIG.bucket}.${OSS_CONFIG.region}.aliyuncs.com/${fileId}`
+        result.url = `https://${this.config.bucket}.${this.config.region}.aliyuncs.com/${fileId}`
       } catch (e) {
         console.error('error2: %j', e)
       }
