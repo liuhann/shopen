@@ -6,7 +6,8 @@ class RESTFullController {
     this.mongodb = mongodb
     this.dbName = dbName
     this.coll = coll
-    router.get(`${path}/list`, this.list.bind(this))
+    router.get(`${path}`, this.list.bind(this))
+    router.get(`${path}/:id`, this.getOne.bind(this))
     router.get(`${path}/regex/:prop/:value`, this.regex.bind(this))
     let middleware = filter || (async (ctx, next) => {
       await next()
@@ -86,6 +87,24 @@ class RESTFullController {
     ctx.body = {
       result,
       object
+    }
+    await next()
+  }
+
+  async getOne (ctx, next) {
+    let objectId = ctx.params.id
+    const db = await this.getDb()
+    const coll = db.collection(this.coll)
+    const found = await coll.findOne({
+      '_id': new bson.ObjectID(objectId)
+    })
+
+    if (found) {
+      ctx.body = found
+    } else {
+      ctx.body = {
+        code: 404
+      }
     }
     await next()
   }
