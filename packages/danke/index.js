@@ -40,5 +40,13 @@ module.exports = {
       path: '/danke/scene',
       filter: app.middlewares.loginRequired
     })
+    app.context.services.animationRest = new RestFulController({
+      router,
+      mongodb: app.context.services.mongodb,
+      dbName: 'animations',
+      coll: 'animations',
+      path: '/danke/animation',
+      filter: app.middlewares.loginRequired
+    })
   }
 }
