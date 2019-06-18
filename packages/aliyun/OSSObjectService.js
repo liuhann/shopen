@@ -23,7 +23,11 @@ module.exports = class OSSObjectService {
       const uploadFile = body.files[fileName]
       try {
         const fileDir = ctx.user.id
-        const fileId = fileDir + '/' + shortid.generate() + '_' + uploadFile.name
+        let fileId = fileDir + '/' + shortid.generate() + '_' + uploadFile.name
+
+        if (!this.fileExtension(fileId)) {
+          fileId = fileId + '.png'
+        }
         // object表示上传到OSS的Object名称，localfile表示本地文件或者文件路径
         let r1 = await this.client.put(fileId, uploadFile.path)
         result.r1 = r1
