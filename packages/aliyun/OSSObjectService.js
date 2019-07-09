@@ -23,7 +23,7 @@ module.exports = class OSSObjectService {
       const uploadFile = body.files[fileName]
       try {
         const fileDir = ctx.user.id
-        let fileId = fileDir + '/' + shortid.generate() + '_' + uploadFile.name
+        let fileId = fileDir + '/' + ctx.query.path + '/' + shortid.generate() + '_' + uploadFile.name
 
         if (!this.fileExtension(fileId)) {
           fileId = fileId + '.png'

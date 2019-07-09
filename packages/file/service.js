@@ -23,7 +23,6 @@ class FileService {
     await makeDir(fileDir)
 
     const result = []
-
     for (const fileName in body.files) {
       const uploadFile = body.files[fileName]
       const fileExt = this.fileExtension(uploadFile.name)
