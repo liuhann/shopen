@@ -81,6 +81,8 @@ class RESTFullController {
   async create (ctx, next) {
     let object = ctx.request.body
     object.creator = ctx.user.id
+    object.created = new Date().getTime()
+    object.updated = object.created
     const db = await this.getDb()
     const coll = db.collection(this.coll)
     const result = await coll.insertOne(object)
@@ -108,14 +110,16 @@ class RESTFullController {
     }
     await next()
   }
-
   async patch (ctx, next) {
     const body = ctx.request.body
     const db = await this.getDb()
     const coll = db.collection(this.coll)
 
     const setProperties = Object.assign({}, body)
-    setProperties.u = new Date().getTime()
+    setProperties.updated = new Date().getTime()
+    if (setProperties._id) {
+      delete setProperties._id
+    }
     let objectId = ctx.params.id
     await coll.findOneAndUpdate({
       '_id': new bson.ObjectID(objectId)
