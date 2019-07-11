@@ -15,6 +15,18 @@ module.exports = class OSSObjectService {
 
   initRoutes (router, app) {
     router.post(`/image/upload`, app.middlewares.loginRequired, this.uploadImage.bind(this))
+    router.post(`/image/remove`, app.middlewares.loginRequired, this.removeImage.bind(this))
+  }
+
+  async removeImage (ctx, next) {
+    const body = ctx.request.body
+    try {
+      await this.client.delete(body.fileId)
+    } catch (e) {
+    }
+    ctx.body = {
+      code: 201
+    }
   }
   async uploadImage (ctx, next) {
     const body = ctx.request.body
@@ -23,14 +35,11 @@ module.exports = class OSSObjectService {
       const uploadFile = body.files[fileName]
       try {
         const fileDir = ctx.user.id
-        let fileId = fileDir + '/' + ctx.query.path + '/' + shortid.generate() + '_' + uploadFile.name
-
-        if (!this.fileExtension(fileId)) {
-          fileId = fileId + '.png'
-        }
+        let fileId = fileDir + '/' + ctx.query.path + '/' + shortid.generate() + '.' + (this.fileExtension(uploadFile.name) || 'png')
         // object表示上传到OSS的Object名称，localfile表示本地文件或者文件路径
         let r1 = await this.client.put(fileId, uploadFile.path)
         result.r1 = r1
+        result.name = fileId
         result.url = `https://${this.config.bucket}.${this.config.region}.aliyuncs.com/${fileId}`
       } catch (e) {
         console.error('error2: %j', e)
