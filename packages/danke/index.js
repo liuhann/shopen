@@ -1,4 +1,5 @@
 const RestFulController = require('../rest/restful-controller.js')
+const publishFilter = require('./filters/publish.js')
 module.exports = {
   async created (app) {
 
@@ -11,7 +12,7 @@ module.exports = {
       dbName: 'danke',
       coll: 'works',
       path: '/danke/work',
-      filter: app.middlewares.loginRequired
+      filter: [app.middlewares.loginRequired, publishFilter]
     })
     app.context.services.animationRest = new RestFulController({
       router,

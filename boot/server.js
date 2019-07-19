@@ -8,6 +8,7 @@ const debug = require('debug')('shopen:server')
 class BootStrap {
   async start () {
     this.app = new Koa()
+    this.app.config = config
 
     this.app.context.services = {}
     this.app.context.packages = []
