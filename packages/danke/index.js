@@ -1,7 +1,7 @@
 const RestFulController = require('../rest/restful-controller.js')
+const config = require('../../config.js')
 module.exports = {
   async created (app) {
-
   },
   ready (app) {
     const router = app.context.router
@@ -11,9 +11,9 @@ module.exports = {
       dbName: 'danke',
       coll: 'works',
       path: '/danke/work',
-      filter: [app.middlewares.loginRequired]
+      filter: app.middlewares.loginRequired
     })
-    app.context.services.sceneRest.setAdmin(app.config.admin)
+    app.context.services.sceneRest.setAdmin(config.admin)
     app.context.services.animationRest = new RestFulController({
       router,
       mongodb: app.context.services.mongodb,
@@ -22,6 +22,6 @@ module.exports = {
       path: '/danke/animation',
       filter: app.middlewares.loginRequired
     })
-    app.context.services.animationRest.setAdmin(app.config.admin)
+    app.context.services.animationRest.setAdmin(config.admin)
   }
 }

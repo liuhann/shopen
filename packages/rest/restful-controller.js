@@ -47,6 +47,7 @@ class RESTFullController {
     let count = parseInt(ctx.request.query.count) || 10
     let sort = ctx.request.query.sort
     let order = ctx.request.query.order
+    let projection = ctx.request.query.projection
     const query = Object.assign({}, ctx.request.query)
     delete query.page
     delete query.count
@@ -54,6 +55,7 @@ class RESTFullController {
     delete query.page
     delete query.token
     delete query.order
+    delete query.projection
     const db = await this.getDb()
     const coll = db.collection(this.coll)
     let cursor = coll.find(query)
@@ -66,6 +68,14 @@ class RESTFullController {
       cursor = cursor.sort({
         $natural: -1
       })
+    }
+    if (projection) {
+      const fields = projection.split(',')
+      const projecObject = {}
+      for (let field of fields) {
+        projecObject[field] = 1
+      }
+      cursor.project(projecObject)
     }
     const list = await cursor.skip((page - 1) * count).limit(count).toArray()
     ctx.body = {
@@ -116,10 +126,10 @@ class RESTFullController {
     const body = ctx.request.body
     const db = await this.getDb()
     const coll = db.collection(this.coll)
-
     const setProperties = Object.assign({}, body)
     // only admin can modify prop.system
     if (setProperties.system && ctx.user.id !== this.admin) {
+      debug(`Patch prop.system ${ctx.user.id} !== ${this.admin}`)
       ctx.throw(403)
       return
     }
