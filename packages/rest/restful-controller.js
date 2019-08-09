@@ -19,7 +19,9 @@ class RESTFullController {
   getDb () {
     return this.mongodb.getDb(this.dbName)
   }
-
+  setAdmin (admin) {
+    this.admin = admin
+  }
   /**
    * 正则查找
    */
@@ -116,6 +118,11 @@ class RESTFullController {
     const coll = db.collection(this.coll)
 
     const setProperties = Object.assign({}, body)
+    // only admin can modify prop.system
+    if (setProperties.system && ctx.user.id !== this.admin) {
+      ctx.throw(403)
+      return
+    }
     setProperties.updated = new Date().getTime()
     if (setProperties._id) {
       delete setProperties._id
@@ -136,11 +143,21 @@ class RESTFullController {
     let objectId = ctx.params.id
     const db = await this.getDb()
     const coll = db.collection(this.coll)
-    const deleted = await coll.deleteOne({
+    const found = coll.getOne({
       '_id': new bson.ObjectID(objectId)
     })
-    ctx.body = {
-      deleted
+    if (found) {
+      // only the creator and admin can perform deleting
+      if (found.creator === ctx.user.id || ctx.user.id === this.admin) {
+        const deleted = await coll.deleteOne({
+          '_id': new bson.ObjectID(objectId)
+        })
+        ctx.body = {
+          deleted
+        }
+      } else {
+        ctx.throw(403)
+      }
     }
     await next()
   }
