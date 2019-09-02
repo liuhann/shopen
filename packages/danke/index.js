@@ -32,7 +32,7 @@ module.exports = {
       filter: app.middlewares.loginRequired
     })
     app.context.services.workLinkServie.setAdmin(config.admin)
-    app.context.services.workLinkServie = new RestFulController({
+    app.context.services.vectorService = new RestFulController({
       router,
       mongodb: app.context.services.mongodb,
       dbName: 'danke',
@@ -40,6 +40,6 @@ module.exports = {
       path: '/danke/vector',
       filter: app.middlewares.loginRequired
     })
-    app.context.services.workLinkServie.setAdmin(config.admin)
+    app.context.services.vectorService.setAdmin(config.admin)
   }
 }
