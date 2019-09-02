@@ -153,7 +153,7 @@ class RESTFullController {
     let objectId = ctx.params.id
     const db = await this.getDb()
     const coll = db.collection(this.coll)
-    const found = coll.getOne({
+    const found = await coll.findOne({
       '_id': new bson.ObjectID(objectId)
     })
     if (found) {
