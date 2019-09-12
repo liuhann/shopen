@@ -15,6 +15,8 @@ class RESTFullController {
     router.post(`${path}`, middleware, this.create.bind(this))
     router.patch(`${path}/:id`, middleware, this.patch.bind(this))
     router.delete(`${path}/:id`, middleware, this.delete.bind(this))
+
+    debug('rest service booted ' + path)
   }
   getDb () {
     return this.mongodb.getDb(this.dbName)

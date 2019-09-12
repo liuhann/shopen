@@ -1,5 +1,6 @@
 const OSS = require('ali-oss')
 const shortid = require('shortid')
+const MP3Cutter = require('mp3-cutter')
 const OSS_CONFIG = {
   region: 'oss-cn-beijing',
   accessKeyId: 'qOqcheyFld6oyr9L',
@@ -16,6 +17,41 @@ module.exports = class OSSObjectService {
   initRoutes (router, app) {
     router.post(`/image/upload`, app.middlewares.loginRequired, this.uploadImage.bind(this))
     router.post(`/image/remove`, app.middlewares.loginRequired, this.removeImage.bind(this))
+    router.post(`/mp3/upload`, app.middlewares.loginRequired, this.uploadAndCutMp3.bind(this))
+  }
+
+  /**
+   * 上传并剪切mp3 文件
+   * @param {Context}} ctx koa context
+   * @param {Function} next next function
+   */
+  async uploadAndCutMp3 (ctx, next) {
+    const body = ctx.request.body
+    const result = {}
+    for (const fileName in body.files) {
+      const uploadFile = body.files[fileName]
+      // 调用剪切mp3
+      MP3Cutter.cut({
+        src: uploadFile.path,
+        target: uploadFile.path + '_cutted',
+        start: parseInt(ctx.query.start) || 0,
+        end: parseInt(ctx.query.end) || 100
+      })
+      try {
+        const fileDir = ctx.user.id
+        let fileId = fileDir + '/' + ctx.query.path + '/' + shortid.generate() + '.' + (this.fileExtension(uploadFile.name) || 'mp3')
+        // object表示上传到OSS的Object名称，localfile表示本地文件或者文件路径
+        console.log('cut mp3 path', uploadFile.path + '_cutted')
+        let r1 = await this.client.put(fileId, uploadFile.path + '_cutted')
+        result.r1 = r1
+        result.name = fileId
+        result.url = `https://${this.config.bucket}.${this.config.region}.aliyuncs.com/${fileId}`
+      } catch (e) {
+        console.error('error2: %j', e)
+      }
+    }
+    ctx.body = result
+    await next()
   }
 
   async removeImage (ctx, next) {
