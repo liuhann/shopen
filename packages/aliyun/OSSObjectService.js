@@ -39,7 +39,7 @@ module.exports = class OSSObjectService {
       })
       try {
         const fileDir = ctx.user.id
-        let fileId = fileDir + '/' + ctx.query.path + '/' + shortid.generate() + '.' + (this.fileExtension(uploadFile.name) || 'mp3')
+        let fileId = fileDir + '/' + ctx.query.path
         // object表示上传到OSS的Object名称，localfile表示本地文件或者文件路径
         console.log('cut mp3 path', uploadFile.path + '_cutted')
         let r1 = await this.client.put(fileId, uploadFile.path + '_cutted')
