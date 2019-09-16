@@ -75,7 +75,16 @@ class RESTFullController {
       const fields = projection.split(',')
       const projecObject = {}
       for (let field of fields) {
-        projecObject[field] = 1
+        const arrayProjection = field.split('.')
+        if (arrayProjection.length === 1) {
+          // object projection
+          projecObject[field] = 1
+        } else {
+          // array projection with splice
+          projecObject[arrayProjection[0]] = {
+            $slice: parseInt(arrayProjection[1])
+          }
+        }
       }
       cursor.project(projecObject)
     }
