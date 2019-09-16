@@ -123,7 +123,6 @@ class RESTFullController {
     const found = await coll.findOne({
       '_id': new bson.ObjectID(objectId)
     })
-
     if (found) {
       ctx.body = found
     } else {
@@ -135,6 +134,7 @@ class RESTFullController {
   }
   async patch (ctx, next) {
     const body = ctx.request.body
+    debug('patch body', body)
     const db = await this.getDb()
     const coll = db.collection(this.coll)
     const setProperties = Object.assign({}, body)
