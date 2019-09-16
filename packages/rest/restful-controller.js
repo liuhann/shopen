@@ -134,7 +134,6 @@ class RESTFullController {
   }
   async patch (ctx, next) {
     const body = ctx.request.body
-    debug('patch body', body)
     const db = await this.getDb()
     const coll = db.collection(this.coll)
     const setProperties = Object.assign({}, body)
