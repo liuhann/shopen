@@ -19,7 +19,7 @@ module.exports = {
   },
   ready (app) {
     initRestService(app, 'danke', 'works', '/danke/work')
-    initRestService(app, 'danke', 'animations', '/danke/animation')
+    initRestService(app, 'animations', 'animations', '/danke/animation')
     initRestService(app, 'danke', 'vectors', '/danke/vector')
     initRestService(app, 'danke', 'audios', '/danke/audio')
   }
