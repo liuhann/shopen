@@ -123,7 +123,6 @@ class RESTFullController {
     const found = await coll.findOne({
       '_id': new bson.ObjectID(objectId)
     })
-
     if (found) {
       ctx.body = found
     } else {
