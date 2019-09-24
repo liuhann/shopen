@@ -168,6 +168,9 @@ class RESTFullController {
     })
     if (found) {
       // only the creator and admin can perform deleting
+      if (!ctx.user || !ctx.user.id) {
+        ctx.throw(403)
+      }
       if (found.creator === ctx.user.id || ctx.user.id === this.admin) {
         const deleted = await coll.deleteOne({
           '_id': new bson.ObjectID(objectId)
