@@ -16,7 +16,7 @@ module.exports = class OSSObjectService {
   }
 
   initRoutes (router, app) {
-    router.post(`/image/upload`, app.middlewares.loginRequired, this.uploadImage.bind(this))
+    router.post(`/image/upload`, this.uploadImage.bind(this))
     router.post(`/image/remove`, app.middlewares.loginRequired, this.removeImage.bind(this))
     router.post(`/mp3/upload`, this.uploadAndCutMp3.bind(this))
   }
@@ -74,7 +74,7 @@ module.exports = class OSSObjectService {
     for (const fileName in body.files) {
       const uploadFile = body.files[fileName]
       try {
-        const fileDir = ctx.user.id
+        const fileDir = ctx.user.id || 'anonymous'
         let fileId = fileDir + '/' + ctx.query.path + '/' + shortid.generate() + '.' + (this.fileExtension(uploadFile.name) || 'png')
         // object表示上传到OSS的Object名称，localfile表示本地文件或者文件路径
         let r1 = await this.client.put(fileId, uploadFile.path)
@@ -88,6 +88,7 @@ module.exports = class OSSObjectService {
     ctx.body = result
     await next()
   }
+
   // from https://stackoverflow.com/questions/190852/how-can-i-get-file-extensions-with-javascript
   fileExtension (fname) {
     return fname.slice((fname.lastIndexOf('.') - 1 >>> 0) + 2).toLowerCase()
