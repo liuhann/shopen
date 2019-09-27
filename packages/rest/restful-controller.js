@@ -55,11 +55,11 @@ class RESTFullController {
     delete query.count
     delete query.sort
     delete query.page
-    delete query.token
     delete query.order
     delete query.projection
     const db = await this.getDb()
     const coll = db.collection(this.coll)
+    console.log('query', query)
     let cursor = coll.find(query)
     const total = await cursor.count()
     if (sort) {
@@ -106,6 +106,7 @@ class RESTFullController {
     object.creator = ctx.user.id
     object.created = new Date().getTime()
     object.updated = object.created
+    object.token = ctx.token
     const db = await this.getDb()
     const coll = db.collection(this.coll)
     const result = await coll.insertOne(object)
@@ -167,8 +168,19 @@ class RESTFullController {
       '_id': new bson.ObjectID(objectId)
     })
     if (found) {
-      // only the creator and admin can perform deleting
-      if (!ctx.user || !ctx.user.id) {
+      // 匿名删除
+      if ((found.creator == null && ctx.token === found.token) || found.token == null) {
+        const deleted = await coll.deleteOne({
+          '_id': new bson.ObjectID(objectId)
+        })
+        ctx.body = {
+          deleted
+        }
+        await next()
+        return
+      }
+
+      if (!ctx.user || !ctx.user.id) { // only the creator and admin can perform deleting
         ctx.throw(403)
       }
       if (found.creator === ctx.user.id || ctx.user.id === this.admin) {
