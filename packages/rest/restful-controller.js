@@ -1,5 +1,5 @@
 const bson = require('bson')
-const debug = require('debug')('shopen:restful')
+const debug = require('debug')('restful')
 
 class RESTFullController {
   constructor ({ path, router, mongodb, dbName, coll, filter }) {
