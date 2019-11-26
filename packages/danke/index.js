@@ -22,5 +22,6 @@ module.exports = {
     initRestService(app, 'danke', 'vectors', '/danke/vector')
     initRestService(app, 'danke', 'audios', '/danke/audio')
     initRestService(app, 'danke', 'oaudios', '/danke/oaudio', true)
+    initRestService(app, 'danke', 'scenetpls', '/danke/scenetpl', true)
   }
 }
