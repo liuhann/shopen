@@ -1,4 +1,5 @@
 const urllib = require('urllib')
+const debug = require('debug')('shopen:flaticon')
 module.exports = class FlatIconAPIClient {
   constructor () {
     this.token = null
@@ -10,18 +11,23 @@ module.exports = class FlatIconAPIClient {
     if (!this.token) {
       this.token = await this.getToken(apiKey)
     }
-    return this.token
+    const searchResponse = await urllib.request('https://api.flaticon.com/v2/search/icons?q=' + query, {
+      dataType: 'json',
+      headers: {
+        'Authorization': 'Bearer ' + this.token
+      }
+    })
+    return searchResponse.data.data
   }
 
   async getToken (apiKey) {
     const response = await urllib.request('https://api.flaticon.com/v2/app/authentication', {
       method: 'POST',
+      dataType: 'json',
       data: {
         apikey: apiKey
       }
     })
-    console.log('response got', JSON.stringify(response.data))
-    console.log('token', response.data.data.token)
     return response.data.data.token
   }
 }

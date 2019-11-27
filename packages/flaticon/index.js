@@ -8,7 +8,8 @@ module.exports = {
     const router = app.context.router
     const client = new FlatIconAPIClient()
     router.get('/flaticon/search', async (ctx, next) => {
-      ctx.body = client.search (apiKey)
+      console.log('flaticon search')
+      ctx.body = await client.search(apiKey, ctx.query.q)
       await next()
     })
   }
