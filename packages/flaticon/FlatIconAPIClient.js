@@ -7,17 +7,22 @@ module.exports = class FlatIconAPIClient {
   /**
   * 按照apikey 查找图标，注意的是首先获取token 如果失效会重新获取
   */
-  async search (apiKey, query) {
+  async search (apiKey, query, color) {
     if (!this.token) {
       this.token = await this.getToken(apiKey)
     }
-    const searchResponse = await urllib.request('https://api.flaticon.com/v2/search/icons?q=' + query, {
-      dataType: 'json',
-      headers: {
-        'Authorization': 'Bearer ' + this.token
-      }
-    })
-    return searchResponse.data.data
+    try {
+      const searchResponse = await urllib.request('https://api.flaticon.com/v2/search/icons?q=' + query + '&color=' + color, {
+        dataType: 'json',
+        headers: {
+          'Authorization': 'Bearer ' + this.token
+        }
+      })
+      return searchResponse.data.data
+    } catch (e) {
+      this.token = null
+      return []
+    }
   }
 
   async getToken (apiKey) {
