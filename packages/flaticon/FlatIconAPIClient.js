@@ -14,12 +14,14 @@ module.exports = class FlatIconAPIClient {
     try {
       const searchResponse = await urllib.request('https://api.flaticon.com/v2/search/icons?q=' + query + '&color=' + color, {
         dataType: 'json',
+        timeout: 60000, // 超时60s
         headers: {
           'Authorization': 'Bearer ' + this.token
         }
       })
       return searchResponse.data.data
     } catch (e) {
+      debug(e)
       this.token = null
       return []
     }
