@@ -11,6 +11,7 @@ module.exports = class FlatIconAPIClient {
     if (!this.token) {
       this.token = await this.getToken(apiKey)
     }
+    debug('query:' + query)
     try {
       const searchResponse = await urllib.request('https://api.flaticon.com/v2/search/icons?q=' + query + '&color=' + color, {
         dataType: 'json',
@@ -19,6 +20,7 @@ module.exports = class FlatIconAPIClient {
           'Authorization': 'Bearer ' + this.token
         }
       })
+      debug(searchResponse.data.data.length)
       return searchResponse.data.data
     } catch (e) {
       debug(e)
