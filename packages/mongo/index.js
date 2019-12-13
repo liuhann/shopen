@@ -10,11 +10,10 @@ module.exports = {
     })
   },
 
-  ready (app) {
-
+  async ready (app) {
+    await app.context.services.mongodb.connect()
   },
 
   async bootComplete (app) {
-    await app.context.services.mongodb.connect()
   }
 }

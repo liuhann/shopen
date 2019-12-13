@@ -83,7 +83,7 @@ class BootStrap {
   async packagesReady () {
     for (let shopenPackage of this.app.context.packages) {
       try {
-        shopenPackage.ready && shopenPackage.ready(this.app)
+        shopenPackage.ready && await shopenPackage.ready(this.app)
       } catch (e) {
         debug(e)
       }

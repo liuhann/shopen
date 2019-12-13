@@ -8,6 +8,7 @@ class RESTFullController {
     this.coll = coll
     router.get(`${path}`, this.list.bind(this))
     router.get(`${path}/:id`, this.getOne.bind(this))
+    router.get(`${path}/distinct/:field`, this.distinct.bind(this))
     router.get(`${path}/regex/:prop/:value`, this.regex.bind(this))
     let middleware = filter || (async (ctx, next) => {
       await next()
@@ -15,7 +16,6 @@ class RESTFullController {
     router.post(`${path}`, middleware, this.create.bind(this))
     router.patch(`${path}/:id`, middleware, this.patch.bind(this))
     router.delete(`${path}/:id`, middleware, this.delete.bind(this))
-
     debug('rest service booted ' + path)
   }
   getDb () {
@@ -23,6 +23,19 @@ class RESTFullController {
   }
   setAdmin (admin) {
     this.admin = admin
+  }
+
+  async ensureIndex (indexKey, {
+    overwriteOnDuplicated
+  }) {
+    const db = await this.getDb()
+    await db.collection(this.coll).createIndex({
+      [indexKey]: 1
+    }, {
+      unique: true
+    })
+    debug(`ensure index ${this.coll}: ${indexKey}`)
+    this.overwriteOnDuplicated = overwriteOnDuplicated
   }
   /**
    * 正则查找
@@ -109,7 +122,12 @@ class RESTFullController {
     object.token = ctx.token
     const db = await this.getDb()
     const coll = db.collection(this.coll)
-    const result = await coll.insertOne(object)
+    let result = null
+    try {
+      result = await coll.insertOne(object)
+    } catch (e) {
+      debug(e)
+    }
     ctx.body = {
       result,
       object
@@ -194,6 +212,21 @@ class RESTFullController {
         ctx.throw(403)
       }
     }
+    await next()
+  }
+
+  /**
+   * 获取coll的distinct列值
+   * @param ctx
+   * @param next
+   * @returns {Promise<void>}
+   */
+  async distinct (ctx, next) {
+    let { field } = ctx.params
+    const db = await this.getDb()
+    const coll = db.collection(this.coll)
+    const distinctValue = await coll.distinct(field)
+    ctx.body = distinctValue
     await next()
   }
 }
