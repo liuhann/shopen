@@ -1,5 +1,6 @@
 const bson = require('bson')
 const debug = require('debug')('restful')
+const { MongoError } = require('mongodb')
 
 class RESTFullController {
   constructor ({ path, router, mongodb, dbName, coll, filter }) {
@@ -34,6 +35,7 @@ class RESTFullController {
     }, {
       unique: true
     })
+    this.indexKey = indexKey
     debug(`ensure index ${this.coll}: ${indexKey}`)
     this.overwriteOnDuplicated = overwriteOnDuplicated
   }
@@ -126,7 +128,16 @@ class RESTFullController {
     try {
       result = await coll.insertOne(object)
     } catch (e) {
-      debug(e)
+      if (e instanceof MongoError) {
+        if (this.overwriteOnDuplicated) {
+          debug(`overwrite duplicated  ${this.coll} ${this.indexKey}=${object[this.indexKey]}`)
+          await coll.deleteOne({
+            [this.indexKey]: object[this.indexKey]
+          })
+          result = await coll.insertOne(object)
+          debug('removed and inserted new')
+        }
+      }
     }
     ctx.body = {
       result,
