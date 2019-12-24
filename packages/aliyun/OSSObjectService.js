@@ -63,6 +63,7 @@ module.exports = class OSSObjectService {
     try {
       await this.client.delete(body.fileId)
     } catch (e) {
+      console.error('delete error', e)
     }
     ctx.body = {
       code: 201
