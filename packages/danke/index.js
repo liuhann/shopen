@@ -9,8 +9,10 @@ module.exports = {
     initRestService(app, 'danke', 'blocks', '/danke/block', true)
     // 动画
     initRestService(app, 'danke', 'animations', '/danke/animation')
-    // 矢量遮罩
+    // 公用图片、资源
     initRestService(app, 'danke', 'vectors', '/danke/vector')
+    // 用户私有的图片、资源
+    initRestService(app, 'danke', 'images', '/danke/image')
     // 音频
     initRestService(app, 'danke', 'audios', '/danke/audio')
   },
