@@ -11,6 +11,8 @@ module.exports = {
     initRestService(app, 'danke', 'animations', '/danke/animation')
     // 公用图片、资源
     initRestService(app, 'danke', 'vectors', '/danke/vector')
+    // 样式和特效集合
+    initRestService(app, 'danke', 'styles', '/danke/style')
     // 用户私有的图片、资源
     initRestService(app, 'danke', 'images', '/danke/image')
     // 音频
