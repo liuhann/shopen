@@ -74,7 +74,7 @@ class RESTFullController {
     delete query.projection
     const db = await this.getDb()
     const coll = db.collection(this.coll)
-    console.log('query', query)
+    debug('filtered query ', query)
     let cursor = coll.find(query)
     const total = await cursor.count()
     if (sort) {
@@ -136,6 +136,15 @@ class RESTFullController {
           })
           result = await coll.insertOne(object)
           debug('removed and inserted new')
+        } else {
+          const msg = 'key duplicated: ' + `${this.indexKey}=${object[this.indexKey]}`
+          debug(msg)
+          ctx.body = {
+            code: 409,
+            msg
+          }
+          await next()
+          return
         }
       }
     }
