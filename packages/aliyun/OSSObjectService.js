@@ -2,11 +2,6 @@ const OSS = require('ali-oss')
 const fs = require('fs')
 const shortid = require('shortid')
 const MP3Cutter = require('mp3-cutter')
-const OSS_CONFIG = {
-  region: 'oss-cn-beijing',
-  accessKeyId: 'qOqcheyFld6oyr9L',
-  accessKeySecret: '7icKekeMgToGgfXzOIyMai7mOb8rMx'
-}
 
 module.exports = class OSSObjectService {
   constructor (bucket) {
