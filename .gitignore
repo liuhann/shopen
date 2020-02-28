@@ -1,5 +1,5 @@
 node_modules/
-
+config.js
 # Editor directories and files
 .idea
 .vscode
@@ -7,3 +7,4 @@ node_modules/
 *.map
 .history
 public
+config.js
