@@ -3,5 +3,8 @@ module.exports = {
   // debug: 'shopen:*,shopen:story:*,danke:*,oauth,animation',
   debug: 'shopen:*,restful',
   port: 80,
-  admin: '15011245191'
+  admin: '15011245191',
+  aliyun: {
+    
+  }
 }
