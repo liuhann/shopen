@@ -29,5 +29,8 @@ module.exports = {
     app.context.services['svgs.rest'].ensureIndex('name', {
       overwriteOnDuplicated: false
     })
+    app.context.services['works.rest'].ensureIndex('id', {
+      overwriteOnDuplicated: false
+    })
   }
 }

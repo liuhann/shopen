@@ -74,7 +74,7 @@ class RESTFullController {
     delete query.projection
     const db = await this.getDb()
     const coll = db.collection(this.coll)
-    debug('filtered query ', query)
+    console.log('query', query)
     let cursor = coll.find(query)
     const total = await cursor.count()
     if (sort) {
@@ -126,7 +126,9 @@ class RESTFullController {
     const coll = db.collection(this.coll)
     let result = null
     try {
-      result = await coll.insertOne(object)
+      result = await coll.insertOne(object, {
+        bypassDocumentValidation: true
+      })
     } catch (e) {
       if (e instanceof MongoError) {
         if (this.overwriteOnDuplicated) {
@@ -136,15 +138,6 @@ class RESTFullController {
           })
           result = await coll.insertOne(object)
           debug('removed and inserted new')
-        } else {
-          const msg = 'key duplicated: ' + `${this.indexKey}=${object[this.indexKey]}`
-          debug(msg)
-          ctx.body = {
-            code: 409,
-            msg
-          }
-          await next()
-          return
         }
       }
     }
@@ -159,14 +152,28 @@ class RESTFullController {
     let objectId = ctx.params.id
     const db = await this.getDb()
     const coll = db.collection(this.coll)
-    const found = await coll.findOne({
-      '_id': new bson.ObjectID(objectId)
-    })
-    if (found) {
-      ctx.body = found
-    } else {
+    try {
+      let found = null
+      if (this.indexKey) {
+        found = await coll.findOne({
+          [this.indexKey]: objectId
+        })
+      } else {
+        found = await coll.findOne({
+          '_id': new bson.ObjectID(objectId)
+        })
+      }
+      if (found) {
+        ctx.body = found
+      } else {
+        ctx.body = {
+          code: 404
+        }
+      }
+    } catch (e) {
       ctx.body = {
-        code: 404
+        code: 400,
+        msg: 'Bad Request Parameter'
       }
     }
     await next()
