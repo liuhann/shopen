@@ -153,8 +153,6 @@ class RESTFullController {
     let ids = ctx.request.body.ids
     const db = await this.getDb()
     const coll = db.collection(this.coll)
-
-    debug('ids', ids)
     if (ids) {
       let cursor = coll.find({
         _id: {
