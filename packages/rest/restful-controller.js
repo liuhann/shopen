@@ -1,6 +1,6 @@
 const bson = require('bson')
 const debug = require('debug')('restful')
-const { MongoError } = require('mongodb')
+const { MongoError, ObjectID } = require('mongodb')
 
 class RESTFullController {
   constructor ({ path, router, mongodb, dbName, coll, filter }) {
@@ -156,7 +156,7 @@ class RESTFullController {
     if (ids) {
       let cursor = coll.find({
         _id: {
-          $in: ids.map(id => new bson.ObjectID(id))
+          $in: ids.map(id => new ObjectID(id))
         }
       })
       const list = await cursor.toArray()
@@ -184,7 +184,7 @@ class RESTFullController {
         })
       } else {
         found = await coll.findOne({
-          '_id': new bson.ObjectID(objectId)
+          '_id': new ObjectID(objectId)
         })
       }
       if (found) {
@@ -219,7 +219,7 @@ class RESTFullController {
     }
     let objectId = ctx.params.id
     await coll.findOneAndUpdate({
-      '_id': new bson.ObjectID(objectId)
+      '_id': new ObjectID(objectId)
     }, {
       $set: setProperties
     })
@@ -234,13 +234,13 @@ class RESTFullController {
     const db = await this.getDb()
     const coll = db.collection(this.coll)
     const found = await coll.findOne({
-      '_id': new bson.ObjectID(objectId)
+      '_id': new ObjectID(objectId)
     })
     if (found) {
       // 匿名删除
       if ((found.creator == null && ctx.token === found.token) || found.token == null) {
         const deleted = await coll.deleteOne({
-          '_id': new bson.ObjectID(objectId)
+          '_id': new ObjectID(objectId)
         })
         ctx.body = {
           deleted
@@ -254,7 +254,7 @@ class RESTFullController {
       }
       if (found.creator === ctx.user.id || ctx.user.id === this.admin) {
         const deleted = await coll.deleteOne({
-          '_id': new bson.ObjectID(objectId)
+          '_id': new ObjectID(objectId)
         })
         ctx.body = {
           deleted

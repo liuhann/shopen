@@ -2,7 +2,6 @@ const RestfullDAO = require('../rest/restful-dao')
 const shortid = require('shortid')
 const svgCaptcha = require('svg-captcha')
 const debug = require('debug')('shopen:user')
-
 /**
  User {
   id: 'mobile' or 'email' (from github),
@@ -24,7 +23,9 @@ module.exports = class UserController {
 
   initRoutes (router) {
     router.post('/user/register', this.register.bind(this))
+    router.post('/user/avatar', this.setAvatar.bind(this))
     router.post('/user/login', this.login.bind(this))
+    router.post('/user/logout', this.logout.bind(this))
     router.get('/user/current', this.getCurrentUser.bind(this))
     router.get('/user/sms/:phone', this.sendPhoneSmsCode.bind(this))
     router.get('/captcha', this.getCaptcha.bind(this))
@@ -37,6 +38,24 @@ module.exports = class UserController {
     this.captchMap[ctx.token] = captcha.text.toLowerCase()
     ctx.body = {
       svg: captcha.data
+    }
+    await next()
+  }
+
+  async logout (ctx, next) {
+    if (ctx.user && ctx.user.id) {
+      await this.userdao.patchOne('id', {
+        id: ctx.user.id,
+        token: null,
+        logout: new Date().getTime()
+      })
+      ctx.body = {
+        code: 200
+      }
+    } else {
+      ctx.body = {
+        code: 401
+      }
     }
     await next()
   }
@@ -58,7 +77,8 @@ module.exports = class UserController {
         debug('update user token', name, ctx.token)
         this.userdao.patchOne('id', {
           id: name,
-          token: ctx.token
+          token: ctx.token,
+          logon: new Date().getTime()
         })
         result.code = 200
         delete user.pwd
@@ -70,6 +90,24 @@ module.exports = class UserController {
       }
     }
     ctx.body = result
+    await next()
+  }
+
+  async setAvatar (ctx, next) {
+    const { url } = ctx.request.body
+    if (ctx.user && ctx.user.id) {
+      await this.userdao.patchOne('id', {
+        id: ctx.user.id,
+        avatar: url
+      })
+      ctx.body = {
+        code: 200
+      }
+    } else {
+      ctx.body = {
+        code: 401
+      }
+    }
     await next()
   }
 
