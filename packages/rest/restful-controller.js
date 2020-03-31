@@ -9,6 +9,7 @@ class RESTFullController {
     this.coll = coll
     router.get(`${path}`, this.list.bind(this))
     router.get(`${path}/:id`, this.getOne.bind(this))
+    router.post(`${path}/id`, this.getMulti.bind(this))
     router.get(`${path}/distinct/:field`, this.distinct.bind(this))
     router.get(`${path}/regex/:prop/:value`, this.regex.bind(this))
     let middleware = filter || (async (ctx, next) => {
@@ -144,6 +145,31 @@ class RESTFullController {
     ctx.body = {
       result,
       object
+    }
+    await next()
+  }
+
+  async getMulti (ctx, next) {
+    let ids = ctx.request.body.ids
+    const db = await this.getDb()
+    const coll = db.collection(this.coll)
+
+    debug('ids', ids)
+    if (ids) {
+      let cursor = coll.find({
+        _id: {
+          $in: ids.map(id => new bson.ObjectID(id))
+        }
+      })
+      const list = await cursor.toArray()
+      ctx.body = {
+        list
+      }
+    } else {
+      ctx.body = {
+        code: 400,
+        msg: 'ids fields required in body'
+      }
     }
     await next()
   }
