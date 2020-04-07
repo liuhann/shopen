@@ -21,7 +21,10 @@ module.exports = {
             token
           })
           if (tokenUser == null) {
-            app.tokenUsers[token] = {}
+            // make token user as empty object : not-registered
+            app.tokenUsers[token] = {
+              msg: 'not-registered'
+            }
           } else {
             delete tokenUser.pwd
             app.tokenUsers[token] = tokenUser

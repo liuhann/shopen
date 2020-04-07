@@ -24,6 +24,7 @@ module.exports = class UserController {
   initRoutes (router) {
     router.post('/user/register', this.register.bind(this))
     router.post('/user/avatar', this.setAvatar.bind(this))
+    router.post('/user/update', this.update.bind(this))
     router.post('/user/login', this.login.bind(this))
     router.post('/user/logout', this.logout.bind(this))
     router.get('/user/current', this.getCurrentUser.bind(this))
@@ -100,6 +101,29 @@ module.exports = class UserController {
         id: ctx.user.id,
         avatar: url
       })
+      ctx.app.tokenUsers[ctx.user.token] = null
+      ctx.body = {
+        code: 200
+      }
+    } else {
+      ctx.body = {
+        code: 401
+      }
+    }
+    await next()
+  }
+
+  async update (ctx, next) {
+    const { email, location, nick } = ctx.request.body
+
+    if (ctx.user && ctx.user.id) {
+      await this.userdao.patchOne('id', {
+        id: ctx.user.id,
+        email,
+        location,
+        nick
+      })
+      ctx.app.tokenUsers[ctx.user.token] = null
       ctx.body = {
         code: 200
       }
@@ -126,6 +150,8 @@ module.exports = class UserController {
           id: name,
           pwd: password,
           nick: nickname,
+          location: '',
+          email: '',
           ip: this.getRemoteIp(ctx.req),
           logined: new Date().getTime(),
           token: token,

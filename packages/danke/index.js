@@ -9,6 +9,8 @@ module.exports = {
     initRestService(app, 'danke', 'blocks', '/danke/block', true)
     // 动画
     initRestService(app, 'danke', 'animations', '/danke/animation')
+    // 资源包
+    initRestService(app, 'danke', 'packs', '/danke/pack')
     // 公用图片、资源
     initRestService(app, 'danke', 'vectors', '/danke/vector')
     // 可修改颜色的SVG资源
