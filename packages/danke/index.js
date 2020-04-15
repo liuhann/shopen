@@ -10,11 +10,13 @@ module.exports = {
     // 动画
     initRestService(app, 'danke', 'animations', '/danke/animation')
     // 资源包
-    initRestService(app, 'danke', 'packs', '/danke/pack')
+    initRestService(app, 'danke', 'packs', '/danke/pack').setSubCollection('svgs', 'pack')
+    // 收藏的资源包
+    initRestService(app, 'danke', 'starpacks', '/danke/starpack').setSubCollection('svgs', 'pack')
     // 公用图片、资源
     initRestService(app, 'danke', 'vectors', '/danke/vector')
     // 可修改颜色的SVG资源
-    initRestService(app, 'danke', 'svgs', '/danke/svg')
+    initRestService(app, 'danke', 'svgs', '/danke/svg').setForeignKeys(['pack'])
     // clippath图片
     initRestService(app, 'danke', 'clippaths', '/danke/clippath')
     // 样式和特效集合
@@ -27,9 +29,6 @@ module.exports = {
   async bootComplete (app) {
     app.context.services['blocks.rest'].ensureIndex('name', {
       overwriteOnDuplicated: true
-    })
-    app.context.services['svgs.rest'].ensureIndex('name', {
-      overwriteOnDuplicated: false
     })
     app.context.services['works.rest'].ensureIndex('id', {
       overwriteOnDuplicated: false

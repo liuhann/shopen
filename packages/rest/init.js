@@ -3,7 +3,7 @@ const config = require('../../config.js')
 
 function initRestService (app, db, coll, path, noLogin) {
   const router = app.context.router
-  app.context.services[coll + '.rest'] = new RestFulController({
+  const controller = new RestFulController({
     router,
     mongodb: app.context.services.mongodb,
     dbName: db,
@@ -11,7 +11,9 @@ function initRestService (app, db, coll, path, noLogin) {
     path: path,
     filter: noLogin === true ? null : app.middlewares.loginRequired
   })
+  app.context.services[coll + '.rest'] = controller
   app.context.services[coll + '.rest'].setAdmin(config.admin)
+  return controller
 }
 
 module.exports = initRestService

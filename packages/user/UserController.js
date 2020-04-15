@@ -50,6 +50,7 @@ module.exports = class UserController {
         token: null,
         logout: new Date().getTime()
       })
+      ctx.app.tokenUsers[ctx.token] = {}
       ctx.body = {
         code: 200
       }
@@ -136,9 +137,16 @@ module.exports = class UserController {
   }
 
   async register (ctx, next) {
-    const { name, password, nickname } = ctx.request.body
+    const { name, password, captcha } = ctx.request.body
     const result = {}
-    if (/^[1][3,4,5,7,8][0-9]{9}$/.test(name)) {
+
+    if (this.captchMap[ctx.token] !== captcha) {
+      delete this.captchMap[ctx.token]
+      result.code = 403
+    } else if (!/^[1][3,4,5,7,8][0-9]{9}$/.test(name)) {
+      // 手机号码不合法
+      result.code = 400
+    } else {
       const user = await this.userdao.getOne({
         id: name
       })
@@ -149,7 +157,6 @@ module.exports = class UserController {
         await this.userdao.insertOne({
           id: name,
           pwd: password,
-          nick: nickname,
           location: '',
           email: '',
           ip: this.getRemoteIp(ctx.req),
@@ -160,8 +167,6 @@ module.exports = class UserController {
         result.token = token
         result.code = 200
       }
-    } else {
-      result.code = 400
     }
     ctx.body = result
     await next()

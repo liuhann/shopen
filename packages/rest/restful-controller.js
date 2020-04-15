@@ -1,4 +1,3 @@
-const bson = require('bson')
 const debug = require('debug')('restful')
 const { MongoError, ObjectID } = require('mongodb')
 
@@ -40,6 +39,32 @@ class RESTFullController {
     debug(`ensure index ${this.coll}: ${indexKey}`)
     this.overwriteOnDuplicated = overwriteOnDuplicated
   }
+
+  /**
+   * 设置外键字段，这些字段在创建、更新、查询时会自动转换为ObjectId
+   * @param keys
+   */
+  async setForeignKeys (keys) {
+    const db = await this.getDb()
+    for (let key of keys) {
+      await db.collection(this.coll).createIndex({
+        [key]: 1
+      })
+    }
+    this.foreignKeys = keys
+  }
+  /**
+   * 设置子集和对应的外键， 主要用于目录、文件这类包含子项应用场景
+   * @param collKey 父文档标记字段，默认为_id
+   * @param subColl 子集名称
+   * @param subCollForeignKey  子集文档外键 指向当前集合的id
+   * @returns {Promise<void>}
+   */
+  setSubCollection (subColl, subCollForeignKey) {
+    this.subColl = subColl
+    this.subCollForeignKey = subCollForeignKey
+  }
+
   /**
    * 正则查找
    */
@@ -63,18 +88,24 @@ class RESTFullController {
     debug(`REST list ${ctx.path}?${ctx.querystring}`)
     let page = parseInt(ctx.request.query.page) || 1
     let count = parseInt(ctx.request.query.count) || 10
+    let subcount = parseInt(ctx.request.query.subcount)
     let sort = ctx.request.query.sort
     let order = ctx.request.query.order
     let projection = ctx.request.query.projection
+    let parentKey = ctx.request.query.parentKey
     const query = Object.assign({}, ctx.request.query)
     delete query.page
     delete query.count
     delete query.sort
     delete query.page
     delete query.order
+    delete query.subcount
     delete query.projection
+    delete query.parentKey
+
     const db = await this.getDb()
     const coll = db.collection(this.coll)
+    this.convertForeignFieldValueToObjectId(ctx, query)
     console.log('query', query)
     let cursor = coll.find(query)
     const total = await cursor.count()
@@ -105,6 +136,15 @@ class RESTFullController {
       cursor.project(projecObject)
     }
     const list = await cursor.skip((page - 1) * count).limit(count).toArray()
+
+    if (subcount && this.subColl && this.subCollForeignKey) {
+      const subcoll = db.collection(this.subColl)
+      for (let item of list) {
+        item.children = await subcoll.find({
+          [this.subCollForeignKey]: item[parentKey || '_id']
+        }).limit(subcount).toArray()
+      }
+    }
     ctx.body = {
       page,
       count,
@@ -117,6 +157,12 @@ class RESTFullController {
     await next()
   }
 
+  /**
+   * 创建一条文档，如何发生主键重复时， overwriteOnDuplicated 可配置是否可替换
+   * @param ctx
+   * @param next
+   * @returns {Promise<void>}
+   */
   async create (ctx, next) {
     let object = ctx.request.body
     object.creator = ctx.user.id
@@ -126,6 +172,7 @@ class RESTFullController {
     const db = await this.getDb()
     const coll = db.collection(this.coll)
     let result = null
+    this.convertForeignFieldValueToObjectId(ctx, object)
     try {
       result = await coll.insertOne(object, {
         bypassDocumentValidation: true
@@ -147,6 +194,21 @@ class RESTFullController {
       object
     }
     await next()
+  }
+
+  convertForeignFieldValueToObjectId (ctx, object) {
+    // 处理foreignkey 创建转换
+    try {
+      if (this.foreignKeys) {
+        for (let foreignKey of this.foreignKeys) {
+          if (object[foreignKey]) {
+            object[foreignKey] = new ObjectID(object[foreignKey])
+          }
+        }
+      }
+    } catch (e) {
+      ctx.throw(400, this.foreignKeys + 'must be ObjectId')
+    }
   }
 
   async getMulti (ctx, next) {
@@ -202,15 +264,26 @@ class RESTFullController {
     }
     await next()
   }
+
+  /**
+   * 更新文档
+   * @param ctx
+   * @param next
+   * @returns {Promise<void>}
+   */
   async patch (ctx, next) {
     const body = ctx.request.body
     const db = await this.getDb()
     const coll = db.collection(this.coll)
     const setProperties = Object.assign({}, body)
+
+    // 处理foreignkey 创建转换
+    this.convertForeignFieldValueToObjectId(ctx, setProperties)
+
     // only admin can modify prop.system
     if (setProperties.system && ctx.user.id !== this.admin) {
       debug(`Patch prop.system ${ctx.user.id} !== ${this.admin}`)
-      ctx.throw(403)
+      ctx.throw(403, 'Patch on prop.system not allowed')
       return
     }
     setProperties.updated = new Date().getTime()
@@ -218,6 +291,9 @@ class RESTFullController {
       delete setProperties._id
     }
     let objectId = ctx.params.id
+
+    setProperties.packKey = new ObjectID(objectId)
+
     await coll.findOneAndUpdate({
       '_id': new ObjectID(objectId)
     }, {
