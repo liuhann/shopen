@@ -55,14 +55,15 @@ class RESTFullController {
   }
   /**
    * 设置子集和对应的外键， 主要用于目录、文件这类包含子项应用场景
-   * @param collKey 父文档标记字段，默认为_id
    * @param subColl 子集名称
    * @param subCollForeignKey  子集文档外键 指向当前集合的id
+   * @param collKey 父文档标记字段，默认为_id
    * @returns {Promise<void>}
    */
-  setSubCollection (subColl, subCollForeignKey) {
+  setSubCollection (subColl, subCollForeignKey, collKey) {
     this.subColl = subColl
     this.subCollForeignKey = subCollForeignKey
+    this.parentCollKey = collKey
   }
 
   /**
@@ -92,7 +93,6 @@ class RESTFullController {
     let sort = ctx.request.query.sort
     let order = ctx.request.query.order
     let projection = ctx.request.query.projection
-    let parentKey = ctx.request.query.parentKey
     const query = Object.assign({}, ctx.request.query)
     delete query.page
     delete query.count
@@ -141,7 +141,7 @@ class RESTFullController {
       const subcoll = db.collection(this.subColl)
       for (let item of list) {
         item.children = await subcoll.find({
-          [this.subCollForeignKey]: item[parentKey || '_id']
+          [this.subCollForeignKey]: item[this.parentCollKey || '_id']
         }).limit(subcount).toArray()
       }
     }
@@ -173,6 +173,11 @@ class RESTFullController {
     const coll = db.collection(this.coll)
     let result = null
     this.convertForeignFieldValueToObjectId(ctx, object)
+    for (let key in object) {
+      if (key.match(/^_[a-z]+_id$/)) {
+        object[key] = new ObjectID(object[key])
+      }
+    }
     try {
       result = await coll.insertOne(object, {
         bypassDocumentValidation: true
@@ -198,10 +203,12 @@ class RESTFullController {
 
   convertForeignFieldValueToObjectId (ctx, object) {
     // 处理foreignkey 创建转换
+    debug('fks', this.foreignKeys)
     try {
       if (this.foreignKeys) {
         for (let foreignKey of this.foreignKeys) {
           if (object[foreignKey]) {
+            debug('set fk', foreignKey, object[foreignKey])
             object[foreignKey] = new ObjectID(object[foreignKey])
           }
         }

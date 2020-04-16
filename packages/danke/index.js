@@ -12,11 +12,11 @@ module.exports = {
     // 资源包
     initRestService(app, 'danke', 'packs', '/danke/pack').setSubCollection('svgs', 'pack')
     // 收藏的资源包
-    initRestService(app, 'danke', 'starpacks', '/danke/starpack').setSubCollection('svgs', 'pack')
+    initRestService(app, 'danke', 'starpacks', '/danke/starpack').setSubCollection('svgs', 'pack', '_pack_id')
     // 公用图片、资源
     initRestService(app, 'danke', 'vectors', '/danke/vector')
     // 可修改颜色的SVG资源
-    initRestService(app, 'danke', 'svgs', '/danke/svg').setForeignKeys(['pack'])
+    initRestService(app, 'danke', 'svgs', '/danke/svg')
     // clippath图片
     initRestService(app, 'danke', 'clippaths', '/danke/clippath')
     // 样式和特效集合
@@ -33,5 +33,7 @@ module.exports = {
     app.context.services['works.rest'].ensureIndex('id', {
       overwriteOnDuplicated: false
     })
+    app.context.services['svgs.rest'].setForeignKeys(['pack'])
+    app.context.services['images.rest'].setForeignKeys(['pack'])
   }
 }

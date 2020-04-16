@@ -18,7 +18,11 @@ module.exports = {
       credentials: true
     }))
     app.use(bodyParser({
-      multipart: true
+      multipart: true,
+      formidable: {
+        uploadDir: app.config.image_storage,
+        maxFileSize: 50 * 1024 * 1024 // 设置上传文件大小最大限制，默认50M
+      }
     }))
     app.context.router = new Router()
 
