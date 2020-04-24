@@ -9,7 +9,7 @@ class RESTFullController {
     router.get(`${path}`, this.list.bind(this))
     router.get(`${path}/:id`, this.getOne.bind(this))
     router.post(`${path}/id`, this.getMulti.bind(this))
-    router.get(`${path}/distinct/:field`, this.distinct.bind(this))
+    router.post(`${path}/distinct/:field`, this.distinct.bind(this))
     router.get(`${path}/regex/:prop/:value`, this.regex.bind(this))
     let middleware = filter || (async (ctx, next) => {
       await next()
@@ -359,7 +359,7 @@ class RESTFullController {
     let { field } = ctx.params
     const db = await this.getDb()
     const coll = db.collection(this.coll)
-    const distinctValue = await coll.distinct(field)
+    const distinctValue = await coll.distinct(field, ctx.request.query)
     ctx.body = distinctValue
     await next()
   }
