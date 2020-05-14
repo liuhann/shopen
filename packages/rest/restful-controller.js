@@ -284,9 +284,6 @@ class RESTFullController {
     const coll = db.collection(this.coll)
     const setProperties = Object.assign({}, body)
 
-    // 处理foreignkey 创建转换
-    this.convertForeignFieldValueToObjectId(ctx, setProperties)
-
     // only admin can modify prop.system
     if (setProperties.system && ctx.user.id !== this.admin) {
       debug(`Patch prop.system ${ctx.user.id} !== ${this.admin}`)
@@ -359,7 +356,7 @@ class RESTFullController {
     let { field } = ctx.params
     const db = await this.getDb()
     const coll = db.collection(this.coll)
-    const distinctValue = await coll.distinct(field, ctx.request.query)
+    const distinctValue = await coll.distinct(field, ctx.request.body)
     ctx.body = distinctValue
     await next()
   }
