@@ -102,7 +102,7 @@ module.exports = class UserController {
         id: ctx.user.id,
         avatar: url
       })
-      ctx.app.tokenUsers[ctx.user.token] = null
+      ctx.app.tokenUsers[ctx.token] = null
       ctx.body = {
         code: 200
       }
@@ -112,6 +112,10 @@ module.exports = class UserController {
       }
     }
     await next()
+  }
+
+  clearUserToken () {
+
   }
 
   async update (ctx, next) {
@@ -124,7 +128,7 @@ module.exports = class UserController {
         location,
         nick
       })
-      ctx.app.tokenUsers[ctx.user.token] = null
+      ctx.app.tokenUsers[ctx.token] = null
       ctx.body = {
         code: 200
       }

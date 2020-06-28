@@ -64,11 +64,14 @@ module.exports = class OSSObjectService {
     const body = ctx.request.body
     try {
       await this.client.delete(body.fileId)
+      ctx.body = {
+        code: 201
+      }
     } catch (e) {
       console.error('delete error', e)
-    }
-    ctx.body = {
-      code: 201
+      ctx.body = {
+        code: 502
+      }
     }
   }
   async uploadImage (ctx, next) {

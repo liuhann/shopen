@@ -7,3 +7,4 @@ node_modules/
 .history
 public
 config.js
+*.webm

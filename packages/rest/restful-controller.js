@@ -41,17 +41,11 @@ class RESTFullController {
   }
 
   /**
-   * 设置外键字段，这些字段在创建、更新、查询时会自动转换为ObjectId
+   * 设置自动转换为ObjectId类型的字段
    * @param keys
    */
-  async setForeignKeys (keys) {
-    const db = await this.getDb()
-    for (let key of keys) {
-      await db.collection(this.coll).createIndex({
-        [key]: 1
-      })
-    }
-    this.foreignKeys = keys
+  async setObjectIdField (keys) {
+    this.objectIdFields = keys
   }
   /**
    * 设置子集和对应的外键， 主要用于目录、文件这类包含子项应用场景
@@ -106,6 +100,13 @@ class RESTFullController {
     const db = await this.getDb()
     const coll = db.collection(this.coll)
     this.convertForeignFieldValueToObjectId(ctx, query)
+
+    // consider value convert to true or false
+    for (let key in query) {
+      if (query[key] === 'true' || query[key] === 'false') {
+        query[key] = JSON.parse(query[key])
+      }
+    }
     console.log('query', query)
     let cursor = coll.find(query)
     const total = await cursor.count()
@@ -203,18 +204,19 @@ class RESTFullController {
 
   convertForeignFieldValueToObjectId (ctx, object) {
     // 处理foreignkey 创建转换
-    debug('fks', this.foreignKeys)
     try {
-      if (this.foreignKeys) {
-        for (let foreignKey of this.foreignKeys) {
+      if (this.objectIdFields) {
+        for (let foreignKey of this.objectIdFields) {
           if (object[foreignKey]) {
-            debug('set fk', foreignKey, object[foreignKey])
+            object[foreignKey] = new ObjectID(object[foreignKey])
+          }
+          if (foreignKey.match(/^_[a-z]+_id$/)) {
             object[foreignKey] = new ObjectID(object[foreignKey])
           }
         }
       }
     } catch (e) {
-      ctx.throw(400, this.foreignKeys + 'must be ObjectId')
+      ctx.throw(400, this.objectIdFields + ' must be ObjectId')
     }
   }
 
