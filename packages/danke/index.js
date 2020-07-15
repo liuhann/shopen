@@ -9,7 +9,9 @@ module.exports = {
     initRestService(app, 'danke', 'templates', '/danke/template', true)
     // 动画
     initRestService(app, 'danke', 'animations', '/danke/animation')
-
+    // SVG路径
+    initRestService(app, 'danke', 'svgpaths', '/danke/path')
+    // 资源包
     initRestService(app, 'danke', 'svgs', '/danke/svg')
     // 资源包
     initRestService(app, 'danke', 'packs', '/danke/pack').setSubCollection('images', 'pack')
