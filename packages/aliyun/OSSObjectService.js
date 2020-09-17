@@ -2,17 +2,14 @@ const OSS = require('ali-oss')
 const fs = require('fs')
 const shortid = require('shortid')
 const MP3Cutter = require('mp3-cutter')
-const config = require('../../config.js')
-
-const OSS_CONFIG = {
-  region: 'oss-cn-beijing',
-  accessKeyId: config.aliyun.accessKeyId,
-  accessKeySecret: config.aliyun.accessKeySecret
-}
 
 module.exports = class OSSObjectService {
-  constructor (bucket) {
-    this.config = Object.assign({}, OSS_CONFIG)
+  constructor (bucket, config) {
+    this.config = Object.assign({}, {
+      region: 'oss-cn-beijing',
+      accessKeyId: config.aliyun.accessKeyId,
+      accessKeySecret: config.aliyun.accessKeySecret
+    })
     this.config.bucket = bucket
     this.client = new OSS(this.config)
   }

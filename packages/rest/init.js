@@ -1,5 +1,4 @@
 const RestFulController = require('./restful-controller.js')
-const config = require('../../config.js')
 
 function initRestService (app, db, coll, path, noLogin) {
   const router = app.context.router
@@ -12,7 +11,7 @@ function initRestService (app, db, coll, path, noLogin) {
     filter: noLogin === true ? null : app.middlewares.loginRequired
   })
   app.context.services[coll + '.rest'] = controller
-  app.context.services[coll + '.rest'].setAdmin(config.admin)
+  app.context.services[coll + '.rest'].setAdmin(app.config.admin)
   return controller
 }
 
