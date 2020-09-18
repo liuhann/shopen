@@ -17,6 +17,8 @@ module.exports = {
     initRestService(app, 'danke', 'packs', '/danke/pack').setSubCollection('images', 'pack')
     // 资源
     initRestService(app, 'danke', 'images', '/danke/image')
+    // 公开资源
+    initRestService(app, 'public', 'images', '/danke/public/image')
     // 过滤器组件
     initRestService(app, 'danke', 'styles', '/danke/style')
     // 音频

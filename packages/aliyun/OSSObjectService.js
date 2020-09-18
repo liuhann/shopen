@@ -78,12 +78,15 @@ module.exports = class OSSObjectService {
       const uploadFile = body.files[fileName]
       try {
         const fileDir = ctx.user.id || 'anonymous'
+        if (fileDir === 'anonymous' && ctx.query.bucket) {
+          ctx.throw(403)
+        }
         let fileId = fileDir + '/' + ctx.query.path + '/' + shortid.generate() + '.' + (this.fileExtension(uploadFile.name) || 'png')
         // object表示上传到OSS的Object名称，localfile表示本地文件或者文件路径
         let r1 = await this.client.put(fileId, uploadFile.path)
         result.r1 = r1
         result.name = fileId
-        result.url = `https://${this.config.bucket}.${this.config.region}.aliyuncs.com/${fileId}`
+        result.url = `https://${ctx.query.bucket || this.config.bucket}.${this.config.region}.aliyuncs.com/${fileId}`
       } catch (e) {
         console.error('error2: %j', e)
       }

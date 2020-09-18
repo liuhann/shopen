@@ -4,7 +4,7 @@
   "description": "A Webstore with themes appearance and code setting written in nodejs",
   "main": "index.js",
   "scripts": {
-    "pm2": "pm2 start ./boot/server.js",
+    "pm2": "pm2 start ./server.js",
     "server": "node ./server.js",
     "standard": "standard --fix",
     "mongo": "mongod --fork --logpath=/data/log/console.log --bind_ip 127.0.0.1 --dbpath=/data/db",
