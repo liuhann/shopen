@@ -1,5 +1,6 @@
 const OSS = require('ali-oss')
 const fs = require('fs')
+const debug = require('debug')('oss')
 const shortid = require('shortid')
 const MP3Cutter = require('mp3-cutter')
 
@@ -15,9 +16,9 @@ module.exports = class OSSObjectService {
   }
 
   initRoutes (router, app) {
-    router.post(`/image/upload`, this.uploadImage.bind(this))
-    router.post(`/image/remove`, app.middlewares.loginRequired, this.removeImage.bind(this))
-    router.post(`/mp3/upload`, this.uploadAndCutMp3.bind(this))
+    router.post(`/${this.config.bucket}/image/upload`, this.uploadImage.bind(this))
+    router.post(`/${this.config.bucket}/image/remove`, app.middlewares.loginRequired, this.removeImage.bind(this))
+    router.post(`/${this.config.bucket}/mp3/upload`, this.uploadAndCutMp3.bind(this))
   }
 
   /**
@@ -73,20 +74,24 @@ module.exports = class OSSObjectService {
   }
   async uploadImage (ctx, next) {
     const body = ctx.request.body
+    debug('upload ', this.config.bucket, ctx.query.path)
     const result = {}
     for (const fileName in body.files) {
       const uploadFile = body.files[fileName]
+      debug('uploadFile ', uploadFile)
       try {
-        const fileDir = ctx.user.id || 'anonymous'
-        if (fileDir === 'anonymous' && ctx.query.bucket) {
-          ctx.throw(403)
+        let fileId = null
+        if (ctx.query.public) {
+          fileId = ctx.query.path
+        } else {
+          let fileDir = ctx.user.id || 'anonymous'
+          fileId = fileDir + '/' + ctx.query.path + '/' + shortid.generate() + '.' + (this.fileExtension(uploadFile.name) || 'png')
         }
-        let fileId = fileDir + '/' + ctx.query.path + '/' + shortid.generate() + '.' + (this.fileExtension(uploadFile.name) || 'png')
         // object表示上传到OSS的Object名称，localfile表示本地文件或者文件路径
         let r1 = await this.client.put(fileId, uploadFile.path)
         result.r1 = r1
         result.name = fileId
-        result.url = `https://${ctx.query.bucket || this.config.bucket}.${this.config.region}.aliyuncs.com/${fileId}`
+        result.url = `https://${this.config.bucket}.${this.config.region}.aliyuncs.com/${fileId}`
       } catch (e) {
         console.error('error2: %j', e)
       }

@@ -1,4 +1,4 @@
-process.env.DEBUG = 'wind:*'
+process.env.DEBUG = 'wind:*,oss'
 const BootStrap = require('wind-boot')
 const coreHttp = require('wind-core-http')
 const aliyun = require('./packages/aliyun')

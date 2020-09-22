@@ -66,9 +66,11 @@ module.exports = class UserController {
     const { name, password, captcha } = ctx.request.body
     const result = {}
     // captcha first
-    if (this.captchMap[ctx.token] !== captcha) {
+    if (!this.captchMap[ctx.token] || this.captchMap[ctx.token].toLowerCase() !== captcha.toLowerCase()) {
+      console.log('correct token: ', this.captchMap[ctx.token], ' request', captcha)
       delete this.captchMap[ctx.token]
-      result.code = 400
+      throw new ctx.app.BadRequestError('验证码不正确')
+      // result.code = 400
     } else {
       delete this.captchMap[ctx.token]
       const user = await this.userdao.getOne({
@@ -87,8 +89,7 @@ module.exports = class UserController {
         ctx.app.tokenUsers[ctx.token] = user
         result.user = user
       } else {
-        result.code = 401
-        result.message = '用户名或密码错误'
+        throw new ctx.app.HttpError('401', '用户名或密码错误')
       }
     }
     ctx.body = result
