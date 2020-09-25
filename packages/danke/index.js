@@ -8,17 +8,18 @@ module.exports = {
     // 作品模板
     initRestService(app, 'danke', 'templates', '/danke/template', true)
     // 动画
-    initRestService(app, 'danke', 'animations', '/danke/animation')
+    // initRestService(app, 'danke', 'animations', '/danke/animation')
     // SVG路径
-    initRestService(app, 'danke', 'svgpaths', '/danke/path')
+    // initRestService(app, 'danke', 'svgpaths', '/danke/path')
     // 资源包
-    initRestService(app, 'danke', 'svgs', '/danke/svg')
+    // initRestService(app, 'danke', 'svgs', '/danke/svg')
     // 资源包
     initRestService(app, 'danke', 'packs', '/danke/pack').setSubCollection('images', 'pack')
     // 资源
     initRestService(app, 'danke', 'images', '/danke/image')
     // 公开资源
     initRestService(app, 'public', 'images', '/danke/public/image')
+    initRestService(app, 'public', 'vectors', '/danke/public/vector')
     // 过滤器组件
     initRestService(app, 'danke', 'styles', '/danke/style')
     // 音频

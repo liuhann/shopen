@@ -73,12 +73,9 @@ module.exports = class OSSObjectService {
     }
   }
   async uploadImage (ctx, next) {
-    const body = ctx.request.body
-    debug('upload ', this.config.bucket, ctx.query.path)
     const result = {}
-    for (const fileName in body.files) {
-      const uploadFile = body.files[fileName]
-      debug('uploadFile ', uploadFile)
+    for (const fileName in ctx.request.files) {
+      const uploadFile = ctx.request.files[fileName]
       try {
         let fileId = null
         if (ctx.query.public) {
@@ -90,7 +87,9 @@ module.exports = class OSSObjectService {
         // object表示上传到OSS的Object名称，localfile表示本地文件或者文件路径
         let r1 = await this.client.put(fileId, uploadFile.path)
         result.r1 = r1
+        // 这个是相对路径， 配合aliyun cdn  image.danke.fun/ 使用
         result.name = fileId
+        // 这个字段是oss字段，通常不用
         result.url = `https://${this.config.bucket}.${this.config.region}.aliyuncs.com/${fileId}`
       } catch (e) {
         console.error('error2: %j', e)

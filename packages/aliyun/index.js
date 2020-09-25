@@ -6,8 +6,6 @@ module.exports = {
   ready (app) {
     const router = app.context.router
     const userSpace = new OSSObjectService('dankev3', app.config)
-    const publicSpace = new OSSObjectService('danke-public', app.config)
     userSpace.initRoutes(router, app)
-    publicSpace.initRoutes(router, app)
   }
 }
