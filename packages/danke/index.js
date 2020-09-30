@@ -19,6 +19,7 @@ module.exports = {
     initRestService(app, 'danke', 'images', '/danke/image')
     // 公开资源
     initRestService(app, 'public', 'images', '/danke/public/image')
+    initRestService(app, 'public', 'deleted', '/danke/public/deleted')
     initRestService(app, 'public', 'vectors', '/danke/public/vector')
     // 过滤器组件
     initRestService(app, 'danke', 'styles', '/danke/style')
