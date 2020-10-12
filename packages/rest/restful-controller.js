@@ -83,7 +83,6 @@ class RESTFullController {
     debug(`REST list ${ctx.path}?${ctx.querystring}`)
     let page = parseInt(ctx.request.query.page) || 1
     let count = parseInt(ctx.request.query.count) || 10
-    let subcount = parseInt(ctx.request.query.subcount)
     let sort = ctx.request.query.sort
     let order = ctx.request.query.order
     let projection = ctx.request.query.projection
@@ -93,9 +92,7 @@ class RESTFullController {
     delete query.sort
     delete query.page
     delete query.order
-    delete query.subcount
     delete query.projection
-    delete query.parentKey
 
     const db = await this.getDb()
     const coll = db.collection(this.coll)
@@ -138,14 +135,6 @@ class RESTFullController {
     }
     const list = await cursor.skip((page - 1) * count).limit(count).toArray()
 
-    if (subcount && this.subColl && this.subCollForeignKey) {
-      const subcoll = db.collection(this.subColl)
-      for (let item of list) {
-        item.children = await subcoll.find({
-          [this.subCollForeignKey]: item[this.parentCollKey || '_id']
-        }).limit(subcount).toArray()
-      }
-    }
     ctx.body = {
       page,
       count,
@@ -266,6 +255,7 @@ class RESTFullController {
         }
       }
     } catch (e) {
+      console.log(e)
       ctx.body = {
         code: 400,
         msg: 'Bad Request Parameter'
