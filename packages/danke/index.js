@@ -6,7 +6,7 @@ module.exports = {
     // 作品
     initRestService(app, 'danke', 'works', '/danke/work', true)
     // 作品模板
-    initRestService(app, 'danke', 'templates', '/danke/template', true)
+    // initRestService(app, 'danke', 'templates', '/danke/template', true)
     // 动画
     // initRestService(app, 'danke', 'animations', '/danke/animation')
     // SVG路径
@@ -15,6 +15,9 @@ module.exports = {
     // initRestService(app, 'danke', 'svgs', '/danke/svg')
     // 资源包
     initRestService(app, 'danke', 'packs', '/danke/pack').setSubCollection('images', 'pack')
+
+    // h5资源
+    initRestService(app, 'danke', 'htmls', '/danke/h5')
     // 资源
     initRestService(app, 'danke', 'images', '/danke/image')
     // 公开资源
