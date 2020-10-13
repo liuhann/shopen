@@ -10,8 +10,8 @@ function initRestService (app, db, coll, path, noLogin) {
     path: path,
     filter: noLogin === true ? null : app.middlewares.loginRequired
   })
-  app.context.services[coll + '.rest'] = controller
-  app.context.services[coll + '.rest'].setAdmin(app.config.admin)
+  app.context.services[db + '.' + coll + '.rest'] = controller
+  app.context.services[db + '.' + coll + '.rest'].setAdmin(app.config.admin)
   return controller
 }
 
