@@ -1,7 +1,8 @@
 const TransferHome = '/data/temp'
 const shortid = require('shortid')
-const puppeteer = require('puppeteer');
+const puppeteer = require('puppeteer')
 const debug = require('debug')('danke:rest')
+const send = require('koa-send')
 
 const travel = require('./templates/travel')
 const lightcircle = require('./templates/lightcircle')
@@ -19,25 +20,28 @@ module.exports = class DankController {
   constructor (app) {
     app.router.get(`/danke/snapshot`, async (ctx, next) => {
       const workId = ctx.query.workId
-      this.takeSnapShot(workId)
+      const filePath = await this.takeSnapShot(workId)
+      await send(ctx, filePath)
     })
   }
 
-   async startPuppeteer () {
+  async startPuppeteer () {
     this.browser = await puppeteer.launch()
     this.page = await this.browser.newPage()
     this.page.setViewport({
       width: 960,
       height: 960
     })
-   }
+  }
 
-   async takeSnapShot (id) {
+  async takeSnapShot (id) {
     await this.page.goto('http://www.dankd.fun/capture/image/' + id)
-    page.on('domcontentloaded', async () => {
-      await page.screenshot({path: 'example.png'});
-  })
-
+    return new Promise(resolve => {
+      this.page.on('domcontentloaded', async () => {
+        await this.page.screenshot({path: '/opt/data/avatar/' + id + '.png'})
+        return '/opt/data/avatar/' + id + '.png'
+      })
+    })
   }
 
   async getTemplateList (ctx, next) {

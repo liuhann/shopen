@@ -1,4 +1,5 @@
 const initRestService = require('../rest/init.js')
+const controller = require('./controller')
 module.exports = {
   async created (app) {
   },
@@ -20,6 +21,10 @@ module.exports = {
     initRestService(app, 'public', 'images', '/danke/public/image')
     initRestService(app, 'public', 'deleted', '/danke/public/deleted')
     initRestService(app, 'public', 'vectors', '/danke/public/vector')
+
+    const cc = new controller(app)
+    cc.startPuppeteer()
+
   },
   async bootComplete (app) {
 
