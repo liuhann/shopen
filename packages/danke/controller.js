@@ -1,6 +1,6 @@
 const TransferHome = '/data/temp'
 const shortid = require('shortid')
-const RestfullDAO = require('../rest/restful-dao')
+const puppeteer = require('puppeteer');
 const debug = require('debug')('danke:rest')
 
 const travel = require('./templates/travel')
@@ -16,12 +16,30 @@ const Templates = {
 }
 
 module.exports = class DankController {
-  constructor (ctx) {
-    this.templatedao = new RestfullDAO(ctx.services.mongodb, 'danke', 'templates')
-    this.imagedao = new RestfullDAO(ctx.services.mongodb, 'danke', 'images')
-    this.workdao = new RestfullDAO(ctx.services.mongodb, 'danke', 'works')
-    this.weixindao = new RestfullDAO(ctx.services.mongodb, 'danke', 'weixin')
+  constructor (app) {
+    app.router.get(`/danke/snapshot`, async (ctx, next) => {
+      const workId = ctx.query.workId
+      this.takeSnapShot(workId)
+    })
   }
+
+   async startPuppeteer () {
+    this.browser = await puppeteer.launch()
+    this.page = await this.browser.newPage()
+    this.page.setViewport({
+      width: 960,
+      height: 960
+    })
+   }
+
+   async takeSnapShot (id) {
+    await this.page.goto('http://www.dankd.fun/capture/image/' + id)
+    page.on('domcontentloaded', async () => {
+      await page.screenshot({path: 'example.png'});
+  })
+
+  }
+
   async getTemplateList (ctx, next) {
     // const result = await this.templatedao.list(ctx.request.query)
     const list = []
