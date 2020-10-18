@@ -22,8 +22,8 @@ module.exports = {
     initRestService(app, 'public', 'deleted', '/danke/public/deleted')
     initRestService(app, 'public', 'vectors', '/danke/public/vector')
 
-    const cc = new controller(app)
-    cc.startPuppeteer()
+    // const cc = new controller(app)
+    // cc.startPuppeteer()
 
   },
   async bootComplete (app) {
