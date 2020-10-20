@@ -18,7 +18,7 @@ const Templates = {
 
 module.exports = class DankController {
   constructor (app) {
-    app.router.get(`/danke/snapshot`, async (ctx, next) => {
+    app.router.put(`/danke/avatar/download`, async (ctx, next) => {
       const workId = ctx.query.workId
       const filePath = await this.takeSnapShot(workId)
       await send(ctx, filePath)

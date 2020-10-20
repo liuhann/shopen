@@ -7,7 +7,10 @@ class RESTFullController {
     this.dbName = dbName
     this.coll = coll
     router.get(`${path}`, this.list.bind(this))
-    router.get(`${path}/:id`, this.getOne.bind(this))
+    router.get(`${path}/:id`, async (ctx, next) => {
+      ctx.body = await this.getOne(ctx.params.id)
+      await next()
+    })
     router.post(`${path}/id`, this.getMulti.bind(this))
     router.post(`${path}/distinct/:field`, this.distinct.bind(this))
     router.get(`${path}/regex/:prop/:value`, this.regex.bind(this))
@@ -15,7 +18,10 @@ class RESTFullController {
       await next()
     })
     router.post(`${path}`, middleware, this.create.bind(this))
-    router.patch(`${path}/:id`, middleware, this.patch.bind(this))
+    router.patch(`${path}/:id`, middleware, async (ctx, next) => {
+      ctx.body = await this.patch(ctx.params.id, ctx.request.body)
+      await next()
+    })
     router.delete(`${path}/:id`, middleware, this.delete.bind(this))
     debug('rest service booted ' + path)
   }
@@ -40,13 +46,6 @@ class RESTFullController {
     this.overwriteOnDuplicated = overwriteOnDuplicated
   }
 
-  /**
-   * 设置自动转换为ObjectId类型的字段
-   * @param keys
-   */
-  async setObjectIdField (keys) {
-    this.objectIdFields = keys
-  }
   /**
    * 设置子集和对应的外键， 主要用于目录、文件这类包含子项应用场景
    * @param subColl 子集名称
@@ -96,7 +95,6 @@ class RESTFullController {
 
     const db = await this.getDb()
     const coll = db.collection(this.coll)
-    this.convertForeignFieldValueToObjectId(ctx, query)
 
     // consider value convert to true or false
     for (let key in query) {
@@ -162,7 +160,6 @@ class RESTFullController {
     const db = await this.getDb()
     const coll = db.collection(this.coll)
     let result = null
-    this.convertForeignFieldValueToObjectId(ctx, object)
     for (let key in object) {
       if (key.match(/^_[a-z]+_id$/)) {
         object[key] = new ObjectID(object[key])
@@ -174,6 +171,7 @@ class RESTFullController {
       })
     } catch (e) {
       if (e instanceof MongoError) {
+        debug('err', e)
         if (this.overwriteOnDuplicated) {
           debug(`overwrite duplicated  ${this.coll} ${this.indexKey}=${object[this.indexKey]}`)
           await coll.deleteOne({
@@ -189,24 +187,6 @@ class RESTFullController {
       object
     }
     await next()
-  }
-
-  convertForeignFieldValueToObjectId (ctx, object) {
-    // 处理foreignkey 创建转换
-    try {
-      if (this.objectIdFields) {
-        for (let foreignKey of this.objectIdFields) {
-          if (object[foreignKey]) {
-            object[foreignKey] = new ObjectID(object[foreignKey])
-          }
-          if (foreignKey.match(/^_[a-z]+_id$/)) {
-            object[foreignKey] = new ObjectID(object[foreignKey])
-          }
-        }
-      }
-    } catch (e) {
-      ctx.throw(400, this.objectIdFields + ' must be ObjectId')
-    }
   }
 
   async getMulti (ctx, next) {
@@ -232,8 +212,7 @@ class RESTFullController {
     await next()
   }
 
-  async getOne (ctx, next) {
-    let objectId = ctx.params.id
+  async getOne (objectId) {
     const db = await this.getDb()
     const coll = db.collection(this.coll)
     try {
@@ -248,20 +227,19 @@ class RESTFullController {
         })
       }
       if (found) {
-        ctx.body = found
+        return found
       } else {
-        ctx.body = {
+        return {
           code: 404
         }
       }
     } catch (e) {
-      console.log(e)
-      ctx.body = {
+      debug('rest get one error:', e)
+      return {
         code: 400,
         msg: 'Bad Request Parameter'
       }
     }
-    await next()
   }
 
   /**
@@ -270,35 +248,24 @@ class RESTFullController {
    * @param next
    * @returns {Promise<void>}
    */
-  async patch (ctx, next) {
-    const body = ctx.request.body
+  async patch (objectId, body) {
     const db = await this.getDb()
     const coll = db.collection(this.coll)
     const setProperties = Object.assign({}, body)
 
-    // only admin can modify prop.system
-    if (setProperties.system && ctx.user.id !== this.admin) {
-      debug(`Patch prop.system ${ctx.user.id} !== ${this.admin}`)
-      ctx.throw(403, 'Patch on prop.system not allowed')
-      return
-    }
     setProperties.updated = new Date().getTime()
     if (setProperties._id) {
       delete setProperties._id
     }
-    let objectId = ctx.params.id
-
-    setProperties.packKey = new ObjectID(objectId)
-
-    await coll.findOneAndUpdate({
+    const query = this.indexKey ? {
+      [this.indexKey]: objectId
+    } : {
       '_id': new ObjectID(objectId)
-    }, {
+    }
+    await coll.findOneAndUpdate(query, {
       $set: setProperties
     })
-    ctx.body = {
-      code: 204
-    }
-    await next()
+    return setProperties
   }
 
   async delete (ctx, next) {
