@@ -262,10 +262,10 @@ class RESTFullController {
     } : {
       '_id': new ObjectID(objectId)
     }
-    await coll.findOneAndUpdate(query, {
+    const result = await coll.findOneAndUpdate(query, {
       $set: setProperties
     })
-    return setProperties
+    return result
   }
 
   async delete (ctx, next) {
