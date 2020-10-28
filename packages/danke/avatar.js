@@ -4,20 +4,20 @@ const EventEmitter = require('events')
 module.exports = class AvatarController extends EventEmitter {
   constructor (app) {
     super()
-    this.followRestService = app.context.services['danke.follows.rest']
+    this.workRestService = app.context.services['danke.works.rest']
     this.queue = []
     this.updated = 0
-    app.router.get(`/danke/avatar/download`, async (ctx, next) => {
+    app.router.get(`/danke/preview/download`, async (ctx, next) => {
       const workId = ctx.query.id
       ctx.body = {
-        url: await this.getAvatarUrl(workId)
+        url: await this.getWorkPreviewUrl(workId)
       }
     })
 
-    app.router.get(`/danke/avatar/ready`, async (ctx, next) => {
+    app.router.get(`/danke/preview/ready`, async (ctx, next) => {
       const { snapshot, id } = ctx.query
       debug('patched follow', snapshot, id)
-      await this.followRestService.patch(id, {
+      await this.workRestService.patch(id, {
         snapshot: snapshot
       })
       debug('patched follow', snapshot, id)
@@ -25,10 +25,13 @@ module.exports = class AvatarController extends EventEmitter {
       ctx.body = 'ok'
       await next()
     })
-    app.router.get('/danke/avatar/queue', async (ctx, next) => {
+    app.router.get('/danke/preview/queue', async (ctx, next) => {
       if (this.queue.length) {
+        const workId = this.queue.shift()
+        const work = await this.workRestService.getOne(workId)
         ctx.body = {
-          follow: this.queue.shift()
+          workId,
+          viewBox: work.viewBox
         }
         debug('queue shift', ctx.body)
       } else {
@@ -39,8 +42,8 @@ module.exports = class AvatarController extends EventEmitter {
     })
   }
 
-  async getAvatarUrl (id) {
-    const work = await this.followRestService.getOne(id)
+  async getWorkPreviewUrl (id) {
+    const work = await this.workRestService.getOne(id)
     if (work.snapshot) {
       return work.snapshot
     } else {

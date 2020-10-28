@@ -1,6 +1,8 @@
 const debug = require('debug')('restful')
 const { MongoError, ObjectID } = require('mongodb')
 
+const checkForHexRegExp = /^(?=[a-f\d]{24}$)(\d+[a-f]|[a-f]+\d)/i
+
 class RESTFullController {
   constructor ({ path, router, mongodb, dbName, coll, filter }) {
     this.mongodb = mongodb
@@ -217,13 +219,13 @@ class RESTFullController {
     const coll = db.collection(this.coll)
     try {
       let found = null
-      if (this.indexKey) {
+      if (checkForHexRegExp.test(objectId)) {
         found = await coll.findOne({
-          [this.indexKey]: objectId
+          '_id': new ObjectID(objectId)
         })
       } else {
         found = await coll.findOne({
-          '_id': new ObjectID(objectId)
+          [this.indexKey || '_id']: objectId
         })
       }
       if (found) {
@@ -257,10 +259,11 @@ class RESTFullController {
     if (setProperties._id) {
       delete setProperties._id
     }
-    const query = this.indexKey ? {
-      [this.indexKey]: objectId
-    } : {
+
+    const query = checkForHexRegExp.test(objectId) ? {
       '_id': new ObjectID(objectId)
+    }: {
+      [this.indexKey || '_id']: objectId
     }
     const result = await coll.findOneAndUpdate(query, {
       $set: setProperties

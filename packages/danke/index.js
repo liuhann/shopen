@@ -9,7 +9,7 @@ module.exports = {
     initRestService(app, 'danke', 'works', '/danke/work', true).ensureIndex('id', {
       overwriteOnDuplicated: false
     })
-    initRestService(app, 'danke', 'follows', '/danke/follow', true).ensureIndex('id', {
+    initRestService(app, 'danke', 'previews', '/danke/preview', true).ensureIndex('id', {
       overwriteOnDuplicated: true
     })
     // lost+found
