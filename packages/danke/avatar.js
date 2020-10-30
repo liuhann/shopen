@@ -1,6 +1,8 @@
 const debug = require('debug')('danke:avatar')
 const EventEmitter = require('events')
 
+const NOT_GENNERATED = ''
+
 module.exports = class AvatarController extends EventEmitter {
   constructor (app) {
     super()
@@ -13,7 +15,6 @@ module.exports = class AvatarController extends EventEmitter {
         url: await this.getWorkPreviewUrl(workId)
       }
     })
-
     app.router.get(`/danke/preview/ready`, async (ctx, next) => {
       const { snapshot, id } = ctx.query
       debug('patched follow', snapshot, id)
@@ -51,7 +52,8 @@ module.exports = class AvatarController extends EventEmitter {
         debug('queue', id)
         this.queue.push(id)
       }
-      return this.waitForSnapshot(id)
+      return NOT_GENNERATED
+      // return this.waitForSnapshot(id)
     }
   }
 

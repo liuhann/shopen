@@ -1,5 +1,6 @@
 const initRestService = require('../rest/init.js')
 const Avatar = require('./avatar')
+const Image = require('./image')
 module.exports = {
   name: 'danke',
   async created (app) {
@@ -30,6 +31,7 @@ module.exports = {
     // const cc = new controller(app)
     // cc.startPuppeteer()
     app.avatarService = new Avatar(app)
+    app.imageService = new Image(app)
   },
   async bootComplete (app) {
 
