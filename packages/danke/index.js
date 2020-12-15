@@ -26,6 +26,9 @@ module.exports = {
     // 公开资源
     initRestService(app, 'public', 'images', '/danke/public/image')
     initRestService(app, 'public', 'deleted', '/danke/public/deleted')
+
+    // 图片包
+    initRestService(app, 'public', 'packs', '/danke/pack')
     initRestService(app, 'public', 'vectors', '/danke/public/vector')
 
     // const cc = new controller(app)
