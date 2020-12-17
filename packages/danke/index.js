@@ -10,26 +10,32 @@ module.exports = {
     initRestService(app, 'danke', 'works', '/danke/work', true).ensureIndex('id', {
       overwriteOnDuplicated: false
     })
+    // 未注册用户的作品
+    initRestService(app, 'anonymous', 'works', '/danke/anonymous/work', true).ensureIndex('id', {
+      overwriteOnDuplicated: false
+    })
     initRestService(app, 'danke', 'previews', '/danke/preview', true).ensureIndex('id', {
       overwriteOnDuplicated: true
     })
     // lost+found
     initRestService(app, 'trash', 'works', '/trash/work', true)
-    // HTML组件
-    initRestService(app, 'danke', 'htmls', '/danke/h5')
-    // 资源
-    // 过滤器组件
-    initRestService(app, 'danke', 'styles', '/danke/style')
     // 音频
     initRestService(app, 'danke', 'audios', '/danke/audio')
-    initRestService(app, 'danke', 'images', '/danke/image')
+    // 字体
+    initRestService(app, 'danke', 'fonts', '/danke/font')
+
     // 公开资源
     initRestService(app, 'public', 'images', '/danke/public/image')
     initRestService(app, 'public', 'deleted', '/danke/public/deleted')
 
-    // 图片包
+    // 资源包 （包括vector和photo）
     initRestService(app, 'public', 'packs', '/danke/pack')
     initRestService(app, 'public', 'vectors', '/danke/public/vector')
+
+    // 个人图片
+    initRestService(app, 'danke', 'images', '/danke/image')
+    // 未注册用户图片
+    initRestService(app, 'anonymous', 'images', '/danke/anonymous/image')
 
     // const cc = new controller(app)
     // cc.startPuppeteer()
