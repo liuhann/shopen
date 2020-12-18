@@ -36,7 +36,6 @@ module.exports = {
     initRestService(app, 'danke', 'images', '/danke/image')
     // 未注册用户图片
     initRestService(app, 'anonymous', 'images', '/danke/anonymous/image')
-
     // const cc = new controller(app)
     // cc.startPuppeteer()
     app.avatarService = new Avatar(app)
